@@ -7,7 +7,6 @@ class PostCard extends StatefulWidget {
   final String imageUrl;
   final String profilePicUrl;
   final String caption;
-  final double height;
 
   const PostCard(
       {super.key,
@@ -16,8 +15,7 @@ class PostCard extends StatefulWidget {
       required this.initialLikes,
       required this.imageUrl,
       required this.profilePicUrl,
-      required this.caption,
-      required this.height});
+      required this.caption});
 
   @override
   State<PostCard> createState() => _PostCardState();
@@ -36,7 +34,6 @@ class _PostCardState extends State<PostCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: widget.height,
       padding: const EdgeInsets.all(20.0),
       child: Card(
         elevation: 10,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:wanderverse_app/screens/post-sharing/createPostScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/homeScreen.dart';
-import 'package:wanderverse_app/screens/post-sharing/useProfileScreen.dart';
+import 'package:wanderverse_app/screens/post-sharing/userProfileScreen.dart';
 
 class NavigatorScreen extends StatefulWidget {
   final String initialRoute;

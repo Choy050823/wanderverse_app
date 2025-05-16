@@ -36,7 +36,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               'imageUrl': imageUrl,
               'profilePicUrl': profilePicUrl,
               'caption': caption,
-              'height': 500 + Random().nextInt(200)
             });
   }
 
@@ -59,7 +58,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 imageUrl: post['imageUrl'],
                 profilePicUrl: post['profilePicUrl'],
                 caption: post['caption'],
-                height: post['height'],
               );
             }),
       ),
