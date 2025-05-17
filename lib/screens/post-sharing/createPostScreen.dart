@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:wanderverse_app/utils/widgets/imagePickerCard.dart';
 
 class CreatePostScreen extends StatefulWidget {
-  const CreatePostScreen({super.key});
+  const CreatePostScreen({
+    super.key,
+  });
 
   @override
   State<CreatePostScreen> createState() => _CreatePostScreenState();
@@ -10,6 +13,6 @@ class CreatePostScreen extends StatefulWidget {
 class _CreatePostScreenState extends State<CreatePostScreen> {
   @override
   Widget build(BuildContext context) {
-    return const Text('create');
+    return const ImagePickerCard();
   }
 }
