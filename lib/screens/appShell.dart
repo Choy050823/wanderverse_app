@@ -14,23 +14,35 @@ class AppShell extends StatefulWidget {
 class _AppShellState extends State<AppShell> {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   late String activeRoute;
-  Widget? oldScreen;
+  bool _showOverlay = false;
 
   void _navigateTo(String route) {
+    if (route == '/create-post') {
+      setState(() {
+        _showOverlay = true;
+      });
+    } else {
+      setState(() {
+        activeRoute = route;
+      });
+      _navigatorKey.currentState?.pushReplacementNamed(activeRoute);
+    }
+  }
+
+  void _closeOverlay() {
     setState(() {
-      oldScreen = _getScreenForRoute(activeRoute);
-      activeRoute = route;
+      _showOverlay = false;
     });
-    _navigatorKey.currentState?.pushReplacementNamed(activeRoute);
   }
 
   Widget _getScreenForRoute(String route) {
     switch (route) {
+      case '/':
+        return const HomeScreen();
       case '/create-post':
         return const CreatePostScreen();
       case '/user-profile':
         return const UserProfileScreen();
-      case '/home':
       default:
         return const HomeScreen();
     }
@@ -40,7 +52,7 @@ class _AppShellState extends State<AppShell> {
   void initState() {
     super.initState();
     setState(() {
-      activeRoute = '/home';
+      activeRoute = '/';
     });
   }
 
@@ -60,49 +72,58 @@ class _AppShellState extends State<AppShell> {
           ],
         ),
       ),
-      body: Row(
+      body: Stack(
         children: [
-          SizedBox(
-              width: 200,
-              child: SidebarMenu(
-                  activeRoute: activeRoute, onRouteSelected: _navigateTo)),
-          Expanded(
-            child: Navigator(
-              key: _navigatorKey,
-              onGenerateRoute: (RouteSettings settings) {
-                final newScreen = _getScreenForRoute(settings.name ?? '/home');
-                return PageRouteBuilder(
-                    pageBuilder: (_, __, ____) => Stack(
-                          children: [
-                            // Old screen slides out to the left
-                            if (oldScreen != null)
-                              SlideTransition(
-                                position: Tween<Offset>(
-                                  begin: Offset.zero,
-                                  end: const Offset(-1.0, 0.0),
-                                ).animate(CurvedAnimation(
-                                  parent: __,
-                                  curve: Curves.easeInOut,
-                                )),
-                                child: oldScreen,
-                              ),
-                            // New screen slides in from the right
-                            SlideTransition(
-                              position: Tween<Offset>(
-                                begin: const Offset(1.0, 0.0),
-                                end: Offset.zero,
-                              ).animate(CurvedAnimation(
-                                parent: __,
-                                curve: Curves.easeInOut,
-                              )),
-                              child: newScreen,
-                            ),
-                          ],
-                        ),
-                    transitionDuration: const Duration(seconds: 1));
-              },
-            ),
+          Row(
+            children: [
+              SizedBox(
+                  width: 200,
+                  child: SidebarMenu(
+                      activeRoute: activeRoute, onRouteSelected: _navigateTo)),
+              Expanded(
+                child: Navigator(
+                  key: _navigatorKey,
+                  onGenerateRoute: (RouteSettings settings) {
+                    final newScreen = _getScreenForRoute(settings.name ?? '/');
+                    return PageRouteBuilder(
+                        pageBuilder: (context, animation, _) {
+                      var curveTween = CurveTween(curve: Curves.easeIn);
+                      return FadeTransition(
+                        opacity: animation.drive(curveTween),
+                        child: newScreen,
+                      );
+                    });
+                  },
+                ),
+              ),
+            ],
           ),
+          if (_showOverlay)
+            Stack(
+              children: [
+                Positioned.fill(
+                  child: GestureDetector(
+                    onTap: _closeOverlay, 
+                    behavior: HitTestBehavior.opaque,  
+                    child: Container(
+                      color: Colors.black54, 
+                    ),
+                  ),
+                ),
+
+                Center(
+                  child: GestureDetector(
+                    onTap: () {},
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16),
+                      child: CreatePostScreen(
+                        onClose: _closeOverlay,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            )
         ],
       ),
     );

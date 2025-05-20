@@ -31,6 +31,7 @@ class Post with _$Post {
       required String creatorId,
       required int likesCount,
       required int commentsCount,
+      required String destinationId,
       required List<String> tags}) = _Post;
 
   factory Post.fromJson(Map<String, dynamic> json) => _$PostFromJson(json);

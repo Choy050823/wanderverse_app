@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 
 class MenuItem {
@@ -14,13 +16,13 @@ class MenuItem {
 }
 
 class DroppedFile {
-  final String url;
+  final Uint8List fileData;
   final String name;
   final String mime;
   final int bytes;
 
   const DroppedFile(
-      {required this.url,
+      {required this.fileData,
       required this.name,
       required this.mime,
       required this.bytes});
@@ -38,7 +40,7 @@ class DroppedFile {
 const List<MenuItem> menuItems = [
   MenuItem(
     pageName: 'Home',
-    route: '/home',
+    route: '/',
     inactiveIcon: Icons.home_outlined,
     activeIcon: Icons.home,
   ),

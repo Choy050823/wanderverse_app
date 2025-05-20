@@ -324,6 +324,7 @@ mixin _$Post {
   String get creatorId => throw _privateConstructorUsedError;
   int get likesCount => throw _privateConstructorUsedError;
   int get commentsCount => throw _privateConstructorUsedError;
+  String get destinationId => throw _privateConstructorUsedError;
   List<String> get tags => throw _privateConstructorUsedError;
 
   /// Serializes this Post to a JSON map.
@@ -350,6 +351,7 @@ abstract class $PostCopyWith<$Res> {
       String creatorId,
       int likesCount,
       int commentsCount,
+      String destinationId,
       List<String> tags});
 }
 
@@ -377,6 +379,7 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
     Object? creatorId = null,
     Object? likesCount = null,
     Object? commentsCount = null,
+    Object? destinationId = null,
     Object? tags = null,
   }) {
     return _then(_value.copyWith(
@@ -416,6 +419,10 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
           ? _value.commentsCount
           : commentsCount // ignore: cast_nullable_to_non_nullable
               as int,
+      destinationId: null == destinationId
+          ? _value.destinationId
+          : destinationId // ignore: cast_nullable_to_non_nullable
+              as String,
       tags: null == tags
           ? _value.tags
           : tags // ignore: cast_nullable_to_non_nullable
@@ -441,6 +448,7 @@ abstract class _$$PostImplCopyWith<$Res> implements $PostCopyWith<$Res> {
       String creatorId,
       int likesCount,
       int commentsCount,
+      String destinationId,
       List<String> tags});
 }
 
@@ -465,6 +473,7 @@ class __$$PostImplCopyWithImpl<$Res>
     Object? creatorId = null,
     Object? likesCount = null,
     Object? commentsCount = null,
+    Object? destinationId = null,
     Object? tags = null,
   }) {
     return _then(_$PostImpl(
@@ -504,6 +513,10 @@ class __$$PostImplCopyWithImpl<$Res>
           ? _value.commentsCount
           : commentsCount // ignore: cast_nullable_to_non_nullable
               as int,
+      destinationId: null == destinationId
+          ? _value.destinationId
+          : destinationId // ignore: cast_nullable_to_non_nullable
+              as String,
       tags: null == tags
           ? _value._tags
           : tags // ignore: cast_nullable_to_non_nullable
@@ -525,6 +538,7 @@ class _$PostImpl implements _Post {
       required this.creatorId,
       required this.likesCount,
       required this.commentsCount,
+      required this.destinationId,
       required final List<String> tags})
       : _imageUrls = imageUrls,
         _tags = tags;
@@ -556,6 +570,8 @@ class _$PostImpl implements _Post {
   final int likesCount;
   @override
   final int commentsCount;
+  @override
+  final String destinationId;
   final List<String> _tags;
   @override
   List<String> get tags {
@@ -566,7 +582,7 @@ class _$PostImpl implements _Post {
 
   @override
   String toString() {
-    return 'Post(id: $id, title: $title, content: $content, imageUrls: $imageUrls, createdAt: $createdAt, updatedAt: $updatedAt, creatorId: $creatorId, likesCount: $likesCount, commentsCount: $commentsCount, tags: $tags)';
+    return 'Post(id: $id, title: $title, content: $content, imageUrls: $imageUrls, createdAt: $createdAt, updatedAt: $updatedAt, creatorId: $creatorId, likesCount: $likesCount, commentsCount: $commentsCount, destinationId: $destinationId, tags: $tags)';
   }
 
   @override
@@ -589,6 +605,8 @@ class _$PostImpl implements _Post {
                 other.likesCount == likesCount) &&
             (identical(other.commentsCount, commentsCount) ||
                 other.commentsCount == commentsCount) &&
+            (identical(other.destinationId, destinationId) ||
+                other.destinationId == destinationId) &&
             const DeepCollectionEquality().equals(other._tags, _tags));
   }
 
@@ -605,6 +623,7 @@ class _$PostImpl implements _Post {
       creatorId,
       likesCount,
       commentsCount,
+      destinationId,
       const DeepCollectionEquality().hash(_tags));
 
   /// Create a copy of Post
@@ -634,6 +653,7 @@ abstract class _Post implements Post {
       required final String creatorId,
       required final int likesCount,
       required final int commentsCount,
+      required final String destinationId,
       required final List<String> tags}) = _$PostImpl;
 
   factory _Post.fromJson(Map<String, dynamic> json) = _$PostImpl.fromJson;
@@ -656,6 +676,8 @@ abstract class _Post implements Post {
   int get likesCount;
   @override
   int get commentsCount;
+  @override
+  String get destinationId;
   @override
   List<String> get tags;
 
