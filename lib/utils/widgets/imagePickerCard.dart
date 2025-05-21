@@ -151,7 +151,6 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
               ? _buildImagePreview()
               : _buildImagePickerLayout(),
         ),
-
         if (_showCaptionPanel && _selectedFiles.isNotEmpty)
           TweenAnimationBuilder<double>(
             duration: const Duration(milliseconds: 500),
@@ -209,7 +208,7 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: Colors.grey[900],
+            color: isHighlighted ? Colors.grey[500] : Colors.grey[900],
             borderRadius: BorderRadius.circular(10),
           ),
           child: Column(
@@ -328,7 +327,7 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
                                       Colors.black.withOpacity(0.6)),
                                 ),
                                 onPressed: _previousImage,
-                                icon: const Icon(Icons.arrow_back_ios))),
+                                icon: const Icon(Icons.chevron_left))),
                         Positioned(
                             right: 10,
                             child: IconButton(
@@ -339,7 +338,7 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
                                       Colors.black.withOpacity(0.6)),
                                 ),
                                 onPressed: _nextImage,
-                                icon: const Icon(Icons.arrow_forward_ios))),
+                                icon: const Icon(Icons.chevron_right))),
                         Positioned(
                           bottom: 10,
                           child: Row(
@@ -393,7 +392,6 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
     );
   }
 
-
   Widget _buildImagePreview() {
     return Stack(
       fit: StackFit.expand,
@@ -440,7 +438,7 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
                             ),
                           ),
                           onPressed: _previousImage,
-                          icon: const Icon(Icons.arrow_back_ios),
+                          icon: const Icon(Icons.chevron_left),
                         ),
                       ),
                       Positioned(
@@ -454,7 +452,7 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
                             ),
                           ),
                           onPressed: _nextImage,
-                          icon: const Icon(Icons.arrow_forward_ios),
+                          icon: const Icon(Icons.chevron_right),
                         ),
                       ),
 
@@ -516,11 +514,10 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
                   });
                 },
                 icon: const Icon(
-                  Icons.arrow_back_ios,
+                  Icons.chevron_left,
                   color: Colors.white,
                 ),
               ),
-
               const Text(
                 'Create New Post',
                 style: TextStyle(
@@ -529,7 +526,6 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue.shade600,
@@ -557,9 +553,7 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
               ),
             ],
           ),
-
           const SizedBox(height: 24),
-
           Expanded(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(16),
@@ -634,7 +628,6 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
           ],
         ),
         const SizedBox(height: 10),
-
         Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
