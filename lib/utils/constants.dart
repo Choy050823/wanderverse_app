@@ -78,5 +78,5 @@ const List<MenuItem> menuItems = [
       pageName: 'User Profile',
       route: '/user-profile',
       inactiveIcon: Icons.person_2_outlined,
-      activeIcon: Icons.person_2)
+      activeIcon: Icons.person_2),
 ];

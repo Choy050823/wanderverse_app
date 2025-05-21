@@ -1,24 +1,26 @@
 import 'package:flutter/material.dart';
-import 'package:wanderverse_app/screens/authentication/signUpPage.dart';
 import 'package:wanderverse_app/utils/widgets/loginImageSlider.dart';
-import 'package:wanderverse_app/utils/widgets/socialIconsButton.dart';
 import 'package:wanderverse_app/utils/widgets/textField.dart';
 
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
+import '../../utils/widgets/socialIconsButton.dart';
+
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
+    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -55,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
         const LoginImageSlider(),
 
         // Right: Login Form
-        Expanded(child: _buildLoginForm()),
+        Expanded(child: _buildSingUpForm()),
       ],
     );
   }
@@ -104,13 +106,13 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
 
-          _buildLoginForm()
+          _buildSingUpForm()
         ],
       ),
     );
   }
 
-  Widget _buildLoginForm() {
+  Widget _buildSingUpForm() {
     return Padding(
         padding: const EdgeInsets.all(30.0),
         child: Form(
@@ -120,7 +122,7 @@ class _LoginPageState extends State<LoginPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                'Log in to your account',
+                'Create an account',
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -130,18 +132,15 @@ class _LoginPageState extends State<LoginPage> {
               Row(
                 children: [
                   const Text(
-                    "Don't have an account?",
+                    "Already have an account?",
                     style: TextStyle(color: Colors.white70),
                   ),
                   TextButton(
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const SignUpPage()));
+                        Navigator.pop(context);
                       },
                       child: const Text(
-                        'Sign Up',
+                        'Log In',
                         style: TextStyle(color: Colors.purpleAccent),
                       ))
                 ],
@@ -150,13 +149,27 @@ class _LoginPageState extends State<LoginPage> {
                 height: 32,
               ),
 
+              // Username
+              buildTextField(
+                  controller: _usernameController,
+                  labelText: 'Username',
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Username required';
+                    }
+                    return null;
+                  }),
+              const SizedBox(
+                height: 16,
+              ),
+
               // Email
               buildTextField(
                   controller: _emailController,
                   labelText: 'Email',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Please enter your email';
+                      return 'Email required';
                     }
 
                     if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
@@ -187,29 +200,17 @@ class _LoginPageState extends State<LoginPage> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a password';
                     }
+                    if (value.length < 8) {
+                      return 'Password must be at least 8 characters';
+                    }
                     return null;
                   }),
 
               const SizedBox(
-                height: 8,
+                height: 32,
               ),
 
-              // Forgot Password
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {},
-                  child: const Text(
-                    'Forgot Password?',
-                    style: TextStyle(color: Colors.purpleAccent),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 24,
-              ),
-
-              // Login Button
+              // Create account Button
               SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -225,7 +226,7 @@ class _LoginPageState extends State<LoginPage> {
                       }
                     },
                     child: const Text(
-                      'Log In',
+                      'Create Account',
                       style: TextStyle(fontSize: 16),
                     )),
               ),

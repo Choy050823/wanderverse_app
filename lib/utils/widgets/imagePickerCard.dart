@@ -32,12 +32,12 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
   final TextEditingController _destinationController = TextEditingController();
   final FocusNode _destinationFocusNode = FocusNode();
 
-  final double imagePickerWidth = 400;
-  final double imagePickerHeight = 400;
-  final double imageWidth = 400;
-  final double imageHeight = 400;
-  final double imageWithCaptionWidth = 800;
-  final double captionHeight = 400;
+  final double imagePickerWidth = 500;
+  final double imagePickerHeight = 500;
+  final double imageWidth = 500;
+  final double imageHeight = 500;
+  final double imageWithCaptionWidth = 1000;
+  final double captionHeight = 500;
 
   void _previousImage() {
     if (_currentImagePage > 0) {

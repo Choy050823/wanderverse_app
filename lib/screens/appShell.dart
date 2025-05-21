@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:wanderverse_app/screens/authentication/loginScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/createPostScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/homeScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/userProfileScreen.dart';
 import 'package:wanderverse_app/screens/sideBar.dart';
 
 class AppShell extends StatefulWidget {
-  const AppShell({super.key});
+  final VoidCallback onLogout;
+
+  const AppShell({super.key, required this.onLogout});
 
   @override
   State<AppShell> createState() => _AppShellState();
@@ -79,7 +82,10 @@ class _AppShellState extends State<AppShell> {
               SizedBox(
                   width: 200,
                   child: SidebarMenu(
-                      activeRoute: activeRoute, onRouteSelected: _navigateTo)),
+                    activeRoute: activeRoute,
+                    onRouteSelected: _navigateTo,
+                    onLogout: widget.onLogout,
+                  )),
               Expanded(
                 child: Navigator(
                   key: _navigatorKey,
@@ -103,14 +109,13 @@ class _AppShellState extends State<AppShell> {
               children: [
                 Positioned.fill(
                   child: GestureDetector(
-                    onTap: _closeOverlay, 
-                    behavior: HitTestBehavior.opaque,  
+                    onTap: _closeOverlay,
+                    behavior: HitTestBehavior.opaque,
                     child: Container(
-                      color: Colors.black54, 
+                      color: Colors.black54,
                     ),
                   ),
                 ),
-
                 Center(
                   child: GestureDetector(
                     onTap: () {},

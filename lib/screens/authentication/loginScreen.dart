@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:wanderverse_app/screens/authentication/signUpScreen.dart';
 import 'package:wanderverse_app/utils/widgets/loginImageSlider.dart';
+import 'package:wanderverse_app/utils/widgets/socialIconsButton.dart';
 import 'package:wanderverse_app/utils/widgets/textField.dart';
 
-import '../../utils/widgets/socialIconsButton.dart';
+class LoginScreen extends StatefulWidget {
+  final VoidCallback onLogin;
 
-class SignUpPage extends StatefulWidget {
-  const SignUpPage({super.key});
+  const LoginScreen({super.key, required this.onLogin});
 
   @override
-  State<SignUpPage> createState() => _SignUpPageState();
+  State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _SignUpPageState extends State<SignUpPage> {
+class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _obscurePassword = true;
 
   @override
   void dispose() {
-    _usernameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
@@ -57,7 +57,7 @@ class _SignUpPageState extends State<SignUpPage> {
         const LoginImageSlider(),
 
         // Right: Login Form
-        Expanded(child: _buildSingUpForm()),
+        Expanded(child: _buildLoginForm()),
       ],
     );
   }
@@ -106,13 +106,13 @@ class _SignUpPageState extends State<SignUpPage> {
             ),
           ),
 
-          _buildSingUpForm()
+          _buildLoginForm()
         ],
       ),
     );
   }
 
-  Widget _buildSingUpForm() {
+  Widget _buildLoginForm() {
     return Padding(
         padding: const EdgeInsets.all(30.0),
         child: Form(
@@ -122,7 +122,7 @@ class _SignUpPageState extends State<SignUpPage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               const Text(
-                'Create an account',
+                'Log in to your account',
                 style: TextStyle(
                     color: Colors.white,
                     fontSize: 24,
@@ -132,15 +132,18 @@ class _SignUpPageState extends State<SignUpPage> {
               Row(
                 children: [
                   const Text(
-                    "Already have an account?",
+                    "Don't have an account?",
                     style: TextStyle(color: Colors.white70),
                   ),
                   TextButton(
                       onPressed: () {
-                        Navigator.pop(context);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SignUpScreen()));
                       },
                       child: const Text(
-                        'Log In',
+                        'Sign Up',
                         style: TextStyle(color: Colors.purpleAccent),
                       ))
                 ],
@@ -149,27 +152,13 @@ class _SignUpPageState extends State<SignUpPage> {
                 height: 32,
               ),
 
-              // Username
-              buildTextField(
-                  controller: _usernameController,
-                  labelText: 'Username',
-                  validator: (value) {
-                    if (value == null || value.isEmpty) {
-                      return 'Username required';
-                    }
-                    return null;
-                  }),
-              const SizedBox(
-                height: 16,
-              ),
-
               // Email
               buildTextField(
                   controller: _emailController,
                   labelText: 'Email',
                   validator: (value) {
                     if (value == null || value.isEmpty) {
-                      return 'Email required';
+                      return 'Please enter your email';
                     }
 
                     if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
@@ -200,17 +189,29 @@ class _SignUpPageState extends State<SignUpPage> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter a password';
                     }
-                    if (value.length < 8) {
-                      return 'Password must be at least 8 characters';
-                    }
                     return null;
                   }),
 
               const SizedBox(
-                height: 32,
+                height: 8,
               ),
 
-              // Create account Button
+              // Forgot Password
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {},
+                  child: const Text(
+                    'Forgot Password?',
+                    style: TextStyle(color: Colors.purpleAccent),
+                  ),
+                ),
+              ),
+              const SizedBox(
+                height: 24,
+              ),
+
+              // Login Button
               SizedBox(
                 width: double.infinity,
                 height: 50,
@@ -222,11 +223,12 @@ class _SignUpPageState extends State<SignUpPage> {
                             borderRadius: BorderRadius.circular(8))),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        // Login function here
+                        // Call the login callback to notify parent
+                        widget.onLogin();
                       }
                     },
                     child: const Text(
-                      'Create Account',
+                      'Log In',
                       style: TextStyle(fontSize: 16),
                     )),
               ),
