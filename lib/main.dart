@@ -1,45 +1,43 @@
 import 'package:flutter/material.dart';
-import 'package:wanderverse_app/screens/appShell.dart';
-import 'package:wanderverse_app/screens/authentication/loginScreen.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wanderverse_app/providers/authentication/authService.dart';
+import 'package:wanderverse_app/router/appRouteParser.dart';
+import 'package:wanderverse_app/router/appState.dart';
+import 'package:wanderverse_app/router/routerDelegate.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 void main() {
-  runApp(const MyApp());
+  setUrlStrategy(PathUrlStrategy());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatefulWidget {
+class MyApp extends ConsumerStatefulWidget {
   const MyApp({super.key});
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  ConsumerState<MyApp> createState() => _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
-  // This would be managed by your auth service in a real app
-  bool _isLoggedIn = false;
-
-  void login() {
-    setState(() {
-      _isLoggedIn = true;
-    });
-  }
-
-  void logout() {
-    setState(() {
-      _isLoggedIn = false;
-    });
-  }
-
+class _MyAppState extends ConsumerState<MyApp> {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    // Initialize providers
+    ref.watch(appstateProvider);
+    ref.watch(authServiceProvider);
+
+    final routerDelegate = ref.watch(routerDelegateProvider);
+    final routeInformationParser = AppRouteParser();
+
+    return MaterialApp.router(
       title: 'Wanderverse',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
         useMaterial3: true,
       ),
-      home: _isLoggedIn
-          ? AppShell(onLogout: logout)
-          : LoginScreen(onLogin: login),
+      routerDelegate: routerDelegate,
+      routeInformationParser: routeInformationParser,
+      // routeInformationProvider: PlatformRouteInformationProvider(
+      //     initialRouteInformation: const RouteInformation(location: '/auth')),
     );
   }
 }
