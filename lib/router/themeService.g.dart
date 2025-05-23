@@ -1,24 +1,24 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'authService.dart';
+part of 'themeService.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authServiceHash() => r'cd32fbd0858559a1ca66309a36eb3738c79a22ee';
+String _$themeServiceHash() => r'6b8a79f2f520094c4225b3ccc2e9394ad3fa5aad';
 
-/// See also [AuthService].
-@ProviderFor(AuthService)
-final authServiceProvider = NotifierProvider<AuthService, AuthState>.internal(
-  AuthService.new,
-  name: r'authServiceProvider',
+/// See also [ThemeService].
+@ProviderFor(ThemeService)
+final themeServiceProvider = NotifierProvider<ThemeService, ThemeMode>.internal(
+  ThemeService.new,
+  name: r'themeServiceProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$authServiceHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$themeServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$AuthService = Notifier<AuthState>;
+typedef _$ThemeService = Notifier<ThemeMode>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

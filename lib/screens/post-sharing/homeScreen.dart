@@ -26,38 +26,41 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   void initState() {
     super.initState();
     posts = List.generate(
-        20,
-        (index) => {
-              'creatorId': creatorId,
-              'destination': destination,
-              'initialLikes': initialLikes,
-              'imageUrl': imageUrl,
-              'profilePicUrl': profilePicUrl,
-              'caption': caption,
-            });
+      20,
+      (index) => {
+        'creatorId': creatorId,
+        'destination': destination,
+        'initialLikes': initialLikes,
+        'imageUrl': imageUrl,
+        'profilePicUrl': profilePicUrl,
+        'caption': caption,
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Background color comes from theme automatically
       body: Center(
         child: MasonryGridView.count(
-            itemCount: 20,
-            crossAxisCount: 4,
-            mainAxisSpacing: 4.0,
-            crossAxisSpacing: 4.0,
-            padding: const EdgeInsets.all(8.0),
-            itemBuilder: (context, index) {
-              final post = posts[index];
-              return PostCard(
-                creatorId: post['creatorId'],
-                destination: post['destination'],
-                initialLikes: post['initialLikes'],
-                imageUrl: post['imageUrl'],
-                profilePicUrl: post['profilePicUrl'],
-                caption: post['caption'],
-              );
-            }),
+          itemCount: 20,
+          crossAxisCount: 4,
+          mainAxisSpacing: 4.0,
+          crossAxisSpacing: 4.0,
+          padding: const EdgeInsets.all(8.0),
+          itemBuilder: (context, index) {
+            final post = posts[index];
+            return PostCard(
+              creatorId: post['creatorId'],
+              destination: post['destination'],
+              initialLikes: post['initialLikes'],
+              imageUrl: post['imageUrl'],
+              profilePicUrl: post['profilePicUrl'],
+              caption: post['caption'],
+            );
+          },
+        ),
       ),
     );
   }

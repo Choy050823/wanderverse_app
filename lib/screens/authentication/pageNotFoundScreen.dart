@@ -14,6 +14,7 @@ class _PageNotFoundScreenState extends ConsumerState<PageNotFoundScreen> {
   @override
   Widget build(BuildContext context) {
     final isAuthenticated = ref.watch(authServiceProvider).isAuthenticated;
+    final theme = Theme.of(context);
 
     return Scaffold(
       appBar: AppBar(
@@ -23,20 +24,25 @@ class _PageNotFoundScreenState extends ConsumerState<PageNotFoundScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(
+            Icon(
               Icons.error_outline,
               size: 80,
-              color: Colors.red,
+              color: theme.colorScheme.error,
             ),
             const SizedBox(height: 20),
-            const Text(
+            Text(
               'Page Not Found',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              style: theme.textTheme.headlineMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onBackground,
+              ),
             ),
             const SizedBox(height: 10),
-            const Text(
+            Text(
               'The requested page does not exist.',
-              style: TextStyle(fontSize: 16),
+              style: theme.textTheme.bodyLarge?.copyWith(
+                color: theme.colorScheme.onBackground.withOpacity(0.7),
+              ),
             ),
             const SizedBox(height: 30),
             ElevatedButton(

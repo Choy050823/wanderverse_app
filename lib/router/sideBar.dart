@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wanderverse_app/providers/authentication/authService.dart';
-import 'package:wanderverse_app/router/appState.dart';
 import 'package:wanderverse_app/utils/constants.dart';
 
 class SidebarMenu extends ConsumerStatefulWidget {

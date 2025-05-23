@@ -6,6 +6,7 @@ import 'package:wanderverse_app/screens/post-sharing/userProfileScreen.dart';
 import 'package:wanderverse_app/router/appState.dart';
 import 'package:wanderverse_app/router/routerDelegate.dart';
 import 'package:wanderverse_app/router/sideBar.dart';
+import 'package:wanderverse_app/utils/widgets/themeToggleButton.dart';
 
 class AppShell extends ConsumerStatefulWidget {
   const AppShell({super.key});
@@ -50,6 +51,12 @@ class _AppShellState extends ConsumerState<AppShell> {
             const Text('Wanderverse'),
           ],
         ),
+        actions: const [
+          ThemeToggleButton(),
+          SizedBox(
+            width: 8,
+          )
+        ],
       ),
       body: Stack(
         children: [

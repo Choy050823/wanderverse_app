@@ -6,19 +6,46 @@ Widget buildTextField(
     bool obscureText = false,
     Widget? suffixIcon,
     String? Function(String?)? validator}) {
-  return TextFormField(
-    controller: controller,
-    obscureText: obscureText,
-    style: const TextStyle(color: Colors.white),
-    decoration: InputDecoration(
+  return Builder(builder: (context) {
+    final theme = Theme.of(context);
+
+    return TextFormField(
+      controller: controller,
+      obscureText: obscureText,
+      // Use theme colors for text
+      style: TextStyle(color: theme.colorScheme.onSurface),
+      decoration: InputDecoration(
         labelText: labelText,
-        labelStyle: const TextStyle(color: Colors.grey),
+        // Use theme colors for label
+        labelStyle:
+            TextStyle(color: theme.colorScheme.onSurface.withOpacity(0.7)),
         filled: true,
-        fillColor: const Color(0xFF2A2632),
+        // Use theme colors for background
+        fillColor: theme.colorScheme.surface,
         border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8),
-            borderSide: BorderSide.none),
-        suffixIcon: suffixIcon),
-    validator: validator,
-  );
+          borderRadius: BorderRadius.circular(8),
+          borderSide:
+              BorderSide(color: theme.colorScheme.primary.withOpacity(0.3)),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide:
+              BorderSide(color: theme.colorScheme.onSurface.withOpacity(0.2)),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: theme.colorScheme.primary),
+        ),
+        suffixIcon: suffixIcon != null
+            ? IconTheme(
+                data: IconThemeData(
+                  color: theme.colorScheme.onSurface.withOpacity(0.7),
+                ),
+                child: suffixIcon,
+              )
+            : null,
+      ),
+      validator: validator,
+    );
+  });
 }

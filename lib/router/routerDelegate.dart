@@ -7,6 +7,7 @@ import 'package:wanderverse_app/router/appShell.dart';
 import 'package:wanderverse_app/screens/authentication/pageNotFoundScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/homeScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/userProfileScreen.dart';
+import 'package:wanderverse_app/utils/widgets/FadeAnimation.dart';
 
 final routerDelegateProvider = Provider<AppRouterDelegate>((ref) {
   return AppRouterDelegate(ref);
@@ -55,7 +56,7 @@ class AppRouterDelegate extends RouterDelegate<AppStateData>
 
         // Check if we're still initializing
         if (authState.isLoading) {
-          pages.add(const MaterialPage(
+          pages.add(const FadeAnimation(
             key: ValueKey('Loading'),
             child: Scaffold(
               body: Center(child: CircularProgressIndicator()),
@@ -71,7 +72,7 @@ class AppRouterDelegate extends RouterDelegate<AppStateData>
         // First check if this is the unknown route - THIS MUST COME FIRST
         if (appState.route == AppStateData.unknown) {
           print('Showing Page Not Found screen');
-          pages.add(const MaterialPage(
+          pages.add(const FadeAnimation(
             key: ValueKey('PageNotFound'),
             name: AppStateData.unknown,
             child: PageNotFoundScreen(),
@@ -79,7 +80,7 @@ class AppRouterDelegate extends RouterDelegate<AppStateData>
         } else if (!authState.isAuthenticated) {
           // Not authenticated - show auth screen
           print('Showing Auth screen');
-          pages.add(const MaterialPage(
+          pages.add(const FadeAnimation(
             key: ValueKey('Auth'),
             name: '/auth',
             child: AuthScreen(),
@@ -88,7 +89,7 @@ class AppRouterDelegate extends RouterDelegate<AppStateData>
           // Authenticated - show app shell
           print('Showing AppShell');
           pages.add(
-            MaterialPage(
+            FadeAnimation(
               key: const ValueKey('AppShell'),
               name: appState.route,
               child: const AppShell(),
@@ -141,7 +142,7 @@ class InnerRouterDelegate extends RouterDelegate<AppStateData>
     switch (appState.route) {
       case AppStateData.home:
         pages.add(
-          const MaterialPage(
+          const FadeAnimation(
             key: ValueKey('Home'),
             name: AppStateData.home,
             child: HomeScreen(),
@@ -151,7 +152,7 @@ class InnerRouterDelegate extends RouterDelegate<AppStateData>
 
       case AppStateData.profile:
         pages.add(
-          const MaterialPage(
+          const FadeAnimation(
             key: ValueKey('Profile'),
             name: AppStateData.profile,
             child: UserProfileScreen(),
@@ -161,7 +162,7 @@ class InnerRouterDelegate extends RouterDelegate<AppStateData>
 
       default:
         pages.add(
-          const MaterialPage(
+          const FadeAnimation(
             key: ValueKey('Home'),
             name: AppStateData.home,
             child: HomeScreen(),

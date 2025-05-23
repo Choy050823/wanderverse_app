@@ -5,6 +5,8 @@ import 'package:wanderverse_app/router/appRouteParser.dart';
 import 'package:wanderverse_app/router/appState.dart';
 import 'package:wanderverse_app/router/routerDelegate.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:wanderverse_app/router/themeService.dart';
+import 'package:wanderverse_app/utils/appTheme.dart';
 
 void main() {
   setUrlStrategy(PathUrlStrategy());
@@ -27,17 +29,15 @@ class _MyAppState extends ConsumerState<MyApp> {
 
     final routerDelegate = ref.watch(routerDelegateProvider);
     final routeInformationParser = AppRouteParser();
+    final currentThemeProvider = ref.watch(themeServiceProvider);
 
     return MaterialApp.router(
       title: 'Wanderverse',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.white),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: currentThemeProvider,
       routerDelegate: routerDelegate,
       routeInformationParser: routeInformationParser,
-      // routeInformationProvider: PlatformRouteInformationProvider(
-      //     initialRouteInformation: const RouteInformation(location: '/auth')),
     );
   }
 }

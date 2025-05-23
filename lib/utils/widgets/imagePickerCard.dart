@@ -609,18 +609,20 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
     required FocusNode focusNode,
     required int maxLines,
   }) {
+    final theme = Theme.of(context);
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           children: [
-            Icon(icon, color: Colors.blue[300], size: 20),
+            Icon(icon, color: theme.colorScheme.primary, size: 20),
             const SizedBox(width: 8),
             Text(
               label,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 16,
-                color: Colors.white,
+                color: theme.colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
                 letterSpacing: 0.5,
               ),
@@ -628,52 +630,48 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
           ],
         ),
         const SizedBox(height: 10),
+        // Use a simplified container with subtle border
         Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(12),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Colors.blue.shade800, Colors.purple.shade800],
+              colors: [
+                theme.colorScheme.primary.withOpacity(0.1),
+                theme.colorScheme.secondary.withOpacity(0.1),
+              ],
             ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.blue.withOpacity(0.2),
-                blurRadius: 8,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            border: Border.all(
+              color: theme.colorScheme.primary.withOpacity(0.3),
+              width: 1.0,
+            ),
           ),
-          padding: const EdgeInsets.all(1.5),
-          child: Container(
-            decoration: BoxDecoration(
-              color: Colors.grey[850],
-              borderRadius: BorderRadius.circular(14.5),
+          child: TextField(
+            controller: controller,
+            focusNode: focusNode,
+            maxLines: maxLines,
+            style: TextStyle(
+              color: theme.colorScheme.onSurface,
+              fontSize: 16,
             ),
-            child: TextField(
-              controller: controller,
-              focusNode: focusNode,
-              maxLines: maxLines,
-              style: const TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                letterSpacing: 0.5,
+            decoration: InputDecoration(
+              hintText: hintText,
+              hintStyle: TextStyle(
+                color: theme.colorScheme.onSurface.withOpacity(0.5),
+                fontWeight: FontWeight.w300,
               ),
-              decoration: InputDecoration(
-                hintText: hintText,
-                hintStyle: TextStyle(
-                  color: Colors.grey[500],
-                  fontWeight: FontWeight.w300,
-                ),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 16,
-                ),
-                suffixIcon: maxLines == 1
-                    ? Icon(Icons.chevron_right, color: Colors.grey[400])
-                    : null,
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(
+                horizontal: 20,
+                vertical: 16,
               ),
+              suffixIcon: maxLines == 1
+                  ? Icon(
+                      Icons.chevron_right,
+                      color: theme.colorScheme.onSurface.withOpacity(0.4),
+                    )
+                  : null,
             ),
           ),
         ),

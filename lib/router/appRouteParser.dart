@@ -5,7 +5,7 @@ class AppRouteParser extends RouteInformationParser<AppStateData> {
   @override
   Future<AppStateData> parseRouteInformation(
       RouteInformation routeInformation) async {
-    final uri = Uri.parse(routeInformation.location ?? '/');
+    final uri = Uri.parse(routeInformation.location);
 
     // Extract path from regular path or hash fragment
     String path;
