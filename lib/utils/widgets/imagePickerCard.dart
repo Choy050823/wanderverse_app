@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:wanderverse_app/utils/constants.dart';
+import 'package:wanderverse_app/utils/widgets/textField.dart';
 
 class ImagePickerCard extends StatefulWidget {
   final VoidCallback? onClose;
@@ -564,32 +565,44 @@ class _ImagePickerCardState extends State<ImagePickerCard> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      _buildInputTextField(
-                        label: 'Title',
-                        hintText: 'Enter title here',
-                        icon: Icons.title,
-                        controller: _titleController,
-                        focusNode: _titleFocusNode,
-                        maxLines: 2,
-                      ),
+                      // _buildInputTextField(
+                      //   label: 'Title',
+                      //   hintText: 'Enter title here',
+                      //   icon: Icons.title,
+                      //   controller: _titleController,
+                      //   focusNode: _titleFocusNode,
+                      //   maxLines: 2,
+                      // ),
+                      buildTextField(
+                          controller: _titleController,
+                          labelText: 'Title',
+                          suffixIcon: const Icon(Icons.title)),
                       const SizedBox(height: 24),
-                      _buildInputTextField(
-                        label: 'Content',
-                        hintText: 'Enter contents here',
-                        icon: Icons.description,
-                        controller: _contentController,
-                        focusNode: _contentFocusNode,
-                        maxLines: 5,
-                      ),
+                      // _buildInputTextField(
+                      //   label: 'Content',
+                      //   hintText: 'Enter contents here',
+                      //   icon: Icons.description,
+                      //   controller: _contentController,
+                      //   focusNode: _contentFocusNode,
+                      //   maxLines: 5,
+                      // ),
+                      buildTextField(
+                          controller: _contentController,
+                          labelText: 'Content',
+                          suffixIcon: const Icon(Icons.description)),
                       const SizedBox(height: 24),
-                      _buildInputTextField(
-                        label: 'Destination',
-                        hintText: 'Add Destination',
-                        icon: Icons.location_on,
-                        controller: _destinationController,
-                        focusNode: _destinationFocusNode,
-                        maxLines: 1,
-                      ),
+                      // _buildInputTextField(
+                      //   label: 'Destination',
+                      //   hintText: 'Add Destination',
+                      //   icon: Icons.location_on,
+                      //   controller: _destinationController,
+                      //   focusNode: _destinationFocusNode,
+                      //   maxLines: 1,
+                      // ),
+                      buildTextField(
+                          controller: _destinationController,
+                          labelText: 'Destination',
+                          suffixIcon: const Icon(Icons.location_on)),
                     ],
                   ),
                 ),

@@ -23,6 +23,9 @@ class ThemeToggleButton extends ConsumerWidget {
             Icon(
               isDarkMode ? Icons.light_mode : Icons.dark_mode,
             ),
+            const SizedBox(
+              width: 2,
+            ),
             Text(isDarkMode ? 'Light Mode' : 'Dark Mode')
           ],
         ),

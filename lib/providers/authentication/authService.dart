@@ -1,10 +1,16 @@
+import 'dart:convert';
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wanderverse_app/router/appState.dart';
+import 'package:wanderverse_app/utils/env.dart';
+import 'package:http/http.dart' as http;
 
 part 'authService.g.dart';
 part 'authService.freezed.dart';
+
+final backend_url = environment['api_url'];
 
 @freezed
 class AuthState with _$AuthState {
@@ -75,24 +81,38 @@ class AuthService extends _$AuthService {
 
   Future<bool> loginWithEmailAndPassword(String email, String password) async {
     try {
-      // login from backend
-      // get JWT Token
-      const token =
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMTIzIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ';
+      // Example HTTP POST request (replace with your backend endpoint and body)
+      final response = await http.post(
+        Uri.parse('$backend_url/api/auth/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'email': email, 'password': password}),
+      );
 
-      // save to preferences
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('auth_token', token);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
 
-      state = state.copyWith(
-          isAuthenticated: true,
-          token: token,
-          userData: _parseUserDataFromToken(token));
+        // get JWT Token
+        final token = data['token'];
 
-      // ref.read(appstateProvider.notifier).changeIsAuthenticated(true);
-      ref.read(appstateProvider.notifier).changeAppRoute('/');
-      print('login complete');
-      return true;
+        // save to preferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('auth_token', token);
+
+        print("Saved token: $token");
+
+        state = state.copyWith(
+            isAuthenticated: true,
+            token: token,
+            userData: _parseUserDataFromToken(token));
+
+        // ref.read(appstateProvider.notifier).changeIsAuthenticated(true);
+        ref.read(appstateProvider.notifier).changeAppRoute('/');
+        print('login complete with token: $token');
+        return true;
+      } else {
+        print("Status Code: ${response.statusCode}");
+        return false;
+      }
     } catch (e) {
       print(e.toString());
       return false;
@@ -102,24 +122,37 @@ class AuthService extends _$AuthService {
   Future<bool> signUp(String username, String email, String password) async {
     try {
       // sign up from backend
+      final response = await http.post(
+          Uri.parse('$backend_url/api/auth/signup'),
+          headers: {'Content-Type': 'application/json'},
+          body: json.encode(
+              {'username': username, 'email': email, 'password': password}));
 
-      // got JWT Token after finish sign up
-      const token =
-          'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyMTIzIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ';
+      if (response.statusCode == 201) {
+        final data = json.decode(response.body);
 
-      // save to preferences
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('auth_token', token);
+        // got JWT Token after finish sign up
+        final token = data['token'];
 
-      state = state.copyWith(isAuthenticated: true, token: token, userData: {
-        'id': 'id from backend',
-        'username': username,
-        'email': email
-      });
+        // save to preferences
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString('auth_token', token);
 
-      ref.read(appstateProvider.notifier).changeAppRoute('/');
-      // ref.read(appstateProvider.notifier).changeIsAuthenticated(true);
-      return true;
+        print("Saved token: $token");
+
+        state = state.copyWith(
+            isAuthenticated: true,
+            token: token,
+            userData: {'id': data['id'], 'username': username, 'email': email});
+
+        ref.read(appstateProvider.notifier).changeAppRoute('/');
+        // ref.read(appstateProvider.notifier).changeIsAuthenticated(true);
+        print('signup complete with token: $token');
+        return true;
+      } else {
+        print("Status Code: ${response.statusCode}");
+        return false;
+      }
     } catch (e) {
       print(e.toString());
       return false;

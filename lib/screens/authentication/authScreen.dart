@@ -5,6 +5,7 @@ import 'package:wanderverse_app/router/appState.dart';
 import 'package:wanderverse_app/utils/widgets/loginImageSlider.dart';
 import 'package:wanderverse_app/utils/widgets/socialIconsButton.dart';
 import 'package:wanderverse_app/utils/widgets/textField.dart';
+import 'package:wanderverse_app/utils/widgets/themeToggleButton.dart';
 
 class AuthScreen extends ConsumerStatefulWidget {
   const AuthScreen({super.key});
@@ -96,7 +97,14 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     final theme = Theme.of(context);
 
     return Scaffold(
-      backgroundColor: theme.colorScheme.background,
+      backgroundColor: theme.colorScheme.surface,
+      floatingActionButton: Card(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+        ),
+        elevation: 20,
+        child: const ThemeToggleButton(),
+      ),
       body: SafeArea(
         child: Center(
           child: Card(
