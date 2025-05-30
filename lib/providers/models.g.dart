@@ -41,7 +41,6 @@ _$PostImpl _$$PostImplFromJson(Map<String, dynamic> json) => _$PostImpl(
       likesCount: (json['likesCount'] as num).toInt(),
       commentsCount: (json['commentsCount'] as num).toInt(),
       destinationId: json['destinationId'] as String,
-      tags: (json['tags'] as List<dynamic>).map((e) => e as String).toList(),
     );
 
 Map<String, dynamic> _$$PostImplToJson(_$PostImpl instance) =>
@@ -56,7 +55,6 @@ Map<String, dynamic> _$$PostImplToJson(_$PostImpl instance) =>
       'likesCount': instance.likesCount,
       'commentsCount': instance.commentsCount,
       'destinationId': instance.destinationId,
-      'tags': instance.tags,
     };
 
 _$CommentImpl _$$CommentImplFromJson(Map<String, dynamic> json) =>

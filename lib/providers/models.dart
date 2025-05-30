@@ -1,3 +1,4 @@
+
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'models.freezed.dart';
@@ -13,10 +14,9 @@ class User with _$User {
       String? profilePicUrl,
       required int gamePoints,
       required DateTime createdAt,
-      required DateTime updatedAt
-    }) = _User;
+      required DateTime updatedAt}) = _User;
 
-    factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
+  factory User.fromJson(Map<String, dynamic> json) => _$UserFromJson(json);
 }
 
 @freezed
@@ -31,8 +31,7 @@ class Post with _$Post {
       required String creatorId,
       required int likesCount,
       required int commentsCount,
-      required String destinationId,
-      required List<String> tags}) = _Post;
+      required String destinationId}) = _Post;
 
   factory Post.fromJson(Map<String, dynamic> json) => _$PostFromJson(json);
 }
@@ -47,8 +46,9 @@ class Comment with _$Comment {
       required DateTime updatedAt,
       required String creatorId}) = _Comment;
 
-  factory Comment.fromJson(Map<String, dynamic> json) => _$CommentFromJson(json);
-} 
+  factory Comment.fromJson(Map<String, dynamic> json) =>
+      _$CommentFromJson(json);
+}
 
 @freezed
 class Like with _$Like {
@@ -71,5 +71,6 @@ class Destination with _$Destination {
       required DateTime createdAt,
       required DateTime updatedAt}) = _Destination;
 
-  factory Destination.fromJson(Map<String, dynamic> json) => _$DestinationFromJson(json);
+  factory Destination.fromJson(Map<String, dynamic> json) =>
+      _$DestinationFromJson(json);
 }

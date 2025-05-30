@@ -2,10 +2,12 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wanderverse_app/providers/post-sharing/postService.dart';
 import 'package:wanderverse_app/utils/constants.dart';
 import 'package:wanderverse_app/utils/widgets/textField.dart';
 
-class CreatePostScreen extends StatefulWidget {
+class CreatePostScreen extends ConsumerStatefulWidget {
   final VoidCallback? onClose;
 
   const CreatePostScreen({
@@ -14,10 +16,10 @@ class CreatePostScreen extends StatefulWidget {
   });
 
   @override
-  State<CreatePostScreen> createState() => _CreatePostScreenState();
+  ConsumerState<CreatePostScreen> createState() => _CreatePostScreenState();
 }
 
-class _CreatePostScreenState extends State<CreatePostScreen>
+class _CreatePostScreenState extends ConsumerState<CreatePostScreen>
     with TickerProviderStateMixin {
   List<Uint8List> _selectedFiles = [];
   late PageController _imagePageController;
@@ -29,8 +31,8 @@ class _CreatePostScreenState extends State<CreatePostScreen>
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
   final TextEditingController _destinationController = TextEditingController();
-  final TextEditingController _captionController = TextEditingController();
-  final TextEditingController _locationController = TextEditingController();
+  // final TextEditingController _captionController = TextEditingController();
+  // final TextEditingController _locationController = TextEditingController();
 
   final double imagePickerWidth = 500;
   final double imagePickerHeight = 500;
@@ -132,8 +134,8 @@ class _CreatePostScreenState extends State<CreatePostScreen>
     _contentController.dispose();
     _titleController.dispose();
     _destinationController.dispose();
-    _captionController.dispose();
-    _locationController.dispose();
+    // _captionController.dispose();
+    // _locationController.dispose();
     super.dispose();
   }
 
@@ -561,7 +563,7 @@ class _CreatePostScreenState extends State<CreatePostScreen>
 
           // Location field
           buildTextField(
-              controller: _locationController,
+              controller: _destinationController,
               labelText: 'Location',
               suffixIcon: const Icon(Icons.location_on)),
 
@@ -573,7 +575,8 @@ class _CreatePostScreenState extends State<CreatePostScreen>
             child: ElevatedButton(
               onPressed: () {
                 // Handle post sharing
-                _sharePost();
+                _sharePost(_titleController.text, _contentController.text,
+                    _destinationController.text, []);
               },
               child: const Text('Share Post'),
             ),
@@ -639,10 +642,82 @@ class _CreatePostScreenState extends State<CreatePostScreen>
     );
   }
 
-  void _sharePost() {
-    // Implement your post sharing logic here
-    print('Sharing post...');
-    widget.onClose?.call();
+  void _sharePost(
+      String title, String content, String destination, List<String> tags) {
+    // Validation checks (use return to exit early)
+    if (_selectedFiles.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please select at least one image'),
+        backgroundColor: Colors.red,
+      ));
+      return; // Exit early
+    }
+
+    if (title.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please enter title'),
+        backgroundColor: Colors.red,
+      ));
+      return; // Exit early
+    }
+
+    if (content.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please enter content'),
+        backgroundColor: Colors.red,
+      ));
+      return; // Exit early
+    }
+
+    if (destination.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please enter destination'),
+        backgroundColor: Colors.red,
+      ));
+      return; // Exit early
+    }
+
+    // Show loading indicator
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Row(children: [
+        CircularProgressIndicator(color: Colors.white),
+        SizedBox(width: 16),
+        Text('Creating post...'),
+      ]),
+      duration: Duration(seconds: 30),
+    ));
+
+    // Store error message variable to avoid widget disposal issues
+    final postServiceNotifier = ref.read(postServiceProvider.notifier);
+
+    postServiceNotifier
+        .createPost(title, content, destination, imageFiles: _selectedFiles)
+        .then((success) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Post created successfully!'),
+          backgroundColor: Colors.greenAccent,
+        ));
+
+        // Only close after successful post creation
+        widget.onClose?.call();
+      } else {
+        // Get error message immediately to avoid ref after disposal
+        String? errorMsg;
+        try {
+          errorMsg = ref.read(postServiceProvider).errorMessage;
+        } catch (e) {
+          errorMsg = "Could not retrieve error details";
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Error: ${errorMsg ?? 'Failed to create post'}"),
+          backgroundColor: Colors.red,
+        ));
+      }
+    });
   }
 
   void _deleteCurrentImage() {

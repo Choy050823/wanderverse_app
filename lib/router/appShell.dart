@@ -140,15 +140,15 @@ class InnerRouterDelegate extends RouterDelegate<AppStateData>
         );
         break;
 
-      case AppStateData.profile:
-        pages.add(
-          const MaterialPage(
-            key: ValueKey('Profile'),
-            name: AppStateData.profile,
-            child: UserProfileScreen(),
-          ),
-        );
-        break;
+      // case AppStateData.profile:
+      //   pages.add(
+      //     const MaterialPage(
+      //       key: ValueKey('Profile'),
+      //       name: AppStateData.profile,
+      //       child: UserProfileScreen(),
+      //     ),
+      //   );
+      //   break;
 
       default:
         pages.add(
