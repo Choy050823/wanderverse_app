@@ -127,10 +127,15 @@ class PostService extends _$PostService {
             .cast<Post>()
             .toList();
 
-        print("New post: ${newPosts.isEmpty ? "None" : newPosts[0]}");
+        print("New post: ${newPosts.isEmpty ? "None" : "have"}");
+
+        final allPosts = [...state.posts, ...newPosts];
+        print("DEBUG: allPost = $allPosts");
+        allPosts
+            .sort((post1, post2) => post2.updatedAt.compareTo(post1.updatedAt));
 
         state = state.copyWith(
-            posts: [...state.posts, ...newPosts],
+            posts: allPosts,
             isLoading: false,
             hasMore: hasMorePages,
             currentPage: state.currentPage + 1);
@@ -225,8 +230,11 @@ class PostService extends _$PostService {
           };
 
           final newPost = Post.fromJson(transformedData);
-          state = state
-              .copyWith(posts: [newPost, ...state.posts], isLoading: false);
+          final allPosts = [newPost, ...state.posts];
+          allPosts.sort(
+              (post1, post2) => post2.updatedAt.compareTo(post1.updatedAt));
+
+          state = state.copyWith(posts: allPosts, isLoading: false);
 
           print("DEBUG: Successfully created post");
           return true;
