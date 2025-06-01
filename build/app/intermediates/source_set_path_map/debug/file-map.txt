@@ -1,0 +1,12 @@
+com.example.wanderverse_app-core-1.6.0-0 C:\Users\choym\.gradle\caches\transforms-3\3a2f4d98b3b6404c1fa5be33c6d33808\transformed\core-1.6.0\res
+com.example.wanderverse_app-jetified-window-1.0.0-beta04-1 C:\Users\choym\.gradle\caches\transforms-3\3fc6841a625c2f6f798513da4342f64b\transformed\jetified-window-1.0.0-beta04\res
+com.example.wanderverse_app-jetified-window-java-1.0.0-beta04-2 C:\Users\choym\.gradle\caches\transforms-3\5b1943f6022f031876b1bcc4cd6f58e6\transformed\jetified-window-java-1.0.0-beta04\res
+com.example.wanderverse_app-jetified-annotation-experimental-1.1.0-3 C:\Users\choym\.gradle\caches\transforms-3\f3b777a6e3202e8f617aa95a18bb10d0\transformed\jetified-annotation-experimental-1.1.0\res
+com.example.wanderverse_app-debug-4 C:\Users\choym\Desktop\NUS Orbital Travel App\wanderverse_app\android\app\src\debug\res
+com.example.wanderverse_app-main-5 C:\Users\choym\Desktop\NUS Orbital Travel App\wanderverse_app\android\app\src\main\res
+com.example.wanderverse_app-pngs-6 C:\Users\choym\Desktop\NUS Orbital Travel App\wanderverse_app\build\app\generated\res\pngs\debug
+com.example.wanderverse_app-resValues-7 C:\Users\choym\Desktop\NUS Orbital Travel App\wanderverse_app\build\app\generated\res\resValues\debug
+com.example.wanderverse_app-rs-8 C:\Users\choym\Desktop\NUS Orbital Travel App\wanderverse_app\build\app\generated\res\rs\debug
+com.example.wanderverse_app-mergeDebugResources-9 C:\Users\choym\Desktop\NUS Orbital Travel App\wanderverse_app\build\app\intermediates\incremental\debug\mergeDebugResources\merged.dir
+com.example.wanderverse_app-mergeDebugResources-10 C:\Users\choym\Desktop\NUS Orbital Travel App\wanderverse_app\build\app\intermediates\incremental\debug\mergeDebugResources\stripped.dir
+com.example.wanderverse_app-merged_res-11 C:\Users\choym\Desktop\NUS Orbital Travel App\wanderverse_app\build\app\intermediates\merged_res\debug
