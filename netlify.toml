@@ -1,5 +1,4 @@
 [build]
-  [build]
   command = '''
     git clone -b 3.22.3 https://github.com/flutter/flutter.git &&
     flutter/bin/flutter config --enable-web && 
