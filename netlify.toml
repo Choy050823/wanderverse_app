@@ -1,9 +1,10 @@
 [build]
-  command = """
-    if [ -d \"flutter\" ]; then cd flutter && git pull && cd ..; else git clone https://github.com/flutter/flutter.git; fi && \\
-    flutter/bin/flutter config --enable-web && \\
+  [build]
+  command = '''
+    git clone -b 3.22.3 https://github.com/flutter/flutter.git &&
+    flutter/bin/flutter config --enable-web && 
     flutter/bin/flutter build web --release
-  """
+  '''
   publish = "build/web"
 
 [build.environment]
