@@ -1,13 +1,16 @@
 [build]
   command = '''
-    git clone -b 3.22.3 https://github.com/flutter/flutter.git &&
-    flutter/bin/flutter config --enable-web && 
+    git clone https://github.com/flutter/flutter.git &&
+    cd flutter &&
+    git checkout 2feea7a407 &&
+    cd .. &&
+    flutter/bin/flutter config --enable-web &&
     flutter/bin/flutter build web --release
   '''
   publish = "build/web"
 
 [build.environment]
-  FLUTTER_VERSION = "3.22.2"
+  FLUTTER_VERSION = "3.23.0-0.1.pre"
 
 [[redirects]]
   from = "/*"
