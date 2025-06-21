@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 import 'dart:typed_data';
 
@@ -6,6 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wanderverse_app/providers/authentication/authService.dart';
 import 'package:wanderverse_app/providers/models.dart';
+import 'package:wanderverse_app/providers/post-sharing/likeService.dart';
 import 'package:wanderverse_app/utils/env.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -15,6 +18,19 @@ part 'postService.g.dart';
 part 'postService.freezed.dart';
 
 final _baseUrl = environment['api_url'];
+
+enum PostApiType { sharing, discussion }
+
+extension PostApiTypeExtension on PostApiType {
+  String get endpoint {
+    switch (this) {
+      case PostApiType.sharing:
+        return "sharing";
+      case PostApiType.discussion:
+        return "discussion";
+    }
+  }
+}
 
 @freezed
 class PostsState with _$PostsState {
@@ -27,12 +43,14 @@ class PostsState with _$PostsState {
       @Default(12) int pageSize,
       @Default(true) bool hasMore}) = _PostsState;
 }
+final sharingPostsProvider = postServiceProvider(PostApiType.sharing);
+final discussionPostsProvider = postServiceProvider(PostApiType.discussion);
 
 @Riverpod(keepAlive: true)
 class PostService extends _$PostService {
   @override
-  PostsState build() {
-    // delay async task after initializing it
+  PostsState build(PostApiType type) {
+    // Initialize with the specific post type
     Future.microtask(() => getPosts());
     return PostsState(currentPage: 0, pageSize: 5);
   }
@@ -67,6 +85,21 @@ class PostService extends _$PostService {
     state = state.copyWith(isLoading: false, errorMessage: message);
   }
 
+  PostType _convertPostType(String postType) {
+    switch (postType) {
+      case "post":
+        return PostType.post;
+      case "experience":
+        return PostType.experience;
+      case "questions":
+        return PostType.questions;
+      case "tips":
+        return PostType.tips;
+      default:
+        return PostType.post;
+    }
+  }
+
   // GET post with paginations from backend
   Future<void> getPosts() async {
     if (state.isLoading || !state.hasMore) return;
@@ -74,35 +107,26 @@ class PostService extends _$PostService {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      String? token = await _getToken();
-      if (token == null) {
-        token = await _getToken();
-        print("DEBUG: new token: $token");
-        // _handleError("Authentication required");
-        // return;
-      }
-
-      print("DEBUG: current page: ${state.currentPage}");
-
+      // Access the type parameter using the property 'type'
       final url = Uri.parse(
-          '$_baseUrl/api/post/listPosts?page=${state.currentPage}&size=${state.pageSize}');
+          '$_baseUrl/api/post/${type.endpoint}?page=${state.currentPage}&size=${state.pageSize}');
 
       final response = await http.get(url, headers: await _headers);
 
-      print("DEBUG - Requesting URL: $url with token: $token");
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final List<dynamic> postsJson = data['content'] ?? [];
         final bool hasMorePages = !data['last'];
 
-        print(data);
+        // print(data);
 
         final newPosts = postsJson
             .map((json) {
               try {
-                final destination = json["destination"];
-                final name = destination["name"];
-                print("Destination name: $name");
+                // Initialize like data with count from post
+                ref
+                    .read(likeServiceProvider(json["id"]).notifier)
+                    .initWithPostData(json["likesCount"]);
 
                 return Post(
                     id: json["id"].toString(),
@@ -114,10 +138,20 @@ class PostService extends _$PostService {
                     // Safe date parsing with fallback
                     createdAt: _parseDateTime(json["createdAt"]),
                     updatedAt: _parseDateTime(json["updatedAt"]),
-                    creatorId: json["creator"]["username"],
+                    creator: User(
+                        id: json["creator"]["id"].toString(),
+                        username: json["creator"]["username"],
+                        email: json["creator"]["email"],
+                        description: json["creator"]["description"],
+                        profilePicUrl: json["creator"]["profilePicUrl"],
+                        gamePoints: json["creator"]["gamePoints"],
+                        createdAt: _parseDateTime(json["creator"]["createdAt"]),
+                        updatedAt:
+                            _parseDateTime(json["creator"]["updatedAt"])),
                     likesCount: json["likesCount"],
                     commentsCount: json["commentsCount"],
-                    destinationId: name);
+                    destinationId: json["destination"]["name"],
+                    postType: _convertPostType(json["postType"]));
               } catch (e) {
                 print("Error parsing post: $e");
                 return null;
@@ -130,9 +164,9 @@ class PostService extends _$PostService {
         print("New post: ${newPosts.isEmpty ? "None" : "have"}");
 
         final allPosts = [...state.posts, ...newPosts];
-        print("DEBUG: allPost = $allPosts");
-        allPosts
-            .sort((post1, post2) => post2.updatedAt.compareTo(post1.updatedAt));
+        // print("DEBUG: allPost = $allPosts");
+        // allPosts
+        //     .sort((post1, post2) => post2.createdAt.compareTo(post1.createdAt));
 
         state = state.copyWith(
             posts: allPosts,
@@ -147,21 +181,24 @@ class PostService extends _$PostService {
     }
   }
 
+  // Method to refresh posts
+  Future<void> refreshPosts() async {
+    state = state.copyWith(
+        currentPage: 0, hasMore: true, posts: [], isLoading: false);
+    await getPosts();
+  }
+
+  // Method to load more posts
   Future<void> loadMorePosts() async {
     if (!state.isLoading && state.hasMore) {
+      state = state.copyWith(currentPage: state.currentPage + 1);
       await getPosts();
     }
   }
 
-  Future<void> refreshPosts() async {
-    state = state
-        .copyWith(posts: [], currentPage: 0, hasMore: true, isLoading: false);
-    await getPosts();
-  }
-
   // Create post
-  Future<bool> createPost(String title, String content, String destination,
-      {List<Uint8List>? imageFiles}) async {
+  Future<bool> createPost(String title, String content, String destinationId,
+      {List<Uint8List>? imageFiles, PostType postType = PostType.post}) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     // Upload images
@@ -180,15 +217,15 @@ class PostService extends _$PostService {
       print(
           "DEBUG: User data from auth: ${ref.read(authServiceProvider).userData}");
       final userId = ref.read(authServiceProvider).userData['id'];
-      final response = await http.post(Uri.parse('$_baseUrl/api/post/create'),
+      final response = await http.post(Uri.parse('$_baseUrl/api/post'),
           headers: await _headers,
           body: jsonEncode({
             'title': title,
             'content': content,
-            'destinationId': 1,
+            'destinationId': destinationId,
             'creatorId': userId,
             'imageUrls': imageUrls,
-            // 'tags': tags
+            'postType': postType.toJson()
           }));
 
       // Print detailed error info for debugging
@@ -198,9 +235,10 @@ class PostService extends _$PostService {
         print("Request payload: ${jsonEncode({
               'title': title,
               'content': content,
-              'destinationId': destination,
+              'destinationId': destinationId,
               'creatorId': userId,
               'imageUrls': imageUrls,
+              'postType': postType
             })}");
       }
 
@@ -208,32 +246,38 @@ class PostService extends _$PostService {
         try {
           final data = json.decode(response.body);
 
-          // Check if required nested objects exist
-          if (data['creator'] == null || data['destination'] == null) {
-            print("Error: Missing creator or destination in response");
-            print("Response data: $data");
-            _handleError('Invalid response data from server');
-            return false;
-          }
+          // Initialize like data with count from post
+          ref
+              .read(likeServiceProvider(int.parse(data["id"].toString()))
+                  .notifier)
+              .initWithPostData(data["likesCount"]);
 
-          final transformedData = {
-            'id': data['id'].toString(),
-            'title': data['title'],
-            'content': data['content'],
-            'imageUrls': data['imageUrls'] ?? [],
-            'createdAt': data['createdAt'],
-            'updatedAt': data['updatedAt'],
-            'likesCount': data['likesCount'] ?? 0,
-            'commentsCount': data['commentsCount'] ?? 0,
-            'creatorId': data['creator']['username'],
-            'destinationId': data['destination']['name']
-          };
+          final newPost = Post(
+              id: data["id"].toString(),
+              title: data["title"],
+              content: data["content"],
+              imageUrls: (data["imageUrls"] as List<dynamic>)
+                  .map((url) => url.toString())
+                  .toList(),
+              createdAt: _parseDateTime(data["createdAt"]),
+              updatedAt: _parseDateTime(data["updatedAt"]),
+              creator: User(
+                  id: data["creator"]["id"].toString(),
+                  username: data["creator"]["username"],
+                  email: data["creator"]["email"],
+                  description: data["creator"]["description"],
+                  profilePicUrl: data["creator"]["profilePicUrl"],
+                  gamePoints: data["creator"]["gamePoints"],
+                  createdAt: _parseDateTime(data["creator"]["createdAt"]),
+                  updatedAt: _parseDateTime(data["creator"]["updatedAt"])),
+              likesCount: data["likesCount"],
+              commentsCount: data["commentsCount"],
+              destinationId: data["destination"]["name"],
+              postType: _convertPostType(data["postType"]));
 
-          final newPost = Post.fromJson(transformedData);
-          final allPosts = [newPost, ...state.posts];
-          allPosts.sort(
-              (post1, post2) => post2.updatedAt.compareTo(post1.updatedAt));
-
+          final List<Post> allPosts = [newPost, ...state.posts];
+          // allPosts.sort(
+          //     (post1, post2) => post2.createdAt.compareTo(post1.createdAt));
           state = state.copyWith(posts: allPosts, isLoading: false);
 
           print("DEBUG: Successfully created post");
@@ -328,6 +372,45 @@ class PostService extends _$PostService {
     } catch (e) {
       print("Error parsing date: $dateString");
       return DateTime.now();
+    }
+  }
+
+  void updatePostLikeCount(String postId, int change) {
+    // Find the post
+    final posts = state.posts;
+    final index = posts.indexWhere((post) => post.id == postId);
+
+    if (index != -1) {
+      // Create updated post with new like count
+      final post = posts[index];
+      final updatedPost = post.copyWith(likesCount: post.likesCount + change);
+
+      // Create new posts list with updated post
+      final newPosts = List<Post>.from(posts);
+      newPosts[index] = updatedPost;
+
+      // Update state
+      state = state.copyWith(posts: newPosts);
+    }
+  }
+
+  void updatePostCommentCount(String postId, int change) {
+    // Find the post
+    final posts = state.posts;
+    final index = posts.indexWhere((post) => post.id == postId);
+
+    if (index != -1) {
+      // Create updated post with new comment count
+      final post = posts[index];
+      final updatedPost =
+          post.copyWith(commentsCount: post.commentsCount + change);
+
+      // Create new posts list with updated post
+      final newPosts = List<Post>.from(posts);
+      newPosts[index] = updatedPost;
+
+      // Update state
+      state = state.copyWith(posts: newPosts);
     }
   }
 }

@@ -19,7 +19,7 @@ publish_to: "none" # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: ">=3.0.0 <4.0.0"
+  sdk: ">=3.5.0-180.3.beta <4.0.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -47,6 +47,8 @@ dependencies:
   http: ^1.4.0
   flutter_image_compress: ^2.4.0
   http_parser: ^4.0.2
+  google_fonts: ^6.2.1
+  comment_tree: ^0.3.0
 
 dev_dependencies:
   flutter_test:
@@ -63,8 +65,7 @@ dev_dependencies:
   riverpod_lint: ^2.3.12
   json_serializable: ^6.8.0
   build_runner: ^2.4.11
-  # freezed: ^2.5.7
-  freezed: ^2.4.5
+  freezed: ^2.5.7
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

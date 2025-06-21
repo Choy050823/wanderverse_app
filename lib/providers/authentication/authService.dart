@@ -1,9 +1,12 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert';
 
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wanderverse_app/providers/post-sharing/postService.dart';
+import 'package:wanderverse_app/providers/post-sharing/userService.dart';
 import 'package:wanderverse_app/router/appState.dart';
 import 'package:wanderverse_app/utils/env.dart';
 import 'package:http/http.dart' as http;
@@ -33,27 +36,6 @@ class AuthService extends _$AuthService {
     return AuthState(isLoading: true);
   }
 
-  // Future<void> _initAuthState() async {
-  //   try {
-  //     final prefs = await SharedPreferences.getInstance();
-  //     final token = prefs.getString('auth_token');
-
-  //     if (token != null) {
-  //       state = state.copyWith(
-  //         isAuthenticated: true,
-  //         isLoading: false,
-  //       );
-  //     } else {
-  //       state = state.copyWith(isLoading: false);
-  //     }
-  //   } catch (e) {
-  //     state = state.copyWith(
-  //       isLoading: false,
-  //       errorMessage: 'Failed to initialize auth state',
-  //     );
-  //   }
-  // }
-
   Future<void> tryAutoLogin() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -72,8 +54,9 @@ class AuthService extends _$AuthService {
 
         print("DEBUG: tryAutoLogin user data: $userData");
 
-        ref.read(postServiceProvider.notifier).getPosts();
-
+        ref.read(userServiceProvider.notifier).getCurrentUser();
+        await ref.read(sharingPostsProvider.notifier).getPosts();
+        await ref.read(discussionPostsProvider.notifier).getPosts();
         ref.read(appstateProvider.notifier).changeAppRoute('/');
         // ref.read(appstateProvider.notifier).changeIsAuthenticated(true);
       } else {
@@ -84,7 +67,7 @@ class AuthService extends _$AuthService {
     }
   }
 
-  // Map<String, dynamic> _parseUserDataFromToken(String token) {
+  // Map<String, dynamic> parseUserDataFromToken(String token) {
   //   // decode and validate JWT token here and parse
   //   try {
   //     final parts = token.split('.');
@@ -143,8 +126,9 @@ class AuthService extends _$AuthService {
         state = state.copyWith(
             isAuthenticated: true, token: token, userData: userData);
 
-        ref.read(postServiceProvider.notifier).getPosts();
-        // ref.read(appstateProvider.notifier).changeIsAuthenticated(true);
+        ref.read(userServiceProvider.notifier).getCurrentUser();
+        await ref.read(sharingPostsProvider.notifier).getPosts();
+        await ref.read(discussionPostsProvider.notifier).getPosts();
         ref.read(appstateProvider.notifier).changeAppRoute('/');
         print('login complete with token: $token, and user: $userData');
         return true;
@@ -183,8 +167,10 @@ class AuthService extends _$AuthService {
         state = state.copyWith(
             isAuthenticated: true, token: token, userData: userData);
 
-        ref.read(postServiceProvider.notifier).getPosts();
+        ref.read(sharingPostsProvider.notifier).getPosts();
+        ref.read(discussionPostsProvider.notifier).getPosts();
         ref.read(appstateProvider.notifier).changeAppRoute('/');
+        ref.read(userServiceProvider.notifier).getCurrentUser();
         // ref.read(appstateProvider.notifier).changeIsAuthenticated(true);
         print('signup complete with token: $token');
         return true;
@@ -211,6 +197,7 @@ class AuthService extends _$AuthService {
       // reset auth state and app state
       state = AuthState();
       await ref.read(appstateProvider.notifier).logout();
+      ref.read(userServiceProvider.notifier).clearUser();
     } catch (e) {
       print(e.toString());
     }

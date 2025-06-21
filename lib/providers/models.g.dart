@@ -33,11 +33,12 @@ _$PostImpl _$$PostImplFromJson(Map<String, dynamic> json) => _$PostImpl(
       id: json['id'] as String,
       title: json['title'] as String,
       content: json['content'] as String,
+      postType: $enumDecode(_$PostTypeEnumMap, json['postType']),
       imageUrls:
           (json['imageUrls'] as List<dynamic>).map((e) => e as String).toList(),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
-      creatorId: json['creatorId'] as String,
+      creator: User.fromJson(json['creator'] as Map<String, dynamic>),
       likesCount: (json['likesCount'] as num).toInt(),
       commentsCount: (json['commentsCount'] as num).toInt(),
       destinationId: json['destinationId'] as String,
@@ -48,23 +49,33 @@ Map<String, dynamic> _$$PostImplToJson(_$PostImpl instance) =>
       'id': instance.id,
       'title': instance.title,
       'content': instance.content,
+      'postType': _$PostTypeEnumMap[instance.postType]!,
       'imageUrls': instance.imageUrls,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
-      'creatorId': instance.creatorId,
+      'creator': instance.creator,
       'likesCount': instance.likesCount,
       'commentsCount': instance.commentsCount,
       'destinationId': instance.destinationId,
     };
+
+const _$PostTypeEnumMap = {
+  PostType.post: 'post',
+  PostType.experience: 'experience',
+  PostType.questions: 'questions',
+  PostType.tips: 'tips',
+};
 
 _$CommentImpl _$$CommentImplFromJson(Map<String, dynamic> json) =>
     _$CommentImpl(
       id: json['id'] as String,
       postId: json['postId'] as String,
       content: json['content'] as String,
+      replies: (json['replies'] as List<dynamic>)
+          .map((e) => Comment.fromJson(e as Map<String, dynamic>))
+          .toList(),
       createdAt: DateTime.parse(json['createdAt'] as String),
-      updatedAt: DateTime.parse(json['updatedAt'] as String),
-      creatorId: json['creatorId'] as String,
+      user: User.fromJson(json['user'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$CommentImplToJson(_$CommentImpl instance) =>
@@ -72,9 +83,9 @@ Map<String, dynamic> _$$CommentImplToJson(_$CommentImpl instance) =>
       'id': instance.id,
       'postId': instance.postId,
       'content': instance.content,
+      'replies': instance.replies,
       'createdAt': instance.createdAt.toIso8601String(),
-      'updatedAt': instance.updatedAt.toIso8601String(),
-      'creatorId': instance.creatorId,
+      'user': instance.user,
     };
 
 _$LikeImpl _$$LikeImplFromJson(Map<String, dynamic> json) => _$LikeImpl(

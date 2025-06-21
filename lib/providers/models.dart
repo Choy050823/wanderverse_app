@@ -1,4 +1,3 @@
-
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'models.freezed.dart';
@@ -25,15 +24,35 @@ class Post with _$Post {
       {required String id,
       required String title,
       required String content,
+      required PostType postType,
       required List<String> imageUrls,
       required DateTime createdAt,
       required DateTime updatedAt,
-      required String creatorId,
+      required User creator,
       required int likesCount,
       required int commentsCount,
       required String destinationId}) = _Post;
 
   factory Post.fromJson(Map<String, dynamic> json) => _$PostFromJson(json);
+}
+
+enum PostType { post, experience, questions, tips }
+
+extension PostTypeExtension on PostType {
+  String toJson() {
+    switch (this) {
+      case PostType.post:
+        return 'post';
+      case PostType.experience:
+        return 'experience';
+      case PostType.questions:
+        return 'questions';
+      case PostType.tips:
+        return 'tips';
+      default:
+        return 'post';
+    }
+  }
 }
 
 @freezed
@@ -42,9 +61,9 @@ class Comment with _$Comment {
       {required String id,
       required String postId,
       required String content,
+      required List<Comment> replies,
       required DateTime createdAt,
-      required DateTime updatedAt,
-      required String creatorId}) = _Comment;
+      required User user}) = _Comment;
 
   factory Comment.fromJson(Map<String, dynamic> json) =>
       _$CommentFromJson(json);

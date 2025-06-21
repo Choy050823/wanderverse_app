@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wanderverse_app/providers/post-sharing/createPostOverlayService.dart';
 import 'package:wanderverse_app/screens/post-sharing/createPostScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/homeScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/userProfileScreen.dart';
@@ -16,14 +17,15 @@ class AppShell extends ConsumerStatefulWidget {
 }
 
 class _AppShellState extends ConsumerState<AppShell> {
-  bool _showOverlay = false;
+  // bool _showOverlay = false;
 
-  void _handleRouteSelected(String route) {
+  void handleRouteSelected(String route) {
     // Special case for create post: no need route to new screen
     if (route == '/create-post') {
-      setState(() {
-        _showOverlay = true;
-      });
+      // setState(() {
+      //   _showOverlay = true;
+      // });
+      ref.read(createPostOverlayServiceProvider.notifier).show();
     } else {
       print('change route');
       ref.read(appstateProvider.notifier).changeAppRoute(route);
@@ -31,43 +33,56 @@ class _AppShellState extends ConsumerState<AppShell> {
   }
 
   void _closeOverlay() {
-    setState(() {
-      _showOverlay = false;
-    });
+    // setState(() {
+    //   _showOverlay = false;
+    // });
+    ref.read(createPostOverlayServiceProvider.notifier).hide();
   }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    final showOverlay = ref.watch(createPostOverlayServiceProvider);
+
     return Scaffold(
       appBar: AppBar(
         elevation: 5,
+        backgroundColor: colorScheme.surface,
         shadowColor: Colors.amber,
         title: Row(
           children: [
             IconButton(
               onPressed: () {},
-              icon: const Icon(Icons.explore_outlined),
+              icon: Icon(
+                Icons.explore_outlined,
+                color: colorScheme.primary, // Use primary color for icon
+              ),
             ),
-            const Text('Wanderverse'),
+            Text(
+              'Wanderverse',
+              style: textTheme.titleLarge?.copyWith(
+                color: colorScheme.primary, // Use primary color for title text
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ),
           ],
         ),
         actions: const [
           ThemeToggleButton(),
-          SizedBox(
-            width: 8,
-          )
+          SizedBox(width: 8),
         ],
       ),
       body: Stack(
         children: [
           Row(
             children: [
-              SizedBox(
-                  width: 200,
-                  child: SidebarMenu(
-                    activeRoute: ref.watch(appstateProvider).route,
-                    onRouteSelected: _handleRouteSelected,
-                  )),
+              SidebarMenu(
+                activeRoute: ref.watch(appstateProvider).route,
+                onRouteSelected: handleRouteSelected,
+              ),
               Expanded(
                 child: Router(
                   routerDelegate: ref.watch(innerRouterDelegateProvider),
@@ -78,7 +93,7 @@ class _AppShellState extends ConsumerState<AppShell> {
           ),
 
           // Create post overlay
-          if (_showOverlay)
+          if (showOverlay)
             Stack(
               children: [
                 Positioned.fill(
@@ -140,15 +155,15 @@ class InnerRouterDelegate extends RouterDelegate<AppStateData>
         );
         break;
 
-      // case AppStateData.profile:
-      //   pages.add(
-      //     const MaterialPage(
-      //       key: ValueKey('Profile'),
-      //       name: AppStateData.profile,
-      //       child: UserProfileScreen(),
-      //     ),
-      //   );
-      //   break;
+      case AppStateData.profile:
+        pages.add(
+          const MaterialPage(
+            key: ValueKey('Profile'),
+            name: AppStateData.profile,
+            child: UserProfileScreen(),
+          ),
+        );
+        break;
 
       default:
         pages.add(

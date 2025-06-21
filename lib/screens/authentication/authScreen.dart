@@ -226,9 +226,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       _isLoginMode = false;
                     });
                   },
-                  child: Text(
+                  child: const Text(
                     'Sign Up',
-                    style: TextStyle(color: theme.colorScheme.primary),
+                    style: TextStyle(color: Colors.blue),
                   ),
                   // TextButton style comes from theme
                 )
@@ -287,10 +287,10 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               alignment: Alignment.centerRight,
               child: TextButton(
                 onPressed: () {},
-                child: Text(
+                child: const Text(
                   'Forgot Password?',
                   // Don't use hardcoded color
-                  style: TextStyle(color: theme.colorScheme.primary),
+                  style: TextStyle(color: Colors.blue),
                 ),
               ),
             ),
@@ -403,9 +403,9 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       _isLoginMode = true;
                     });
                   },
-                  child: Text(
+                  child: const Text(
                     'Log In',
-                    style: TextStyle(color: theme.colorScheme.primary),
+                    style: TextStyle(color: Colors.blue),
                   ),
                 )
               ],

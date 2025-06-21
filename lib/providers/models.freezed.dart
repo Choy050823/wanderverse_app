@@ -318,10 +318,11 @@ mixin _$Post {
   String get id => throw _privateConstructorUsedError;
   String get title => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
+  PostType get postType => throw _privateConstructorUsedError;
   List<String> get imageUrls => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
   DateTime get updatedAt => throw _privateConstructorUsedError;
-  String get creatorId => throw _privateConstructorUsedError;
+  User get creator => throw _privateConstructorUsedError;
   int get likesCount => throw _privateConstructorUsedError;
   int get commentsCount => throw _privateConstructorUsedError;
   String get destinationId => throw _privateConstructorUsedError;
@@ -344,13 +345,16 @@ abstract class $PostCopyWith<$Res> {
       {String id,
       String title,
       String content,
+      PostType postType,
       List<String> imageUrls,
       DateTime createdAt,
       DateTime updatedAt,
-      String creatorId,
+      User creator,
       int likesCount,
       int commentsCount,
       String destinationId});
+
+  $UserCopyWith<$Res> get creator;
 }
 
 /// @nodoc
@@ -371,10 +375,11 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
     Object? id = null,
     Object? title = null,
     Object? content = null,
+    Object? postType = null,
     Object? imageUrls = null,
     Object? createdAt = null,
     Object? updatedAt = null,
-    Object? creatorId = null,
+    Object? creator = null,
     Object? likesCount = null,
     Object? commentsCount = null,
     Object? destinationId = null,
@@ -392,6 +397,10 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
+      postType: null == postType
+          ? _value.postType
+          : postType // ignore: cast_nullable_to_non_nullable
+              as PostType,
       imageUrls: null == imageUrls
           ? _value.imageUrls
           : imageUrls // ignore: cast_nullable_to_non_nullable
@@ -404,10 +413,10 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      creatorId: null == creatorId
-          ? _value.creatorId
-          : creatorId // ignore: cast_nullable_to_non_nullable
-              as String,
+      creator: null == creator
+          ? _value.creator
+          : creator // ignore: cast_nullable_to_non_nullable
+              as User,
       likesCount: null == likesCount
           ? _value.likesCount
           : likesCount // ignore: cast_nullable_to_non_nullable
@@ -422,6 +431,16 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
               as String,
     ) as $Val);
   }
+
+  /// Create a copy of Post
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res> get creator {
+    return $UserCopyWith<$Res>(_value.creator, (value) {
+      return _then(_value.copyWith(creator: value) as $Val);
+    });
+  }
 }
 
 /// @nodoc
@@ -435,13 +454,17 @@ abstract class _$$PostImplCopyWith<$Res> implements $PostCopyWith<$Res> {
       {String id,
       String title,
       String content,
+      PostType postType,
       List<String> imageUrls,
       DateTime createdAt,
       DateTime updatedAt,
-      String creatorId,
+      User creator,
       int likesCount,
       int commentsCount,
       String destinationId});
+
+  @override
+  $UserCopyWith<$Res> get creator;
 }
 
 /// @nodoc
@@ -459,10 +482,11 @@ class __$$PostImplCopyWithImpl<$Res>
     Object? id = null,
     Object? title = null,
     Object? content = null,
+    Object? postType = null,
     Object? imageUrls = null,
     Object? createdAt = null,
     Object? updatedAt = null,
-    Object? creatorId = null,
+    Object? creator = null,
     Object? likesCount = null,
     Object? commentsCount = null,
     Object? destinationId = null,
@@ -480,6 +504,10 @@ class __$$PostImplCopyWithImpl<$Res>
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
+      postType: null == postType
+          ? _value.postType
+          : postType // ignore: cast_nullable_to_non_nullable
+              as PostType,
       imageUrls: null == imageUrls
           ? _value._imageUrls
           : imageUrls // ignore: cast_nullable_to_non_nullable
@@ -492,10 +520,10 @@ class __$$PostImplCopyWithImpl<$Res>
           ? _value.updatedAt
           : updatedAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      creatorId: null == creatorId
-          ? _value.creatorId
-          : creatorId // ignore: cast_nullable_to_non_nullable
-              as String,
+      creator: null == creator
+          ? _value.creator
+          : creator // ignore: cast_nullable_to_non_nullable
+              as User,
       likesCount: null == likesCount
           ? _value.likesCount
           : likesCount // ignore: cast_nullable_to_non_nullable
@@ -519,10 +547,11 @@ class _$PostImpl implements _Post {
       {required this.id,
       required this.title,
       required this.content,
+      required this.postType,
       required final List<String> imageUrls,
       required this.createdAt,
       required this.updatedAt,
-      required this.creatorId,
+      required this.creator,
       required this.likesCount,
       required this.commentsCount,
       required this.destinationId})
@@ -537,6 +566,8 @@ class _$PostImpl implements _Post {
   final String title;
   @override
   final String content;
+  @override
+  final PostType postType;
   final List<String> _imageUrls;
   @override
   List<String> get imageUrls {
@@ -550,7 +581,7 @@ class _$PostImpl implements _Post {
   @override
   final DateTime updatedAt;
   @override
-  final String creatorId;
+  final User creator;
   @override
   final int likesCount;
   @override
@@ -560,7 +591,7 @@ class _$PostImpl implements _Post {
 
   @override
   String toString() {
-    return 'Post(id: $id, title: $title, content: $content, imageUrls: $imageUrls, createdAt: $createdAt, updatedAt: $updatedAt, creatorId: $creatorId, likesCount: $likesCount, commentsCount: $commentsCount, destinationId: $destinationId)';
+    return 'Post(id: $id, title: $title, content: $content, postType: $postType, imageUrls: $imageUrls, createdAt: $createdAt, updatedAt: $updatedAt, creator: $creator, likesCount: $likesCount, commentsCount: $commentsCount, destinationId: $destinationId)';
   }
 
   @override
@@ -571,14 +602,15 @@ class _$PostImpl implements _Post {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.title, title) || other.title == title) &&
             (identical(other.content, content) || other.content == content) &&
+            (identical(other.postType, postType) ||
+                other.postType == postType) &&
             const DeepCollectionEquality()
                 .equals(other._imageUrls, _imageUrls) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
             (identical(other.updatedAt, updatedAt) ||
                 other.updatedAt == updatedAt) &&
-            (identical(other.creatorId, creatorId) ||
-                other.creatorId == creatorId) &&
+            (identical(other.creator, creator) || other.creator == creator) &&
             (identical(other.likesCount, likesCount) ||
                 other.likesCount == likesCount) &&
             (identical(other.commentsCount, commentsCount) ||
@@ -594,10 +626,11 @@ class _$PostImpl implements _Post {
       id,
       title,
       content,
+      postType,
       const DeepCollectionEquality().hash(_imageUrls),
       createdAt,
       updatedAt,
-      creatorId,
+      creator,
       likesCount,
       commentsCount,
       destinationId);
@@ -623,10 +656,11 @@ abstract class _Post implements Post {
       {required final String id,
       required final String title,
       required final String content,
+      required final PostType postType,
       required final List<String> imageUrls,
       required final DateTime createdAt,
       required final DateTime updatedAt,
-      required final String creatorId,
+      required final User creator,
       required final int likesCount,
       required final int commentsCount,
       required final String destinationId}) = _$PostImpl;
@@ -640,13 +674,15 @@ abstract class _Post implements Post {
   @override
   String get content;
   @override
+  PostType get postType;
+  @override
   List<String> get imageUrls;
   @override
   DateTime get createdAt;
   @override
   DateTime get updatedAt;
   @override
-  String get creatorId;
+  User get creator;
   @override
   int get likesCount;
   @override
@@ -671,9 +707,9 @@ mixin _$Comment {
   String get id => throw _privateConstructorUsedError;
   String get postId => throw _privateConstructorUsedError;
   String get content => throw _privateConstructorUsedError;
+  List<Comment> get replies => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
-  DateTime get updatedAt => throw _privateConstructorUsedError;
-  String get creatorId => throw _privateConstructorUsedError;
+  User get user => throw _privateConstructorUsedError;
 
   /// Serializes this Comment to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -693,9 +729,11 @@ abstract class $CommentCopyWith<$Res> {
       {String id,
       String postId,
       String content,
+      List<Comment> replies,
       DateTime createdAt,
-      DateTime updatedAt,
-      String creatorId});
+      User user});
+
+  $UserCopyWith<$Res> get user;
 }
 
 /// @nodoc
@@ -716,9 +754,9 @@ class _$CommentCopyWithImpl<$Res, $Val extends Comment>
     Object? id = null,
     Object? postId = null,
     Object? content = null,
+    Object? replies = null,
     Object? createdAt = null,
-    Object? updatedAt = null,
-    Object? creatorId = null,
+    Object? user = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -733,19 +771,29 @@ class _$CommentCopyWithImpl<$Res, $Val extends Comment>
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
+      replies: null == replies
+          ? _value.replies
+          : replies // ignore: cast_nullable_to_non_nullable
+              as List<Comment>,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      updatedAt: null == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      creatorId: null == creatorId
-          ? _value.creatorId
-          : creatorId // ignore: cast_nullable_to_non_nullable
-              as String,
+      user: null == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User,
     ) as $Val);
+  }
+
+  /// Create a copy of Comment
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $UserCopyWith<$Res> get user {
+    return $UserCopyWith<$Res>(_value.user, (value) {
+      return _then(_value.copyWith(user: value) as $Val);
+    });
   }
 }
 
@@ -760,9 +808,12 @@ abstract class _$$CommentImplCopyWith<$Res> implements $CommentCopyWith<$Res> {
       {String id,
       String postId,
       String content,
+      List<Comment> replies,
       DateTime createdAt,
-      DateTime updatedAt,
-      String creatorId});
+      User user});
+
+  @override
+  $UserCopyWith<$Res> get user;
 }
 
 /// @nodoc
@@ -781,9 +832,9 @@ class __$$CommentImplCopyWithImpl<$Res>
     Object? id = null,
     Object? postId = null,
     Object? content = null,
+    Object? replies = null,
     Object? createdAt = null,
-    Object? updatedAt = null,
-    Object? creatorId = null,
+    Object? user = null,
   }) {
     return _then(_$CommentImpl(
       id: null == id
@@ -798,18 +849,18 @@ class __$$CommentImplCopyWithImpl<$Res>
           ? _value.content
           : content // ignore: cast_nullable_to_non_nullable
               as String,
+      replies: null == replies
+          ? _value._replies
+          : replies // ignore: cast_nullable_to_non_nullable
+              as List<Comment>,
       createdAt: null == createdAt
           ? _value.createdAt
           : createdAt // ignore: cast_nullable_to_non_nullable
               as DateTime,
-      updatedAt: null == updatedAt
-          ? _value.updatedAt
-          : updatedAt // ignore: cast_nullable_to_non_nullable
-              as DateTime,
-      creatorId: null == creatorId
-          ? _value.creatorId
-          : creatorId // ignore: cast_nullable_to_non_nullable
-              as String,
+      user: null == user
+          ? _value.user
+          : user // ignore: cast_nullable_to_non_nullable
+              as User,
     ));
   }
 }
@@ -821,9 +872,10 @@ class _$CommentImpl implements _Comment {
       {required this.id,
       required this.postId,
       required this.content,
+      required final List<Comment> replies,
       required this.createdAt,
-      required this.updatedAt,
-      required this.creatorId});
+      required this.user})
+      : _replies = replies;
 
   factory _$CommentImpl.fromJson(Map<String, dynamic> json) =>
       _$$CommentImplFromJson(json);
@@ -834,16 +886,22 @@ class _$CommentImpl implements _Comment {
   final String postId;
   @override
   final String content;
+  final List<Comment> _replies;
+  @override
+  List<Comment> get replies {
+    if (_replies is EqualUnmodifiableListView) return _replies;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_replies);
+  }
+
   @override
   final DateTime createdAt;
   @override
-  final DateTime updatedAt;
-  @override
-  final String creatorId;
+  final User user;
 
   @override
   String toString() {
-    return 'Comment(id: $id, postId: $postId, content: $content, createdAt: $createdAt, updatedAt: $updatedAt, creatorId: $creatorId)';
+    return 'Comment(id: $id, postId: $postId, content: $content, replies: $replies, createdAt: $createdAt, user: $user)';
   }
 
   @override
@@ -854,18 +912,16 @@ class _$CommentImpl implements _Comment {
             (identical(other.id, id) || other.id == id) &&
             (identical(other.postId, postId) || other.postId == postId) &&
             (identical(other.content, content) || other.content == content) &&
+            const DeepCollectionEquality().equals(other._replies, _replies) &&
             (identical(other.createdAt, createdAt) ||
                 other.createdAt == createdAt) &&
-            (identical(other.updatedAt, updatedAt) ||
-                other.updatedAt == updatedAt) &&
-            (identical(other.creatorId, creatorId) ||
-                other.creatorId == creatorId));
+            (identical(other.user, user) || other.user == user));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(
-      runtimeType, id, postId, content, createdAt, updatedAt, creatorId);
+  int get hashCode => Object.hash(runtimeType, id, postId, content,
+      const DeepCollectionEquality().hash(_replies), createdAt, user);
 
   /// Create a copy of Comment
   /// with the given fields replaced by the non-null parameter values.
@@ -888,9 +944,9 @@ abstract class _Comment implements Comment {
       {required final String id,
       required final String postId,
       required final String content,
+      required final List<Comment> replies,
       required final DateTime createdAt,
-      required final DateTime updatedAt,
-      required final String creatorId}) = _$CommentImpl;
+      required final User user}) = _$CommentImpl;
 
   factory _Comment.fromJson(Map<String, dynamic> json) = _$CommentImpl.fromJson;
 
@@ -901,11 +957,11 @@ abstract class _Comment implements Comment {
   @override
   String get content;
   @override
+  List<Comment> get replies;
+  @override
   DateTime get createdAt;
   @override
-  DateTime get updatedAt;
-  @override
-  String get creatorId;
+  User get user;
 
   /// Create a copy of Comment
   /// with the given fields replaced by the non-null parameter values.

@@ -5,6 +5,7 @@ import 'package:wanderverse_app/router/appState.dart';
 import 'package:wanderverse_app/screens/authentication/authScreen.dart';
 import 'package:wanderverse_app/router/appShell.dart';
 import 'package:wanderverse_app/screens/authentication/pageNotFoundScreen.dart';
+import 'package:wanderverse_app/screens/discussion/DiscussionScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/homeScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/userProfileScreen.dart';
 import 'package:wanderverse_app/utils/widgets/FadeAnimation.dart';
@@ -150,15 +151,25 @@ class InnerRouterDelegate extends RouterDelegate<AppStateData>
         );
         break;
 
-      // case AppStateData.profile:
-      //   pages.add(
-      //     const FadeAnimation(
-      //       key: ValueKey('Profile'),
-      //       name: AppStateData.profile,
-      //       child: UserProfileScreen(),
-      //     ),
-      //   );
-      //   break;
+      case AppStateData.discussion:
+        pages.add(
+          const FadeAnimation(
+            key: ValueKey('Discussion'),
+            name: AppStateData.discussion,
+            child: DiscussionScreen(),
+          ),
+        );
+        break;
+
+      case AppStateData.profile:
+        pages.add(
+          const FadeAnimation(
+            key: ValueKey('Profile'),
+            name: AppStateData.profile,
+            child: UserProfileScreen(),
+          ),
+        );
+        break;
 
       default:
         pages.add(

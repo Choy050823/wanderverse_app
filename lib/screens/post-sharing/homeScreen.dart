@@ -17,32 +17,11 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   Timer? _debounce;
-  // String creatorId = "choymh23";
-  // String destination = "NUS";
-  // int initialLikes = 123;
-  // String imageUrl =
-  //     "https://m.media-amazon.com/images/I/71eYCAMKcJL._AC_UF1000,1000_QL80_.jpg";
-  // String profilePicUrl =
-  //     "https://media.licdn.com/dms/image/v2/D5603AQHGl9U2jctJ0Q/profile-displayphoto-shrink_400_400/B56ZTJkMWIGQAo-/0/1738548496286?e=1752710400&v=beta&t=RPWykSYhW9Ek6yXupsn9QUQICrY8LUlPLG-cIk_8G6E";
-  // String caption = "Japan is fun";
-
-  // late final List<Map<String, dynamic>> posts;
 
   @override
   void initState() {
     super.initState();
     _scrollController.addListener(_scrollListener);
-    // posts = List.generate(
-    //   20,
-    //   (index) => {
-    //     'creatorId': creatorId,
-    //     'destination': destination,
-    //     'initialLikes': initialLikes,
-    //     'imageUrl': imageUrl,
-    //     'profilePicUrl': profilePicUrl,
-    //     'caption': caption,
-    //   },
-    // );
   }
 
   @override
@@ -61,16 +40,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       if (_debounce?.isActive ?? false) _debounce?.cancel();
 
       _debounce = Timer(const Duration(milliseconds: 300), () {
-        ref.read(postServiceProvider.notifier).loadMorePosts();
+        ref.read(sharingPostsProvider.notifier).loadMorePosts();
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final postState = ref.watch(postServiceProvider);
+    final postState = ref.watch(sharingPostsProvider);
     List<Post> posts = List<Post>.from(postState.posts);
-    posts.sort((post1, post2) => post2.updatedAt.compareTo(post1.updatedAt));
     final isLoading = postState.isLoading;
     final hasError = postState.errorMessage != null;
 
@@ -81,7 +59,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return Scaffold(
       body: RefreshIndicator(
-        onRefresh: () => ref.read(postServiceProvider.notifier).refreshPosts(),
+        onRefresh: () => ref.read(sharingPostsProvider.notifier).refreshPosts(),
         child: posts.isEmpty && !isLoading
             ? _buildEmptyView(hasError, postState.errorMessage)
             : MasonryGridView.count(
@@ -102,13 +80,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   // all listed posts
                   final post = posts[index];
                   return PostCard(
-                    creatorId: post.creatorId,
+                    post: post,
                     destination: post.destinationId,
-                    initialLikes: post.likesCount,
-                    imageUrl: post.imageUrls[0],
-                    profilePicUrl:
-                        "https://plus.unsplash.com/premium_photo-1665203415837-a3b389a6b33e?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8dHJhdmVsbGVyfGVufDB8fDB8fHww",
-                    caption: post.title,
+                    // initialLikes: post.likesCount,
+                    // imageUrl: post.imageUrls.isEmpty ? "" : post.imageUrls[0],
+                    // profilePicUrl:
+                    //     post.creator.profilePicUrl ?? defaultProfilePic,
+                    // caption: post.title,
                   );
                 },
               ),
@@ -148,7 +126,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             const Text(
               "No post found\nPull down to refresh",
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.grey),
+              style: TextStyle(color: Colors.black),
             )
           ],
           const SizedBox(
@@ -156,7 +134,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
           ElevatedButton(
               onPressed: () =>
-                  ref.read(postServiceProvider.notifier).refreshPosts(),
+                  ref.read(sharingPostsProvider.notifier).refreshPosts(),
               child: const Text("Refresh"))
         ],
       ),
@@ -198,7 +176,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       alignment: Alignment.center,
       child: const Text(
         "You've reached the end",
-        style: TextStyle(color: Colors.grey, fontStyle: FontStyle.italic),
+        style: TextStyle(color: Colors.black, fontStyle: FontStyle.italic),
       ),
     );
   }

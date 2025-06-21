@@ -3,6 +3,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_dropzone/flutter_dropzone.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:wanderverse_app/providers/models.dart';
+import 'package:wanderverse_app/providers/post-sharing/destinationService.dart';
 import 'package:wanderverse_app/providers/post-sharing/postService.dart';
 import 'package:wanderverse_app/utils/constants.dart';
 import 'package:wanderverse_app/utils/widgets/textField.dart';
@@ -27,10 +29,13 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen>
   late DropzoneViewController _dropzoneController;
   bool isHighlighted = false;
 
+  PostType _selectedPostType = PostType.post; // default post type
+  String? _selectedDestinationId;
+
   bool _showCaptionPanel = false;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
-  final TextEditingController _destinationController = TextEditingController();
+  TextEditingController _destinationController = TextEditingController();
   // final TextEditingController _captionController = TextEditingController();
   // final TextEditingController _locationController = TextEditingController();
 
@@ -507,8 +512,39 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen>
     );
   }
 
+  IconData _getPostTypeIcon(PostType type) {
+    switch (type) {
+      case PostType.post:
+        return Icons.photo;
+      case PostType.experience:
+        return Icons.hiking;
+      case PostType.questions:
+        return Icons.help;
+      case PostType.tips:
+        return Icons.lightbulb;
+      default:
+        return Icons.article;
+    }
+  }
+
+  String _getPostTypeName(PostType type) {
+    switch (type) {
+      case PostType.post:
+        return 'General Post';
+      case PostType.experience:
+        return 'Travel Experience';
+      case PostType.questions:
+        return 'Question';
+      case PostType.tips:
+        return 'Travel Tip';
+      default:
+        return type.toString().split('.').last;
+    }
+  }
+
   Widget _buildCaptionPanel() {
     final theme = Theme.of(context);
+    final destinationAsync = ref.watch(destinationServiceProvider);
 
     return Container(
       decoration: BoxDecoration(
@@ -562,10 +598,160 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen>
           const SizedBox(height: 16),
 
           // Location field
-          buildTextField(
-              controller: _destinationController,
-              labelText: 'Location',
-              suffixIcon: const Icon(Icons.location_on)),
+          // buildTextField(
+          //     controller: _destinationController,
+          //     labelText: 'Location',
+          //     suffixIcon: const Icon(Icons.location_on)),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Destination",
+                style: theme.textTheme.bodyMedium
+                    ?.copyWith(fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              destinationAsync.when(
+                  data: (destinations) {
+                    return Autocomplete<Destination>(
+                      optionsBuilder: (TextEditingValue textEditingValue) {
+                        if (textEditingValue.text.isEmpty) {
+                          return destinations;
+                        }
+                        return destinations.where((destination) {
+                          return destination.name
+                              .toLowerCase()
+                              .contains(textEditingValue.text.toLowerCase());
+                        });
+                      },
+                      displayStringForOption: (destination) => destination.name,
+                      fieldViewBuilder: (context, textEditingController,
+                          focusNode, onFieldSubmitted) {
+                        _destinationController = textEditingController;
+                        return TextField(
+                          controller: textEditingController,
+                          focusNode: focusNode,
+                          decoration: InputDecoration(
+                              hintText: "Search for a destination...",
+                              prefixIcon: const Icon(Icons.location_on),
+                              border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(8)),
+                              fillColor: theme.colorScheme.surface,
+                              filled: true),
+                          onSubmitted: (_) => onFieldSubmitted(),
+                        );
+                      },
+                      onSelected: (Destination destination) {
+                        setState(() {
+                          _selectedDestinationId = destination.id;
+                          _destinationController.text = destination.name;
+                        });
+                      },
+                      optionsViewBuilder: (context, onSelected, options) {
+                        return Align(
+                          alignment: Alignment.topLeft,
+                          child: Material(
+                              elevation: 4.0,
+                              child: ConstrainedBox(
+                                constraints: const BoxConstraints(
+                                    maxHeight: 200, maxWidth: 500),
+                                child: ListView.builder(
+                                    padding: EdgeInsets.zero,
+                                    shrinkWrap: true,
+                                    itemCount: options.length,
+                                    itemBuilder: (context, index) {
+                                      final Destination option =
+                                          options.elementAt(index);
+                                      return ListTile(
+                                        leading: option.imageUrl.isNotEmpty
+                                            ? CircleAvatar(
+                                                backgroundImage: NetworkImage(
+                                                    option.imageUrl),
+                                              )
+                                            : const CircleAvatar(
+                                                child: Icon(Icons.location_on),
+                                              ),
+                                        title: Text(option.name),
+                                        subtitle: Text(
+                                          option.description,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        onTap: () => onSelected(option),
+                                      );
+                                    }),
+                              )),
+                        );
+                      },
+                    );
+                  },
+                  error: (error, _) =>
+                      Text("Error loading destinations: $error"),
+                  loading: () => const Center(
+                        child: CircularProgressIndicator(),
+                      ))
+            ],
+          ),
+
+          const SizedBox(
+            height: 8,
+          ),
+
+          // Post type selector
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                "Post Type",
+                style: theme.textTheme.titleMedium
+                    ?.copyWith(fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: theme.colorScheme.outline.withOpacity(0.5),
+                    ),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: DropdownButtonHideUnderline(
+                    child: DropdownButton<PostType>(
+                      isExpanded: true,
+                      value: _selectedPostType,
+                      icon: const Icon(Icons.arrow_drop_down),
+                      style: theme.textTheme.bodyLarge,
+                      onChanged: (PostType? newValue) {
+                        if (newValue != null) {
+                          setState(() {
+                            _selectedPostType = newValue;
+                          });
+                        }
+                      },
+                      items: PostType.values
+                          .map<DropdownMenuItem<PostType>>((PostType type) {
+                        return DropdownMenuItem<PostType>(
+                            value: type,
+                            child: Row(
+                              children: [
+                                Icon(
+                                  _getPostTypeIcon(type),
+                                  size: 20,
+                                ),
+                                const SizedBox(
+                                  width: 8,
+                                ),
+                                Text(_getPostTypeName(type))
+                              ],
+                            ));
+                      }).toList(),
+                    ),
+                  ))
+            ],
+          ),
 
           const Spacer(),
 
@@ -575,8 +761,10 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen>
             child: ElevatedButton(
               onPressed: () {
                 // Handle post sharing
-                _sharePost(_titleController.text, _contentController.text,
-                    _destinationController.text, []);
+                _sharePost(
+                  _titleController.text,
+                  _contentController.text,
+                );
               },
               child: const Text('Share Post'),
             ),
@@ -586,64 +774,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen>
     );
   }
 
-  Widget _buildInputTextField({
-    required String label,
-    required String hintText,
-    required IconData icon,
-    required TextEditingController controller,
-    required FocusNode focusNode,
-    required int maxLines,
-  }) {
-    final theme = Theme.of(context);
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Icon(icon, color: theme.colorScheme.primary, size: 20),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 16,
-                color: theme.colorScheme.onSurface,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        const SizedBox(height: 10),
-        TextField(
-          controller: controller,
-          focusNode: focusNode,
-          maxLines: maxLines,
-          style: TextStyle(color: theme.colorScheme.onSurface),
-          decoration: InputDecoration(
-            hintText: hintText,
-            hintStyle: TextStyle(
-              color: theme.colorScheme.onSurface.withOpacity(0.5),
-            ),
-            filled: true,
-            fillColor: theme.colorScheme.surface,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(
-                color: theme.colorScheme.onSurface.withOpacity(0.2),
-              ),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(8),
-              borderSide: BorderSide(color: theme.colorScheme.primary),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _sharePost(
-      String title, String content, String destination, List<String> tags) {
+  void _sharePost(String title, String content) {
     // Validation checks (use return to exit early)
     if (_selectedFiles.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -669,12 +800,20 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen>
       return; // Exit early
     }
 
-    if (destination.trim().isEmpty) {
+    // if (destination.trim().isEmpty) {
+    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+    //     content: Text('Please enter destination'),
+    //     backgroundColor: Colors.red,
+    //   ));
+    //   return; // Exit early
+    // }
+
+    if (_selectedDestinationId == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Please enter destination'),
+        content: Text('Please select a destination'),
         backgroundColor: Colors.red,
       ));
-      return; // Exit early
+      return;
     }
 
     // Show loading indicator
@@ -684,14 +823,23 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen>
         SizedBox(width: 16),
         Text('Creating post...'),
       ]),
-      duration: Duration(seconds: 30),
+      duration: Duration(seconds: 10),
     ));
 
     // Store error message variable to avoid widget disposal issues
-    final postServiceNotifier = ref.read(postServiceProvider.notifier);
+    final postServiceNotifier = _selectedPostType == PostType.post
+        ? ref.read(sharingPostsProvider.notifier)
+        : ref.read(discussionPostsProvider.notifier);
+
+    final postService = _selectedPostType == PostType.post
+        ? ref.read(sharingPostsProvider)
+        : ref.read(discussionPostsProvider);
+
+    // print("SELECTED POST TYPE: $_selectedPostType");
 
     postServiceNotifier
-        .createPost(title, content, destination, imageFiles: _selectedFiles)
+        .createPost(title, content, _selectedDestinationId!,
+            postType: _selectedPostType, imageFiles: _selectedFiles)
         .then((success) {
       ScaffoldMessenger.of(context).hideCurrentSnackBar();
 
@@ -707,7 +855,7 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen>
         // Get error message immediately to avoid ref after disposal
         String? errorMsg;
         try {
-          errorMsg = ref.read(postServiceProvider).errorMessage;
+          errorMsg = postService.errorMessage;
         } catch (e) {
           errorMsg = "Could not retrieve error details";
         }

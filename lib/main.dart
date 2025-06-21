@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wanderverse_app/providers/authentication/authService.dart';
 import 'package:wanderverse_app/providers/post-sharing/postService.dart';
+import 'package:wanderverse_app/providers/post-sharing/userService.dart';
 import 'package:wanderverse_app/router/appRouteParser.dart';
 import 'package:wanderverse_app/router/appState.dart';
 import 'package:wanderverse_app/router/routerDelegate.dart';
@@ -27,7 +28,9 @@ class _MyAppState extends ConsumerState<MyApp> {
     // Initialize providers
     ref.watch(appstateProvider);
     ref.watch(authServiceProvider);
-    ref.watch(postServiceProvider);
+    ref.watch(sharingPostsProvider);
+    ref.watch(discussionPostsProvider);
+    ref.watch(userServiceProvider);
 
     final routerDelegate = ref.watch(routerDelegateProvider);
     final routeInformationParser = AppRouteParser();

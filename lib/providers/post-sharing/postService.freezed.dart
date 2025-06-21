@@ -169,8 +169,8 @@ class _$PostsStateImpl extends _PostsState {
       {final List<Post> posts = const [],
       this.isLoading = false,
       this.errorMessage,
-      this.currentPage = 1,
-      this.pageSize = 10,
+      this.currentPage = 0,
+      this.pageSize = 12,
       this.hasMore = true})
       : _posts = posts,
         super._();

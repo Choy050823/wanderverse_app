@@ -80,3 +80,19 @@ const List<MenuItem> menuItems = [
       inactiveIcon: Icons.person_2_outlined,
       activeIcon: Icons.person_2),
 ];
+
+String getTimeAgo(DateTime dateTime) {
+  final difference = DateTime.now().difference(dateTime);
+  if (difference.inDays > 0) {
+    return '${difference.inDays} days ago';
+  } else if (difference.inHours > 0) {
+    return '${difference.inHours} hours ago';
+  } else if (difference.inMinutes > 0) {
+    return '${difference.inMinutes} minutes ago';
+  } else {
+    return 'Just now';
+  }
+}
+
+const defaultProfilePic =
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCHU5JIkqfD2z1KMc4c1nW4zdArnxBM3cCcQ&s";
