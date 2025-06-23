@@ -1,5 +1,6 @@
 [build]
   command = '''
+    rm -rf flutter &&
     git clone https://github.com/flutter/flutter.git &&
     cd flutter &&
     git checkout 2feea7a407 &&
