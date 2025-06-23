@@ -7,7 +7,7 @@ part of 'createPostOverlayService.dart';
 // **************************************************************************
 
 String _$createPostOverlayServiceHash() =>
-    r'02f05f79436b360aa31c2e6e129c616678ac997a';
+    r'1b8de21ecb97f158df0649c56c143c6e4ee127dd';
 
 /// See also [CreatePostOverlayService].
 @ProviderFor(CreatePostOverlayService)

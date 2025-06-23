@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wanderverse_app/providers/models.dart';
 import 'package:wanderverse_app/providers/post-sharing/commentService.dart';
 import 'package:wanderverse_app/providers/post-sharing/userService.dart';
+import 'package:wanderverse_app/router/ResponsiveLayout.dart';
 import 'package:wanderverse_app/utils/constants.dart';
 import 'package:wanderverse_app/utils/widgets/CommentInput.dart';
 import 'package:wanderverse_app/utils/widgets/CommentItem.dart';
@@ -35,8 +36,10 @@ import 'package:wanderverse_app/utils/widgets/postDetails.dart';
 
 class SpecificDiscussionScreen extends ConsumerStatefulWidget {
   final Post discussionPost;
+  final Destination? destination;
 
-  const SpecificDiscussionScreen({required this.discussionPost, super.key});
+  const SpecificDiscussionScreen(
+      {required this.destination, required this.discussionPost, super.key});
 
   @override
   ConsumerState<SpecificDiscussionScreen> createState() =>
@@ -243,15 +246,18 @@ class _SpecificDiscussionScreenState
                     // Comments
                     SliverToBoxAdapter(
                       // should change to current user avatar
-                      child: CommentInput(
-                        userProfilePic:
-                            ref.watch(userServiceProvider).user == null
-                                ? defaultProfilePic
-                                : ref
-                                    .watch(userServiceProvider)
-                                    .user!
-                                    .profilePicUrl,
-                        postId: widget.discussionPost.id,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: CommentInput(
+                          userProfilePic:
+                              ref.watch(userServiceProvider).user == null
+                                  ? defaultProfilePic
+                                  : ref
+                                      .watch(userServiceProvider)
+                                      .user!
+                                      .profilePicUrl,
+                          postId: widget.discussionPost.id,
+                        ),
                       ),
                     ),
 
@@ -296,15 +302,15 @@ class _SpecificDiscussionScreenState
               //   width: 24,
               // ),
               if (MediaQuery.of(context).size.width > 800) ...[
-                const Expanded(
+                Expanded(
                     flex: 3,
                     child: SingleChildScrollView(
                       child: Padding(
-                        padding:
-                            EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 16),
                         // should change currentDestination to support provider
                         child: DiscussionSidebar(
-                          currentDestination: "Paris",
+                          currentDestination: widget.destination,
                         ),
                       ),
                     ))
@@ -397,6 +403,68 @@ class _SpecificDiscussionScreenState
             ),
           )
         ],
+      ),
+    );
+  }
+}
+
+class SearchField extends StatelessWidget {
+  final TextEditingController textEditingController;
+  final FocusNode focusNode;
+  final VoidCallback onFieldSubmitted;
+
+  const SearchField({
+    Key? key,
+    required this.textEditingController,
+    required this.focusNode,
+    required this.onFieldSubmitted,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return SizedBox(
+      height: 48, // Fixed height improves alignment consistency
+      child: TextField(
+        controller: textEditingController,
+        focusNode: focusNode,
+        textAlignVertical: TextAlignVertical.center,
+        style: TextStyle(
+          fontSize: ResponsiveLayout.isMobile(context) ? 14 : 16,
+        ),
+        decoration: InputDecoration(
+          hintText: "Search for a destination...",
+          hintStyle: TextStyle(
+            color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7),
+          ),
+          prefixIcon: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12),
+            child: Icon(
+              Icons.search,
+              color: theme.colorScheme.onSurfaceVariant,
+              size: 20, // Slightly smaller icon for better alignment
+            ),
+          ),
+          prefixIconConstraints: const BoxConstraints(
+            minWidth: 44,
+            minHeight: 44,
+          ),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(8),
+            borderSide: BorderSide(
+              color: theme.colorScheme.outline.withOpacity(0.5),
+            ),
+          ),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 0, // Critical for vertical centering
+            horizontal: 16,
+          ),
+          fillColor: theme.colorScheme.surface,
+          filled: true,
+          isDense: true, // Makes the field more compact
+        ),
+        onSubmitted: (_) => onFieldSubmitted(),
       ),
     );
   }

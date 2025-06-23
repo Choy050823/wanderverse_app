@@ -5,8 +5,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:wanderverse_app/providers/models.dart';
 import 'package:wanderverse_app/providers/post-sharing/createPostOverlayService.dart';
+import 'package:wanderverse_app/providers/post-sharing/destinationService.dart';
 import 'package:wanderverse_app/providers/post-sharing/postService.dart';
+import 'package:wanderverse_app/router/ResponsiveLayout.dart';
 import 'package:wanderverse_app/screens/discussion/SpecificDiscussionScreen.dart';
+import 'package:wanderverse_app/utils/constants.dart';
 import 'package:wanderverse_app/utils/widgets/DiscussionCard.dart';
 import 'package:wanderverse_app/utils/widgets/DiscussionSidebar.dart';
 
@@ -19,12 +22,13 @@ class DiscussionScreen extends ConsumerStatefulWidget {
 
 class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
     with SingleTickerProviderStateMixin {
-  final String currentDestination = "Paris";
+  Destination? currentDestination;
   String _sortBy = "Top";
   final List<String> _sortOptions = ["Top", "New", "Hot"];
   late AnimationController _animationController;
   final ScrollController _scrollController = ScrollController();
   Timer? _debounce;
+  TextEditingController _destinationController = TextEditingController();
 
   @override
   void initState() {
@@ -62,9 +66,17 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     final postState = ref.watch(discussionPostsProvider);
-    List<Post> discussions = List<Post>.from(postState.posts);
     final isLoading = postState.isLoading;
     final hasError = postState.errorMessage != null;
+
+    final destinationAsync = ref.watch(destinationServiceProvider);
+    List<Post> discussions = List<Post>.from(postState.posts)
+        .where((post) =>
+            currentDestination == null ||
+            currentDestination!.name == "General" ||
+            post.destination.id == currentDestination!.id)
+        .toList();
+    final theme = Theme.of(context);
 
     return Scaffold(
       body: RefreshIndicator(
@@ -94,7 +106,7 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
                           color: colorScheme.surface.withOpacity(0.5),
                           borderRadius: BorderRadius.circular(12)),
                       child: Text(
-                        "Travel Discussions: $currentDestination",
+                        "Travel Discussions: ${currentDestination == null ? generalDestination.name : currentDestination!.name}",
                         style: textTheme.headlineLarge?.copyWith(
                           fontSize: 22,
                         ),
@@ -106,7 +118,9 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
                   fit: StackFit.expand,
                   children: [
                     Image.network(
-                      "https://wanderverse-cloud-bucket.s3.ap-southeast-1.amazonaws.com/paris.png",
+                      currentDestination == null
+                          ? generalDestination.imageUrl
+                          : currentDestination!.imageUrl,
                       fit: BoxFit.cover,
                     ),
                     Container(
@@ -234,29 +248,111 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
                           ),
                         ),
                         const Spacer(),
-                        // Search Comments
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: colorScheme.surfaceVariant.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Icon(
-                                Icons.search,
-                                size: 16,
-                                color: colorScheme.onSurfaceVariant,
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                "Search Comments",
-                                style: textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant),
-                              ),
-                            ],
+                        Expanded(
+                          child: destinationAsync.when(
+                            data: (destinations) {
+                              return Autocomplete<Destination>(
+                                optionsBuilder:
+                                    (TextEditingValue textEditingValue) {
+                                  if (textEditingValue.text.isEmpty) {
+                                    return destinations;
+                                  }
+                                  return destinations.where((destination) {
+                                    return destination.name
+                                        .toLowerCase()
+                                        .contains(textEditingValue.text
+                                            .toLowerCase());
+                                  });
+                                },
+                                displayStringForOption: (destination) =>
+                                    destination.name,
+                                fieldViewBuilder: (context,
+                                    textEditingController,
+                                    focusNode,
+                                    onFieldSubmitted) {
+                                  _destinationController =
+                                      textEditingController;
+                                  return TextField(
+                                    controller: textEditingController,
+                                    focusNode: focusNode,
+                                    textAlignVertical: TextAlignVertical.center,
+                                    decoration: InputDecoration(
+                                      hintText: "Search for a destination...",
+                                      prefixIcon: const Icon(Icons.search),
+                                      border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8)),
+                                      fillColor: theme.colorScheme.surface,
+                                      filled: true,
+                                      contentPadding:
+                                          ResponsiveLayout.isMobile(context)
+                                              ? const EdgeInsets.symmetric(
+                                                  vertical: 8, horizontal: 12)
+                                              : null,
+                                    ),
+                                    onSubmitted: (_) => onFieldSubmitted(),
+                                  );
+                                },
+                                onSelected: (Destination destination) {
+                                  setState(() {
+                                    currentDestination = destination;
+                                    _destinationController.text =
+                                        destination.name;
+                                  });
+                                  // You could also refresh posts based on new destination here
+                                  // ref.read(discussionPostsProvider.notifier).refreshPostsByDestination(destination.id);
+                                },
+                                // Add this options view builder for rich destination display
+                                optionsViewBuilder:
+                                    (context, onSelected, options) {
+                                  return Align(
+                                    alignment: Alignment.topLeft,
+                                    child: Material(
+                                      elevation: 4.0,
+                                      child: ConstrainedBox(
+                                        constraints: const BoxConstraints(
+                                          maxHeight: 200,
+                                          maxWidth: 500,
+                                        ),
+                                        child: ListView.builder(
+                                          padding: EdgeInsets.zero,
+                                          shrinkWrap: true,
+                                          itemCount: options.length,
+                                          itemBuilder: (context, index) {
+                                            final Destination option =
+                                                options.elementAt(index);
+                                            return ListTile(
+                                              leading: option
+                                                      .imageUrl.isNotEmpty
+                                                  ? CircleAvatar(
+                                                      backgroundImage:
+                                                          NetworkImage(
+                                                              option.imageUrl),
+                                                    )
+                                                  : const CircleAvatar(
+                                                      child: Icon(
+                                                          Icons.location_on),
+                                                    ),
+                                              title: Text(option.name),
+                                              subtitle: Text(
+                                                option.description,
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                              onTap: () => onSelected(option),
+                                            );
+                                          },
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              );
+                            },
+                            error: (error, _) =>
+                                Text("Error loading destinations: $error"),
+                            loading: () => const Center(
+                                child: CircularProgressIndicator()),
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -287,7 +383,9 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
                               ),
                               const SizedBox(width: 6),
                               Text(
-                                currentDestination,
+                                currentDestination == null
+                                    ? generalDestination.name
+                                    : currentDestination!.name,
                                 style: GoogleFonts.notoSans(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
@@ -309,7 +407,7 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
             SliverPadding(
               padding: const EdgeInsets.all(16),
               sliver: SliverToBoxAdapter(
-                child: MediaQuery.of(context).size.width > 800
+                child: ResponsiveLayout.isDesktop(context)
                     ? Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -328,6 +426,8 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
                                           post: discussions[index],
                                           index: index,
                                           screen: SpecificDiscussionScreen(
+                                            destination:
+                                                discussions[index].destination,
                                             discussionPost: discussions[index],
                                           ),
                                         );
@@ -353,6 +453,7 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
                           const SizedBox(width: 24),
                           Expanded(
                             flex: 3,
+                            // set to destination entity
                             child: DiscussionSidebar(
                               currentDestination: currentDestination,
                             ),
@@ -369,6 +470,7 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
                                   post: discussions[index],
                                   index: index,
                                   screen: SpecificDiscussionScreen(
+                                    destination: discussions[index].destination,
                                     discussionPost: discussions[index],
                                   ),
                                 );

@@ -251,7 +251,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                   itemBuilder: (context, index) {
                     return PostCard(
                       post: sharingPosts[index],
-                      destination: sharingPosts[index].destinationId,
+                      destination: sharingPosts[index].destination.name,
                     );
                   },
                 ),
@@ -268,6 +268,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                       post: discussionPosts[index],
                       index: index,
                       screen: SpecificDiscussionScreen(
+                        destination: discussionPosts[index].destination,
                         discussionPost: discussionPosts[index],
                       ),
                     );

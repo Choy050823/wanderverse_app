@@ -43,6 +43,7 @@ class PostsState with _$PostsState {
       @Default(12) int pageSize,
       @Default(true) bool hasMore}) = _PostsState;
 }
+
 final sharingPostsProvider = postServiceProvider(PostApiType.sharing);
 final discussionPostsProvider = postServiceProvider(PostApiType.discussion);
 
@@ -150,7 +151,15 @@ class PostService extends _$PostService {
                             _parseDateTime(json["creator"]["updatedAt"])),
                     likesCount: json["likesCount"],
                     commentsCount: json["commentsCount"],
-                    destinationId: json["destination"]["name"],
+                    destination: Destination(
+                        id: json["destination"]["id"].toString(),
+                        name: json["destination"]["name"],
+                        description: json["destination"]["description"],
+                        imageUrl: json["destination"]["imageUrl"],
+                        createdAt:
+                            _parseDateTime(json["destination"]["createdAt"]),
+                        updatedAt:
+                            _parseDateTime(json["destination"]["updatedAt"])),
                     postType: _convertPostType(json["postType"]));
               } catch (e) {
                 print("Error parsing post: $e");
@@ -272,7 +281,13 @@ class PostService extends _$PostService {
                   updatedAt: _parseDateTime(data["creator"]["updatedAt"])),
               likesCount: data["likesCount"],
               commentsCount: data["commentsCount"],
-              destinationId: data["destination"]["name"],
+              destination: Destination(
+                  id: data["destination"]["id"].toString(),
+                  name: data["destination"]["name"],
+                  description: data["destination"]["description"],
+                  imageUrl: data["destination"]["imageUrl"],
+                  createdAt: _parseDateTime(data["destination"]["createdAt"]),
+                  updatedAt: _parseDateTime(data["destination"]["updatedAt"])),
               postType: _convertPostType(data["postType"]));
 
           final List<Post> allPosts = [newPost, ...state.posts];

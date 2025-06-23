@@ -41,7 +41,8 @@ _$PostImpl _$$PostImplFromJson(Map<String, dynamic> json) => _$PostImpl(
       creator: User.fromJson(json['creator'] as Map<String, dynamic>),
       likesCount: (json['likesCount'] as num).toInt(),
       commentsCount: (json['commentsCount'] as num).toInt(),
-      destinationId: json['destinationId'] as String,
+      destination:
+          Destination.fromJson(json['destination'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$$PostImplToJson(_$PostImpl instance) =>
@@ -56,7 +57,7 @@ Map<String, dynamic> _$$PostImplToJson(_$PostImpl instance) =>
       'creator': instance.creator,
       'likesCount': instance.likesCount,
       'commentsCount': instance.commentsCount,
-      'destinationId': instance.destinationId,
+      'destination': instance.destination,
     };
 
 const _$PostTypeEnumMap = {

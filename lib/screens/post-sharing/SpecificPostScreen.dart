@@ -97,18 +97,21 @@ class _SpecificPostScreenState extends ConsumerState<SpecificPostScreen> {
                     // Comment Input
                     SliverToBoxAdapter(
                       // should change to current user avatar
-                      child: CommentInput(
-                        userProfilePic:
-                            ref.watch(authServiceProvider).userData.isEmpty ||
-                                    ref
-                                            .watch(authServiceProvider)
-                                            .userData["profilePicUrl"] ==
-                                        ""
-                                ? defaultProfilePic
-                                : ref
-                                    .watch(authServiceProvider)
-                                    .userData["profilePicUrl"],
-                        postId: widget.post.id,
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: CommentInput(
+                          userProfilePic:
+                              ref.watch(authServiceProvider).userData.isEmpty ||
+                                      ref
+                                              .watch(authServiceProvider)
+                                              .userData["profilePicUrl"] ==
+                                          ""
+                                  ? defaultProfilePic
+                                  : ref
+                                      .watch(authServiceProvider)
+                                      .userData["profilePicUrl"],
+                          postId: widget.post.id,
+                        ),
                       ),
                     ),
                     commentsAsync.when(
@@ -150,15 +153,18 @@ class _SpecificPostScreenState extends ConsumerState<SpecificPostScreen> {
                         // Comment Input
                         SliverToBoxAdapter(
                           // should change to current user avatar
-                          child: CommentInput(
-                            userProfilePic:
-                                ref.watch(userServiceProvider).user == null
-                                    ? defaultProfilePic
-                                    : ref
-                                        .watch(userServiceProvider)
-                                        .user!
-                                        .profilePicUrl,
-                            postId: widget.post.id,
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: CommentInput(
+                              userProfilePic:
+                                  ref.watch(userServiceProvider).user == null
+                                      ? defaultProfilePic
+                                      : ref
+                                          .watch(userServiceProvider)
+                                          .user!
+                                          .profilePicUrl,
+                              postId: widget.post.id,
+                            ),
                           ),
                         ),
                         commentsAsync.when(

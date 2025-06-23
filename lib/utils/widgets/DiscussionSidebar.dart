@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:wanderverse_app/providers/models.dart';
+import 'package:wanderverse_app/utils/constants.dart';
 
 class DiscussionSidebar extends StatefulWidget {
-  final String currentDestination;
+  final Destination? currentDestination;
   const DiscussionSidebar({required this.currentDestination, super.key});
 
   @override
@@ -31,10 +33,12 @@ class _DiscussionSidebarState extends State<DiscussionSidebar> {
                   // Banner image
                   Container(
                     height: 160,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       image: DecorationImage(
                         image: NetworkImage(
-                          "https://wanderverse-cloud-bucket.s3.ap-southeast-1.amazonaws.com/paris.png",
+                          widget.currentDestination == null
+                              ? generalDestination.imageUrl
+                              : widget.currentDestination!.imageUrl,
                         ),
                         fit: BoxFit.cover,
                       ),
@@ -89,7 +93,9 @@ class _DiscussionSidebarState extends State<DiscussionSidebar> {
                         ),
                         const SizedBox(height: 6),
                         Text(
-                          widget.currentDestination,
+                          widget.currentDestination == null
+                              ? generalDestination.name
+                              : widget.currentDestination!.name,
                           style: Theme.of(context)
                               .textTheme
                               .headlineMedium
@@ -147,7 +153,9 @@ class _DiscussionSidebarState extends State<DiscussionSidebar> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "The City of Light awaits you",
+                      widget.currentDestination == null
+                          ? generalDestination.description
+                          : widget.currentDestination!.description,
                       style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
@@ -155,7 +163,7 @@ class _DiscussionSidebarState extends State<DiscussionSidebar> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "Join our community of travelers to discover the magic of Paris. Share your experiences, ask questions, and connect with fellow adventurers exploring the romantic streets of Paris.",
+                      "Join our community of travelers to discover the magic of ${widget.currentDestination == null ? "the world" : widget.currentDestination!.name}. Share your experiences, ask questions, and connect with fellow adventurers exploring the uniqueness of ${widget.currentDestination == null ? generalDestination.name : widget.currentDestination!.name}.",
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontSize: 13,
                             height: 1.5,

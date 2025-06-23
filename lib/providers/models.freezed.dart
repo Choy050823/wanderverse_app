@@ -325,7 +325,7 @@ mixin _$Post {
   User get creator => throw _privateConstructorUsedError;
   int get likesCount => throw _privateConstructorUsedError;
   int get commentsCount => throw _privateConstructorUsedError;
-  String get destinationId => throw _privateConstructorUsedError;
+  Destination get destination => throw _privateConstructorUsedError;
 
   /// Serializes this Post to a JSON map.
   Map<String, dynamic> toJson() => throw _privateConstructorUsedError;
@@ -352,9 +352,10 @@ abstract class $PostCopyWith<$Res> {
       User creator,
       int likesCount,
       int commentsCount,
-      String destinationId});
+      Destination destination});
 
   $UserCopyWith<$Res> get creator;
+  $DestinationCopyWith<$Res> get destination;
 }
 
 /// @nodoc
@@ -382,7 +383,7 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
     Object? creator = null,
     Object? likesCount = null,
     Object? commentsCount = null,
-    Object? destinationId = null,
+    Object? destination = null,
   }) {
     return _then(_value.copyWith(
       id: null == id
@@ -425,10 +426,10 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
           ? _value.commentsCount
           : commentsCount // ignore: cast_nullable_to_non_nullable
               as int,
-      destinationId: null == destinationId
-          ? _value.destinationId
-          : destinationId // ignore: cast_nullable_to_non_nullable
-              as String,
+      destination: null == destination
+          ? _value.destination
+          : destination // ignore: cast_nullable_to_non_nullable
+              as Destination,
     ) as $Val);
   }
 
@@ -439,6 +440,16 @@ class _$PostCopyWithImpl<$Res, $Val extends Post>
   $UserCopyWith<$Res> get creator {
     return $UserCopyWith<$Res>(_value.creator, (value) {
       return _then(_value.copyWith(creator: value) as $Val);
+    });
+  }
+
+  /// Create a copy of Post
+  /// with the given fields replaced by the non-null parameter values.
+  @override
+  @pragma('vm:prefer-inline')
+  $DestinationCopyWith<$Res> get destination {
+    return $DestinationCopyWith<$Res>(_value.destination, (value) {
+      return _then(_value.copyWith(destination: value) as $Val);
     });
   }
 }
@@ -461,10 +472,12 @@ abstract class _$$PostImplCopyWith<$Res> implements $PostCopyWith<$Res> {
       User creator,
       int likesCount,
       int commentsCount,
-      String destinationId});
+      Destination destination});
 
   @override
   $UserCopyWith<$Res> get creator;
+  @override
+  $DestinationCopyWith<$Res> get destination;
 }
 
 /// @nodoc
@@ -489,7 +502,7 @@ class __$$PostImplCopyWithImpl<$Res>
     Object? creator = null,
     Object? likesCount = null,
     Object? commentsCount = null,
-    Object? destinationId = null,
+    Object? destination = null,
   }) {
     return _then(_$PostImpl(
       id: null == id
@@ -532,10 +545,10 @@ class __$$PostImplCopyWithImpl<$Res>
           ? _value.commentsCount
           : commentsCount // ignore: cast_nullable_to_non_nullable
               as int,
-      destinationId: null == destinationId
-          ? _value.destinationId
-          : destinationId // ignore: cast_nullable_to_non_nullable
-              as String,
+      destination: null == destination
+          ? _value.destination
+          : destination // ignore: cast_nullable_to_non_nullable
+              as Destination,
     ));
   }
 }
@@ -554,7 +567,7 @@ class _$PostImpl implements _Post {
       required this.creator,
       required this.likesCount,
       required this.commentsCount,
-      required this.destinationId})
+      required this.destination})
       : _imageUrls = imageUrls;
 
   factory _$PostImpl.fromJson(Map<String, dynamic> json) =>
@@ -587,11 +600,11 @@ class _$PostImpl implements _Post {
   @override
   final int commentsCount;
   @override
-  final String destinationId;
+  final Destination destination;
 
   @override
   String toString() {
-    return 'Post(id: $id, title: $title, content: $content, postType: $postType, imageUrls: $imageUrls, createdAt: $createdAt, updatedAt: $updatedAt, creator: $creator, likesCount: $likesCount, commentsCount: $commentsCount, destinationId: $destinationId)';
+    return 'Post(id: $id, title: $title, content: $content, postType: $postType, imageUrls: $imageUrls, createdAt: $createdAt, updatedAt: $updatedAt, creator: $creator, likesCount: $likesCount, commentsCount: $commentsCount, destination: $destination)';
   }
 
   @override
@@ -615,8 +628,8 @@ class _$PostImpl implements _Post {
                 other.likesCount == likesCount) &&
             (identical(other.commentsCount, commentsCount) ||
                 other.commentsCount == commentsCount) &&
-            (identical(other.destinationId, destinationId) ||
-                other.destinationId == destinationId));
+            (identical(other.destination, destination) ||
+                other.destination == destination));
   }
 
   @JsonKey(includeFromJson: false, includeToJson: false)
@@ -633,7 +646,7 @@ class _$PostImpl implements _Post {
       creator,
       likesCount,
       commentsCount,
-      destinationId);
+      destination);
 
   /// Create a copy of Post
   /// with the given fields replaced by the non-null parameter values.
@@ -663,7 +676,7 @@ abstract class _Post implements Post {
       required final User creator,
       required final int likesCount,
       required final int commentsCount,
-      required final String destinationId}) = _$PostImpl;
+      required final Destination destination}) = _$PostImpl;
 
   factory _Post.fromJson(Map<String, dynamic> json) = _$PostImpl.fromJson;
 
@@ -688,7 +701,7 @@ abstract class _Post implements Post {
   @override
   int get commentsCount;
   @override
-  String get destinationId;
+  Destination get destination;
 
   /// Create a copy of Post
   /// with the given fields replaced by the non-null parameter values.

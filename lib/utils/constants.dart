@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+import 'package:wanderverse_app/providers/models.dart';
 
 class MenuItem {
   final String pageName;
@@ -68,12 +69,12 @@ const List<MenuItem> menuItems = [
     inactiveIcon: Icons.location_on_outlined,
     activeIcon: Icons.location_on,
   ),
-  MenuItem(
-    pageName: 'Notifications',
-    route: '/notifications',
-    inactiveIcon: Icons.notifications_outlined,
-    activeIcon: Icons.notifications,
-  ),
+  // MenuItem(
+  //   pageName: 'Notifications',
+  //   route: '/notifications',
+  //   inactiveIcon: Icons.notifications_outlined,
+  //   activeIcon: Icons.notifications,
+  // ),
   MenuItem(
       pageName: 'User Profile',
       route: '/user-profile',
@@ -96,3 +97,12 @@ String getTimeAgo(DateTime dateTime) {
 
 const defaultProfilePic =
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCHU5JIkqfD2z1KMc4c1nW4zdArnxBM3cCcQ&s";
+
+final generalDestination = Destination(
+    id: "0",
+    name: "General",
+    description: "Welcome to the General Page",
+    imageUrl: "https://wanderverse-cloud-bucket.s3.ap-southeast-1.amazonaws.com/general.png",
+    createdAt: DateTime.now(),
+    updatedAt: DateTime.now()
+);

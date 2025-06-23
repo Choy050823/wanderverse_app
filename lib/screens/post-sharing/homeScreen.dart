@@ -80,7 +80,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       final post = posts[index];
                       return PostCard(
                         post: post,
-                        destination: post.destinationId,
+                        destination: post.destination.name,
                         // initialLikes: post.likesCount,
                         // imageUrl: post.imageUrls.isEmpty ? "" : post.imageUrls[0],
                         // profilePicUrl:
@@ -107,7 +107,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       final post = posts[index];
                       return PostCard(
                         post: post,
-                        destination: post.destinationId,
+                        destination: post.destination.name,
                         // initialLikes: post.likesCount,
                         // imageUrl: post.imageUrls.isEmpty ? "" : post.imageUrls[0],
                         // profilePicUrl:
