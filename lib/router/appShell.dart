@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wanderverse_app/providers/post-sharing/createPostOverlayService.dart';
+import 'package:wanderverse_app/router/ResponsiveLayout.dart';
 import 'package:wanderverse_app/screens/post-sharing/createPostScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/homeScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/userProfileScreen.dart';
@@ -18,6 +19,7 @@ class AppShell extends ConsumerStatefulWidget {
 
 class _AppShellState extends ConsumerState<AppShell> {
   // bool _showOverlay = false;
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   void handleRouteSelected(String route) {
     // Special case for create post: no need route to new screen
@@ -43,23 +45,33 @@ class _AppShellState extends ConsumerState<AppShell> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    final isMobile = ResponsiveLayout.isMobile(context);
 
     final showOverlay = ref.watch(createPostOverlayServiceProvider);
 
     return Scaffold(
+      key: _scaffoldKey,
       appBar: AppBar(
         elevation: 5,
         backgroundColor: colorScheme.surface,
         shadowColor: Colors.amber,
+        leading: isMobile
+            ? IconButton(
+                onPressed: () {
+                  _scaffoldKey.currentState?.openDrawer();
+                },
+                icon: const Icon(Icons.menu))
+            : null,
         title: Row(
           children: [
-            IconButton(
-              onPressed: () {},
-              icon: Icon(
-                Icons.explore_outlined,
-                color: colorScheme.primary, // Use primary color for icon
+            if (!isMobile)
+              IconButton(
+                onPressed: () {},
+                icon: Icon(
+                  Icons.explore_outlined,
+                  color: colorScheme.primary, // Use primary color for icon
+                ),
               ),
-            ),
             Text(
               'Wanderverse',
               style: textTheme.titleLarge?.copyWith(
@@ -75,22 +87,35 @@ class _AppShellState extends ConsumerState<AppShell> {
           SizedBox(width: 8),
         ],
       ),
+      drawer: isMobile
+          ? SidebarMenu(
+              activeRoute: ref.watch(appstateProvider).route,
+              onRouteSelected: (route) {
+                handleRouteSelected(route);
+                Navigator.pop(context);
+              })
+          : null,
       body: Stack(
         children: [
-          Row(
-            children: [
-              SidebarMenu(
-                activeRoute: ref.watch(appstateProvider).route,
-                onRouteSelected: handleRouteSelected,
-              ),
-              Expanded(
-                child: Router(
+          isMobile
+              ? Router(
                   routerDelegate: ref.watch(innerRouterDelegateProvider),
                   backButtonDispatcher: RootBackButtonDispatcher(),
+                )
+              : Row(
+                  children: [
+                    SidebarMenu(
+                      activeRoute: ref.watch(appstateProvider).route,
+                      onRouteSelected: handleRouteSelected,
+                    ),
+                    Expanded(
+                      child: Router(
+                        routerDelegate: ref.watch(innerRouterDelegateProvider),
+                        backButtonDispatcher: RootBackButtonDispatcher(),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
 
           // Create post overlay
           if (showOverlay)

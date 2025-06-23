@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wanderverse_app/providers/models.dart';
 import 'package:wanderverse_app/providers/post-sharing/destinationService.dart';
 import 'package:wanderverse_app/providers/post-sharing/postService.dart';
+import 'package:wanderverse_app/router/ResponsiveLayout.dart';
 import 'package:wanderverse_app/utils/constants.dart';
 import 'package:wanderverse_app/utils/widgets/textField.dart';
 
@@ -38,13 +39,6 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen>
   TextEditingController _destinationController = TextEditingController();
   // final TextEditingController _captionController = TextEditingController();
   // final TextEditingController _locationController = TextEditingController();
-
-  final double imagePickerWidth = 500;
-  final double imagePickerHeight = 500;
-  final double imageWidth = 500;
-  final double imageHeight = 500;
-  final double imageWithCaptionWidth = 1000;
-  final double captionHeight = 500;
 
   void _previousImage() {
     if (_currentImagePage > 0) {
@@ -114,18 +108,138 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen>
     });
   }
 
-  Widget _buildImage(Uint8List fileData) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(8),
-      child: Image.memory(
-        fileData,
-        fit: BoxFit.cover,
-        width: double.infinity,
-        height: double.infinity,
-        errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
-      ),
-    );
+  void _sharePost(String title, String content) {
+    // Validation checks (use return to exit early)
+    if (_selectedFiles.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please select at least one image'),
+        backgroundColor: Colors.red,
+      ));
+      return; // Exit early
+    }
+
+    if (title.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please enter title'),
+        backgroundColor: Colors.red,
+      ));
+      return; // Exit early
+    }
+
+    if (content.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please enter content'),
+        backgroundColor: Colors.red,
+      ));
+      return; // Exit early
+    }
+
+    // if (destination.trim().isEmpty) {
+    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+    //     content: Text('Please enter destination'),
+    //     backgroundColor: Colors.red,
+    //   ));
+    //   return; // Exit early
+    // }
+
+    if (_selectedDestinationId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text('Please select a destination'),
+        backgroundColor: Colors.red,
+      ));
+      return;
+    }
+
+    // Show loading indicator
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+      content: Row(children: [
+        CircularProgressIndicator(color: Colors.white),
+        SizedBox(width: 16),
+        Text('Creating post...'),
+      ]),
+      duration: Duration(seconds: 10),
+    ));
+
+    // Store error message variable to avoid widget disposal issues
+    final postServiceNotifier = _selectedPostType == PostType.post
+        ? ref.read(sharingPostsProvider.notifier)
+        : ref.read(discussionPostsProvider.notifier);
+
+    final postService = _selectedPostType == PostType.post
+        ? ref.read(sharingPostsProvider)
+        : ref.read(discussionPostsProvider);
+
+    // print("SELECTED POST TYPE: $_selectedPostType");
+
+    postServiceNotifier
+        .createPost(title, content, _selectedDestinationId!,
+            postType: _selectedPostType, imageFiles: _selectedFiles)
+        .then((success) {
+      ScaffoldMessenger.of(context).hideCurrentSnackBar();
+
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Post created successfully!'),
+          backgroundColor: Colors.greenAccent,
+        ));
+
+        // Only close after successful post creation
+        widget.onClose?.call();
+      } else {
+        // Get error message immediately to avoid ref after disposal
+        String? errorMsg;
+        try {
+          errorMsg = postService.errorMessage;
+        } catch (e) {
+          errorMsg = "Could not retrieve error details";
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Error: ${errorMsg ?? 'Failed to create post'}"),
+          backgroundColor: Colors.red,
+        ));
+      }
+    });
   }
+
+  void _deleteCurrentImage() {
+    if (_selectedFiles.isEmpty) return;
+
+    setState(() {
+      _selectedFiles.removeAt(_currentImagePage);
+
+      // Adjust current page if necessary
+      if (_currentImagePage >= _selectedFiles.length &&
+          _selectedFiles.isNotEmpty) {
+        _currentImagePage = _selectedFiles.length - 1;
+      } else if (_selectedFiles.isEmpty) {
+        _currentImagePage = 0;
+        _showCaptionPanel = false; // Hide caption panel if no images
+      }
+
+      // Update page controller if there are still images
+      if (_selectedFiles.isNotEmpty) {
+        _imagePageController.animateToPage(
+          _currentImagePage,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+        );
+      }
+    });
+  }
+
+  // Widget _buildImage(Uint8List fileData) {
+  //   return ClipRRect(
+  //     borderRadius: BorderRadius.circular(8),
+  //     child: Image.memory(
+  //       fileData,
+  //       fit: BoxFit.cover,
+  //       width: double.infinity,
+  //       height: double.infinity,
+  //       errorBuilder: (context, error, stackTrace) => const Icon(Icons.error),
+  //     ),
+  //   );
+  // }
 
   @override
   void initState() {
@@ -146,44 +260,441 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen>
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = ResponsiveLayout.isMobile(context);
+    final double imagePickerWidth =
+        isMobile ? MediaQuery.of(context).size.width - 32 : 500;
+    final double imagePickerHeight =
+        isMobile ? MediaQuery.of(context).size.height * 0.8 : 500;
+    final double imageWithCaptionWidth =
+        isMobile ? MediaQuery.of(context).size.width - 32 : 1000;
+
     return Container(
-      width: _showCaptionPanel && _selectedFiles.isNotEmpty
-          ? imageWithCaptionWidth
-          : imagePickerWidth,
-      height: imagePickerHeight,
+      width: isMobile
+          ? MediaQuery.of(context).size.width - 32 // Full minus margins
+          : (_showCaptionPanel && _selectedFiles.isNotEmpty
+              ? imageWithCaptionWidth
+              : imagePickerWidth),
+      height: isMobile
+          ? _showCaptionPanel
+              ? MediaQuery.of(context).size.height * 0.8
+              : imagePickerHeight
+          : imagePickerHeight,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(10),
       ),
-      child: Row(
-        children: [
-          // Main image picker section
-          SizedBox(
-            width: imagePickerWidth,
-            height: imagePickerHeight,
-            child: _buildImagePickerLayout(),
-          ),
+      child: isMobile
+          ? _buildMobileLayout(
+              imagePickerWidth, imagePickerHeight, imageWithCaptionWidth)
+          : _buildDesktopLayout(
+              imagePickerWidth, imagePickerHeight, imageWithCaptionWidth),
+    );
+  }
 
-          // Caption panel (animated)
-          if (_showCaptionPanel && _selectedFiles.isNotEmpty)
-            TweenAnimationBuilder<double>(
-              duration: const Duration(milliseconds: 300),
-              tween: Tween<double>(begin: 0.0, end: 1.0),
-              builder: (context, value, child) {
-                return ClipRect(
-                  child: SizedBox(
-                    width: (imageWithCaptionWidth - imagePickerWidth) * value,
-                    height: imagePickerHeight,
-                    child: Opacity(
-                      opacity: value,
-                      child: _buildCaptionPanel(),
-                    ),
-                  ),
-                );
-              },
-            ),
+  Widget _buildMobileLayout(double imagePickerWidth, double imagePickerHeight,
+      double imageWithCaptionWidth) {
+    final theme = Theme.of(context);
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(12),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                _showCaptionPanel ? "Add Details" : "New Post",
+                style: theme.textTheme.titleLarge
+                    ?.copyWith(fontWeight: FontWeight.bold),
+              ),
+              IconButton(
+                  onPressed: () => widget.onClose?.call(),
+                  icon: const Icon(Icons.close))
+            ],
+          ),
+        ),
+        const Divider(),
+
+        // Image Picker or form
+        Expanded(
+            child: AnimatedSwitcher(
+          duration: const Duration(milliseconds: 300),
+          child: _showCaptionPanel && _selectedFiles.isNotEmpty
+              ? _buildCaptionPanelMobile()
+              : _buildImagePickerLayoutMobile(),
+        ))
+      ],
+    );
+  }
+
+  Widget _buildImagePickerLayoutMobile() {
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.6,
+            child: _buildImagePickerContent(),
+          ),
+          // if (_selectedFiles.isNotEmpty) ...[
+          // const SizedBox(
+          //   height: 16,
+          // ),
+          // SizedBox(
+          //   height: 120,
+          //   child: ListView.builder(
+          //       scrollDirection: Axis.horizontal,
+          //       itemCount: _selectedFiles.length,
+          //       padding: const EdgeInsets.symmetric(horizontal: 16),
+          //       itemBuilder: (context, index) {
+          //         final isSelected = index == _currentImagePage;
+          //         return GestureDetector(
+          //           onTap: () {
+          //             setState(() {
+          //               _currentImagePage = index;
+          //               _imagePageController.animateToPage(index,
+          //                   duration: const Duration(milliseconds: 300),
+          //                   curve: Curves.easeInOut);
+          //             });
+          //           },
+          //           child: Container(
+          //             width: 100,
+          //             margin: const EdgeInsets.only(right: 8),
+          //             decoration: BoxDecoration(
+          //                 border: Border.all(
+          //                     color: isSelected
+          //                         ? Theme.of(context).colorScheme.primary
+          //                         : Colors.transparent,
+          //                     width: 3),
+          //                 borderRadius: BorderRadius.circular(8)),
+          //             child: ClipRRect(
+          //               borderRadius: BorderRadius.circular(6),
+          //               child: Image.memory(
+          //                 _selectedFiles[index],
+          //                 fit: BoxFit.cover,
+          //               ),
+          //             ),
+          //           ),
+          //         );
+          //       }),
+          // ),
+          // const SizedBox(
+          //   height: 16,
+          // ),
+          // AspectRatio(
+          //   aspectRatio: 1,
+          //   child: _buildImagePreview(),
+          // ),
+
+          //     // Next Button
+          //     const SizedBox(
+          //       height: 24,
+          //     ),
+          //     SizedBox(
+          //       width: double.infinity,
+          //       child: Padding(
+          //         padding: const EdgeInsets.symmetric(horizontal: 16),
+          //         child: ElevatedButton(
+          //             style: ElevatedButton.styleFrom(
+          //                 padding: const EdgeInsets.symmetric(vertical: 16),
+          //                 backgroundColor: Theme.of(context).colorScheme.primary,
+          //                 foregroundColor:
+          //                     Theme.of(context).colorScheme.onPrimary),
+          //             onPressed: () {
+          //               setState(() {
+          //                 _showCaptionPanel = true;
+          //               });
+          //             },
+          //             child: const Text(
+          //               'Continue',
+          //               style: TextStyle(fontSize: 16),
+          //             )),
+          //       ),
+          //       ),
+          //     )
+          //   ]
         ],
       ),
+    );
+  }
+
+  Widget _buildCaptionPanelMobile() {
+    final theme = Theme.of(context);
+    final destinationAsync = ref.watch(destinationServiceProvider);
+
+    return SingleChildScrollView(
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // AspectRatio(
+            //   aspectRatio: 16 / 9,
+            //   child: Container(
+            //     decoration: BoxDecoration(
+            //         border: Border.all(
+            //             color: theme.colorScheme.outline.withOpacity(0.5)),
+            //         borderRadius: BorderRadius.circular(8)),
+            //     child: ClipRRect(
+            //       borderRadius: BorderRadius.circular(7),
+            //       child: Image.memory(
+            //         _selectedFiles[_currentImagePage],
+            //         fit: BoxFit.cover,
+            //       ),
+            //     ),
+            //   ),
+            // ),
+
+            // const SizedBox(
+            //   height: 24,
+            // ),
+
+            // Form fields
+            buildTextField(
+                controller: _titleController,
+                labelText: 'Title',
+                suffixIcon: const Icon(Icons.title)),
+
+            const SizedBox(
+              height: 16,
+            ),
+
+            buildTextField(
+                controller: _contentController,
+                labelText: 'Content',
+                suffixIcon: const Icon(Icons.edit)),
+
+            const SizedBox(
+              height: 16,
+            ),
+
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Destination",
+                  style: theme.textTheme.bodyMedium
+                      ?.copyWith(fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+                destinationAsync.when(
+                    data: (destinations) {
+                      return Autocomplete<Destination>(
+                        optionsBuilder: (TextEditingValue textEditingValue) {
+                          if (textEditingValue.text.isEmpty) {
+                            return destinations;
+                          }
+                          return destinations.where((destination) {
+                            return destination.name
+                                .toLowerCase()
+                                .contains(textEditingValue.text.toLowerCase());
+                          });
+                        },
+                        displayStringForOption: (destination) =>
+                            destination.name,
+                        fieldViewBuilder: (context, textEditingController,
+                            focusNode, onFieldSubmitted) {
+                          _destinationController = textEditingController;
+                          return TextField(
+                            controller: textEditingController,
+                            focusNode: focusNode,
+                            decoration: InputDecoration(
+                                hintText: "Search for a destination...",
+                                prefixIcon: const Icon(Icons.location_on),
+                                border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8)),
+                                fillColor: theme.colorScheme.surface,
+                                filled: true),
+                            onSubmitted: (_) => onFieldSubmitted(),
+                          );
+                        },
+                        onSelected: (Destination destination) {
+                          setState(() {
+                            _selectedDestinationId = destination.id;
+                            _destinationController.text = destination.name;
+                          });
+                        },
+                        optionsViewBuilder: (context, onSelected, options) {
+                          return Align(
+                            alignment: Alignment.topLeft,
+                            child: Material(
+                                elevation: 4.0,
+                                child: ConstrainedBox(
+                                  constraints: const BoxConstraints(
+                                      maxHeight: 200, maxWidth: 500),
+                                  child: ListView.builder(
+                                      padding: EdgeInsets.zero,
+                                      shrinkWrap: true,
+                                      itemCount: options.length,
+                                      itemBuilder: (context, index) {
+                                        final Destination option =
+                                            options.elementAt(index);
+                                        return ListTile(
+                                          leading: option.imageUrl.isNotEmpty
+                                              ? CircleAvatar(
+                                                  backgroundImage: NetworkImage(
+                                                      option.imageUrl),
+                                                )
+                                              : const CircleAvatar(
+                                                  child:
+                                                      Icon(Icons.location_on),
+                                                ),
+                                          title: Text(option.name),
+                                          subtitle: Text(
+                                            option.description,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                          onTap: () => onSelected(option),
+                                        );
+                                      }),
+                                )),
+                          );
+                        },
+                      );
+                    },
+                    error: (error, _) =>
+                        Text("Error loading destinations: $error"),
+                    loading: () => const Center(
+                          child: CircularProgressIndicator(),
+                        ))
+              ],
+            ),
+
+            const SizedBox(
+              height: 16,
+            ),
+
+            // Post type selector
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "Post Type",
+                  style: theme.textTheme.titleMedium
+                      ?.copyWith(fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(
+                  height: 8,
+                ),
+                Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: theme.colorScheme.outline.withOpacity(0.5),
+                      ),
+                    ),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<PostType>(
+                        isExpanded: true,
+                        value: _selectedPostType,
+                        icon: const Icon(Icons.arrow_drop_down),
+                        style: theme.textTheme.bodyLarge,
+                        onChanged: (PostType? newValue) {
+                          if (newValue != null) {
+                            setState(() {
+                              _selectedPostType = newValue;
+                            });
+                          }
+                        },
+                        items: PostType.values
+                            .map<DropdownMenuItem<PostType>>((PostType type) {
+                          return DropdownMenuItem<PostType>(
+                              value: type,
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    _getPostTypeIcon(type),
+                                    size: 20,
+                                  ),
+                                  const SizedBox(
+                                    width: 8,
+                                  ),
+                                  Text(_getPostTypeName(type))
+                                ],
+                              ));
+                        }).toList(),
+                      ),
+                    ))
+              ],
+            ),
+
+            const SizedBox(
+              height: 32,
+            ),
+
+            // Post and Back Button
+            Row(
+              children: [
+                Expanded(
+                    flex: 1,
+                    child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16)),
+                        onPressed: () {
+                          setState(() {
+                            _showCaptionPanel = false;
+                          });
+                        },
+                        child: const Text('Back'))),
+                const SizedBox(
+                  width: 16,
+                ),
+                Expanded(
+                    flex: 2,
+                    child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            backgroundColor: theme.colorScheme.primary),
+                        onPressed: () => _sharePost(
+                              _titleController.text,
+                              _contentController.text,
+                            ),
+                        child: Text(
+                          'Share Post',
+                          style: TextStyle(
+                            color: theme.colorScheme.onPrimary,
+                            // fontSize: 12,
+                          ),
+                        ))),
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDesktopLayout(double imagePickerWidth, double imagePickerHeight,
+      double imageWithCaptionWidth) {
+    return Row(
+      children: [
+        // Main image picker section
+        SizedBox(
+          width: imagePickerWidth,
+          height: imagePickerHeight,
+          child: _buildImagePickerLayout(),
+        ),
+
+        // Caption panel (animated)
+        if (_showCaptionPanel && _selectedFiles.isNotEmpty)
+          TweenAnimationBuilder<double>(
+            duration: const Duration(milliseconds: 300),
+            tween: Tween<double>(begin: 0.0, end: 1.0),
+            builder: (context, value, child) {
+              return ClipRect(
+                child: SizedBox(
+                  width: (imageWithCaptionWidth - imagePickerWidth) * value,
+                  height: imagePickerHeight,
+                  child: Opacity(
+                    opacity: value,
+                    child: _buildCaptionPanel(),
+                  ),
+                ),
+              );
+            },
+          ),
+      ],
     );
   }
 
@@ -772,125 +1283,5 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen>
         ],
       ),
     );
-  }
-
-  void _sharePost(String title, String content) {
-    // Validation checks (use return to exit early)
-    if (_selectedFiles.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Please select at least one image'),
-        backgroundColor: Colors.red,
-      ));
-      return; // Exit early
-    }
-
-    if (title.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Please enter title'),
-        backgroundColor: Colors.red,
-      ));
-      return; // Exit early
-    }
-
-    if (content.trim().isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Please enter content'),
-        backgroundColor: Colors.red,
-      ));
-      return; // Exit early
-    }
-
-    // if (destination.trim().isEmpty) {
-    //   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-    //     content: Text('Please enter destination'),
-    //     backgroundColor: Colors.red,
-    //   ));
-    //   return; // Exit early
-    // }
-
-    if (_selectedDestinationId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text('Please select a destination'),
-        backgroundColor: Colors.red,
-      ));
-      return;
-    }
-
-    // Show loading indicator
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      content: Row(children: [
-        CircularProgressIndicator(color: Colors.white),
-        SizedBox(width: 16),
-        Text('Creating post...'),
-      ]),
-      duration: Duration(seconds: 10),
-    ));
-
-    // Store error message variable to avoid widget disposal issues
-    final postServiceNotifier = _selectedPostType == PostType.post
-        ? ref.read(sharingPostsProvider.notifier)
-        : ref.read(discussionPostsProvider.notifier);
-
-    final postService = _selectedPostType == PostType.post
-        ? ref.read(sharingPostsProvider)
-        : ref.read(discussionPostsProvider);
-
-    // print("SELECTED POST TYPE: $_selectedPostType");
-
-    postServiceNotifier
-        .createPost(title, content, _selectedDestinationId!,
-            postType: _selectedPostType, imageFiles: _selectedFiles)
-        .then((success) {
-      ScaffoldMessenger.of(context).hideCurrentSnackBar();
-
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Post created successfully!'),
-          backgroundColor: Colors.greenAccent,
-        ));
-
-        // Only close after successful post creation
-        widget.onClose?.call();
-      } else {
-        // Get error message immediately to avoid ref after disposal
-        String? errorMsg;
-        try {
-          errorMsg = postService.errorMessage;
-        } catch (e) {
-          errorMsg = "Could not retrieve error details";
-        }
-
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Error: ${errorMsg ?? 'Failed to create post'}"),
-          backgroundColor: Colors.red,
-        ));
-      }
-    });
-  }
-
-  void _deleteCurrentImage() {
-    if (_selectedFiles.isEmpty) return;
-
-    setState(() {
-      _selectedFiles.removeAt(_currentImagePage);
-
-      // Adjust current page if necessary
-      if (_currentImagePage >= _selectedFiles.length &&
-          _selectedFiles.isNotEmpty) {
-        _currentImagePage = _selectedFiles.length - 1;
-      } else if (_selectedFiles.isEmpty) {
-        _currentImagePage = 0;
-        _showCaptionPanel = false; // Hide caption panel if no images
-      }
-
-      // Update page controller if there are still images
-      if (_selectedFiles.isNotEmpty) {
-        _imagePageController.animateToPage(
-          _currentImagePage,
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-        );
-      }
-    });
   }
 }

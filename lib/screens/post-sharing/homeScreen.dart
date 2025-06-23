@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:wanderverse_app/providers/models.dart';
 import 'package:wanderverse_app/providers/post-sharing/postService.dart';
+import 'package:wanderverse_app/router/ResponsiveLayout.dart';
 import 'package:wanderverse_app/utils/widgets/postCard.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -51,6 +52,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     List<Post> posts = List<Post>.from(postState.posts);
     final isLoading = postState.isLoading;
     final hasError = postState.errorMessage != null;
+    final isMobile = ResponsiveLayout.isMobile(context);
 
     // item count for the grids
     final itemCount = posts.isEmpty && isLoading
@@ -62,34 +64,58 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         onRefresh: () => ref.read(sharingPostsProvider.notifier).refreshPosts(),
         child: posts.isEmpty && !isLoading
             ? _buildEmptyView(hasError, postState.errorMessage)
-            : MasonryGridView.count(
-                controller: _scrollController,
-                itemCount: itemCount,
-                crossAxisCount: 3,
-                mainAxisSpacing: 4.0,
-                crossAxisSpacing: 4.0,
-                padding: const EdgeInsets.all(8.0),
-                itemBuilder: (context, index) {
-                  // show loading indicator after running all the index
-                  if (index >= posts.length) {
-                    return isLoading
-                        ? _buildLoadingIndicator()
-                        : _buildNoMorePostsIndicator();
-                  }
+            : isMobile
+                ? ListView.builder(
+                    controller: _scrollController,
+                    itemCount: itemCount,
+                    padding: const EdgeInsets.all(8.0),
+                    itemBuilder: (context, index) {
+                      if (index >= posts.length) {
+                        return isLoading
+                            ? _buildLoadingIndicator()
+                            : _buildNoMorePostsIndicator();
+                      }
 
-                  // all listed posts
-                  final post = posts[index];
-                  return PostCard(
-                    post: post,
-                    destination: post.destinationId,
-                    // initialLikes: post.likesCount,
-                    // imageUrl: post.imageUrls.isEmpty ? "" : post.imageUrls[0],
-                    // profilePicUrl:
-                    //     post.creator.profilePicUrl ?? defaultProfilePic,
-                    // caption: post.title,
-                  );
-                },
-              ),
+                      // all listed posts
+                      final post = posts[index];
+                      return PostCard(
+                        post: post,
+                        destination: post.destinationId,
+                        // initialLikes: post.likesCount,
+                        // imageUrl: post.imageUrls.isEmpty ? "" : post.imageUrls[0],
+                        // profilePicUrl:
+                        //     post.creator.profilePicUrl ?? defaultProfilePic,
+                        // caption: post.title,
+                      );
+                    })
+                : MasonryGridView.count(
+                    controller: _scrollController,
+                    itemCount: itemCount,
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 4.0,
+                    crossAxisSpacing: 4.0,
+                    padding: const EdgeInsets.all(8.0),
+                    itemBuilder: (context, index) {
+                      // show loading indicator after running all the index
+                      if (index >= posts.length) {
+                        return isLoading
+                            ? _buildLoadingIndicator()
+                            : _buildNoMorePostsIndicator();
+                      }
+
+                      // all listed posts
+                      final post = posts[index];
+                      return PostCard(
+                        post: post,
+                        destination: post.destinationId,
+                        // initialLikes: post.likesCount,
+                        // imageUrl: post.imageUrls.isEmpty ? "" : post.imageUrls[0],
+                        // profilePicUrl:
+                        //     post.creator.profilePicUrl ?? defaultProfilePic,
+                        // caption: post.title,
+                      );
+                    },
+                  ),
       ),
     );
   }
