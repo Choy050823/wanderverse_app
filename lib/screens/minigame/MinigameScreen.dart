@@ -22,6 +22,7 @@ class _MinigameScreenState extends State<MinigameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    print("loading unity game");
     return Scaffold(body: WebViewWidget(controller: _controller));
   }
 }
