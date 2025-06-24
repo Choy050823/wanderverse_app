@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 class MinigameScreen extends StatefulWidget {
   const MinigameScreen({super.key});
@@ -8,8 +9,19 @@ class MinigameScreen extends StatefulWidget {
 }
 
 class _MinigameScreenState extends State<MinigameScreen> {
+  late final WebViewController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = WebViewController()
+      // ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..loadRequest(Uri.base.resolve('web/unity/index.html'));
+    // _controller.loadFlutterAsset('web/unity/index.html');
+  }
+
   @override
   Widget build(BuildContext context) {
-    return const Scaffold();
+    return Scaffold(body: WebViewWidget(controller: _controller));
   }
 }
