@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wanderverse_app/providers/post-sharing/createPostOverlayService.dart';
 import 'package:wanderverse_app/router/ResponsiveLayout.dart';
+import 'package:wanderverse_app/screens/discussion/DiscussionScreen.dart';
+import 'package:wanderverse_app/screens/minigame/MinigameScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/createPostScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/homeScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/userProfileScreen.dart';
@@ -176,6 +178,26 @@ class InnerRouterDelegate extends RouterDelegate<AppStateData>
             key: ValueKey('Home'),
             name: AppStateData.home,
             child: HomeScreen(),
+          ),
+        );
+        break;
+
+      case AppStateData.game:
+        pages.add(
+          const MaterialPage(
+            key: ValueKey('Game'),
+            name: AppStateData.game,
+            child: MinigameScreen(),
+          ),
+        );
+        break;
+
+      case AppStateData.discussion:
+        pages.add(
+          const MaterialPage(
+            key: ValueKey('Discussion'),
+            name: AppStateData.discussion,
+            child: DiscussionScreen(),
           ),
         );
         break;

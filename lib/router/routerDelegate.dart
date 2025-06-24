@@ -6,6 +6,7 @@ import 'package:wanderverse_app/screens/authentication/authScreen.dart';
 import 'package:wanderverse_app/router/appShell.dart';
 import 'package:wanderverse_app/screens/authentication/pageNotFoundScreen.dart';
 import 'package:wanderverse_app/screens/discussion/DiscussionScreen.dart';
+import 'package:wanderverse_app/screens/minigame/MinigameScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/homeScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/userProfileScreen.dart';
 import 'package:wanderverse_app/utils/widgets/FadeAnimation.dart';
@@ -147,6 +148,16 @@ class InnerRouterDelegate extends RouterDelegate<AppStateData>
             key: ValueKey('Home'),
             name: AppStateData.home,
             child: HomeScreen(),
+          ),
+        );
+        break;
+
+      case AppStateData.game:
+        pages.add(
+          const FadeAnimation(
+            key: ValueKey('Game'),
+            name: AppStateData.game,
+            child: MinigameScreen(),
           ),
         );
         break;

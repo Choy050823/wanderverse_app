@@ -16,12 +16,14 @@ class AppStateData with _$AppStateData {
   static const String auth = '/auth';
   static const String discussion = '/discussion';
   static const String profile = '/user-profile';
+  static const String game = '/game';
   static const String unknown = '/page-not-found';
 
   bool isValidRoute(String route) {
     return route == home ||
         route == auth ||
         route == discussion ||
+        route == game ||
         route == profile;
   }
 }

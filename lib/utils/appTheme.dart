@@ -93,7 +93,7 @@ class AppTheme {
         fontWeight: FontWeight.w600,
       ),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: Colors.white,
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -197,7 +197,7 @@ class AppTheme {
       thickness: 1,
       space: 24,
     ),
-    tabBarTheme: const TabBarTheme(
+    tabBarTheme: const TabBarThemeData(
       labelColor: primaryBlue,
       unselectedLabelColor: mediumGrey,
       indicatorColor: primaryBlue,
@@ -257,17 +257,17 @@ class AppTheme {
         fontWeight: FontWeight.bold,
       ),
     ),
-    appBarTheme: AppBarTheme(
+    appBarTheme: const AppBarTheme(
       backgroundColor: backgroundDark,
       foregroundColor: Colors.white,
       elevation: 0,
       centerTitle: false,
-      titleTextStyle: const TextStyle(
+      titleTextStyle: TextStyle(
         fontSize: 20,
         fontWeight: FontWeight.w600,
       ),
     ),
-    cardTheme: CardTheme(
+    cardTheme: CardThemeData(
       color: const Color(0xFF2D3748),
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -371,7 +371,7 @@ class AppTheme {
       thickness: 1,
       space: 24,
     ),
-    tabBarTheme: const TabBarTheme(
+    tabBarTheme: const TabBarThemeData(
       labelColor: tertiaryGreen,
       unselectedLabelColor: Color(0xFF9CA3AF),
       indicatorColor: tertiaryGreen,
