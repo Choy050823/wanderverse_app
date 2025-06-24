@@ -183,6 +183,9 @@ class PostService extends _$PostService {
             hasMore: hasMorePages,
             currentPage: state.currentPage + 1);
       } else {
+        if (response.statusCode == 401) {
+          await ref.read(authServiceProvider.notifier).logout();
+        }
         _handleError("Failed to load posts. Status: ${response.statusCode}");
       }
     } catch (e) {
