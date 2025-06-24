@@ -44,13 +44,13 @@ class PostsState with _$PostsState {
       @Default(true) bool hasMore}) = _PostsState;
 }
 
-final sharingPostsProvider = postServiceProvider(PostApiType.sharing);
-final discussionPostsProvider = postServiceProvider(PostApiType.discussion);
+// final sharingPostsProvider = postServiceProvider(PostApiType.sharing);
+// final discussionPostsProvider = postServiceProvider(PostApiType.discussion);
 
 @Riverpod(keepAlive: true)
 class PostService extends _$PostService {
   @override
-  PostsState build(PostApiType type) {
+  PostsState build(PostApiType type, String destinationId) {
     // Initialize with the specific post type
     Future.microtask(() => getPosts());
     return PostsState(currentPage: 0, pageSize: 5);
@@ -110,7 +110,7 @@ class PostService extends _$PostService {
     try {
       // Access the type parameter using the property 'type'
       final url = Uri.parse(
-          '$_baseUrl/api/post/${type.endpoint}?page=${state.currentPage}&size=${state.pageSize}');
+          '$_baseUrl/api/post/${type.endpoint}?destinationId=$destinationId&page=${state.currentPage}&size=${state.pageSize}');
 
       final response = await http.get(url, headers: await _headers);
 

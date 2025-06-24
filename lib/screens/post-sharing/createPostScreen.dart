@@ -39,6 +39,8 @@ class _CreatePostScreenState extends ConsumerState<CreatePostScreen>
   TextEditingController _destinationController = TextEditingController();
   // final TextEditingController _captionController = TextEditingController();
   // final TextEditingController _locationController = TextEditingController();
+  final  PostServiceProvider sharingPostsProvider = postServiceProvider(PostApiType.sharing, "all");
+  final PostServiceProvider discussionPostsProvider = postServiceProvider(PostApiType.discussion, "all");
 
   void _previousImage() {
     if (_currentImagePage > 0) {

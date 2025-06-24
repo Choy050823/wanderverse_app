@@ -9,10 +9,13 @@ class CommentItem extends ConsumerStatefulWidget {
   final Comment comment;
   final int depth;
   final String creatorId;
+  final String destinationId;
+
   const CommentItem(
       {required this.comment,
       required this.depth,
       required this.creatorId,
+      required this.destinationId,
       super.key});
 
   @override
@@ -171,6 +174,7 @@ class _CommentItemState extends ConsumerState<CommentItem> {
                                           .profilePicUrl,
                               parentCommentId: widget.comment.id,
                               onSuccessfulReply: _handleSuccessfulReply,
+                              destinationId: widget.destinationId,
                             ),
                           )
                       ],
@@ -186,7 +190,8 @@ class _CommentItemState extends ConsumerState<CommentItem> {
                             .map((reply) => CommentItem(
                                 comment: reply,
                                 creatorId: widget.creatorId,
-                                depth: widget.depth + 1))
+                                depth: widget.depth + 1, 
+                                destinationId: widget.destinationId,))
                             .toList(),
                       ),
                     ),

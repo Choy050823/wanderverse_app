@@ -111,6 +111,7 @@ class _SpecificPostScreenState extends ConsumerState<SpecificPostScreen> {
                                       .watch(authServiceProvider)
                                       .userData["profilePicUrl"],
                           postId: widget.post.id,
+                          destinationId: widget.post.destination.id,
                         ),
                       ),
                     ),
@@ -121,9 +122,11 @@ class _SpecificPostScreenState extends ConsumerState<SpecificPostScreen> {
                         print(
                             "Comment User profile pic: ${comments[index].user.profilePicUrl}");
                         return CommentItem(
-                            comment: comments[index],
-                            creatorId: widget.post.creator.id,
-                            depth: 0);
+                          comment: comments[index],
+                          creatorId: widget.post.creator.id,
+                          depth: 0,
+                          destinationId: widget.post.destination.id,
+                        );
                       }, childCount: comments.length)),
                       loading: () => const SliverToBoxAdapter(
                         child: Center(
@@ -164,6 +167,7 @@ class _SpecificPostScreenState extends ConsumerState<SpecificPostScreen> {
                                           .user!
                                           .profilePicUrl,
                               postId: widget.post.id,
+                              destinationId: widget.post.destination.id,
                             ),
                           ),
                         ),
@@ -172,9 +176,11 @@ class _SpecificPostScreenState extends ConsumerState<SpecificPostScreen> {
                               delegate:
                                   SliverChildBuilderDelegate((context, index) {
                             return CommentItem(
-                                comment: comments[index],
-                                creatorId: widget.post.creator.id,
-                                depth: 0);
+                              comment: comments[index],
+                              creatorId: widget.post.creator.id,
+                              depth: 0,
+                              destinationId: widget.post.destination.id,
+                            );
                           }, childCount: comments.length)),
                           loading: () => const SliverToBoxAdapter(
                             child: Center(

@@ -257,6 +257,7 @@ class _SpecificDiscussionScreenState
                                       .user!
                                       .profilePicUrl,
                           postId: widget.discussionPost.id,
+                          destinationId: widget.discussionPost.destination.id,
                         ),
                       ),
                     ),
@@ -274,7 +275,8 @@ class _SpecificDiscussionScreenState
                         return CommentItem(
                             comment: comments[index],
                             creatorId: widget.discussionPost.creator.id,
-                            depth: 0);
+                            depth: 0, destinationId: widget.discussionPost.destination.id,
+                        );
                       }, childCount: comments.length)),
                       loading: () => const SliverToBoxAdapter(
                         child: Center(

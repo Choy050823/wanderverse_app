@@ -59,13 +59,13 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
     final currentUser = userState.user!;
 
     final sharingPosts = ref
-        .watch(sharingPostsProvider)
+        .watch(postServiceProvider(PostApiType.sharing, "all"))
         .posts
         .where((post) => post.creator.id == currentUser.id)
         .toList();
 
     final discussionPosts = ref
-        .watch(discussionPostsProvider)
+        .watch(postServiceProvider(PostApiType.discussion, "all"))
         .posts
         .where((post) => post.creator.id == currentUser.id)
         .toList();
@@ -251,7 +251,7 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                   itemBuilder: (context, index) {
                     return PostCard(
                       post: sharingPosts[index],
-                      destination: sharingPosts[index].destination.name,
+                      // destination: sharingPosts[index].destination.name,
                     );
                   },
                 ),

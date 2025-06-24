@@ -28,8 +28,14 @@ class _MyAppState extends ConsumerState<MyApp> {
     // Initialize providers
     ref.watch(appstateProvider);
     ref.watch(authServiceProvider);
-    ref.watch(sharingPostsProvider);
-    ref.watch(discussionPostsProvider);
+    ref.watch(postServiceProvider(PostApiType.sharing, "all"));
+    for (int i = 1; i <= 20; i++) {
+      ref.watch(postServiceProvider(PostApiType.sharing, i.toString()));
+    }
+    ref.watch(postServiceProvider(PostApiType.discussion, "all"));
+    for (int i = 1; i <= 20; i++) {
+      ref.watch(postServiceProvider(PostApiType.discussion, i.toString()));
+    }
     ref.watch(userServiceProvider);
 
     final routerDelegate = ref.watch(routerDelegateProvider);

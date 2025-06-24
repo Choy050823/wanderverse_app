@@ -115,12 +115,12 @@ class LikeService extends _$LikeService {
 
   // Remove fetchLikeCount since we'll use the count from posts
 
-  Future<void> toggleLike(String postId) async {
+  Future<void> toggleLike(String postId, String destinationId) async {
     try {
       // Get current state from cache
       final cacheKey = postId;
       final currentData = _globalLikeCache[cacheKey] ??
-          PostLikeData(isLiked: false, likesCount: 0);
+          const PostLikeData(isLiked: false, likesCount: 0);
 
       // Update state optimistically
       final newIsLiked = !currentData.isLiked;
@@ -137,14 +137,8 @@ class LikeService extends _$LikeService {
       final url = Uri.parse('$_baseUrl/api/like?postId=$postId&userId=$userId');
 
       final response = newIsLiked
-          ? await http.post(
-              url,
-              headers: await _headers,
-            )
-          : await http.delete(
-              url,
-              headers: await _headers,
-            );
+          ? await http.post(url, headers: await _headers)
+          : await http.delete(url, headers: await _headers);
 
       // Handle API error
       if (response.statusCode != 200 && response.statusCode != 201) {
@@ -155,32 +149,52 @@ class LikeService extends _$LikeService {
             'Failed to toggle like. Status: ${response.statusCode}');
       }
 
-      // After successful API call, update the post's like count
+      // After successful API call, update ALL post instances with this ID
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final sharingPost = ref
-            .watch(sharingPostsProvider)
-            .posts
-            .where((post) => post.id == postId)
-            .firstOrNull;
+        final delta = newIsLiked ? 1 : -1;
 
-        sharingPost != null
-            ? ref
-                .read(sharingPostsProvider.notifier)
-                .updatePostLikeCount(postId, newIsLiked ? 1 : -1)
-            : ref
-                .read(discussionPostsProvider.notifier)
-                .updatePostLikeCount(postId, newIsLiked ? 1 : -1);
-        // Update the post in PostService
-        // ref
-        //     .read(postServiceProvider.notifier)
-        //     .updatePostLikeCount(postId, newIsLiked ? 1 : -1);
+        // Update "all" providers
+        _updatePostProvider(PostApiType.sharing, "all", postId, delta);
+        _updatePostProvider(PostApiType.discussion, "all", postId, delta);
+
+        // Update destination-specific provider
+        if (destinationId.isNotEmpty) {
+          _updatePostProvider(
+              PostApiType.sharing, destinationId, postId, delta);
+          _updatePostProvider(
+              PostApiType.discussion, destinationId, postId, delta);
+        }
+
+        // Update other possible destination providers (from main.dart we see there are 21)
+        for (int i = 1; i <= 21; i++) {
+          final destId = i.toString();
+          if (destId != destinationId) {
+            // Skip the one we already updated
+            _updatePostProvider(PostApiType.sharing, destId, postId, delta);
+            _updatePostProvider(PostApiType.discussion, destId, postId, delta);
+          }
+        }
       }
-
-      // Force refresh other instances
-      ref.invalidateSelf();
     } catch (e) {
       print('Network error: ${e.toString()}');
       rethrow;
+    }
+  }
+
+  // Helper method to safely update post providers
+  void _updatePostProvider(
+      PostApiType type, String destId, String postId, int delta) {
+    try {
+      final posts = ref.read(postServiceProvider(type, destId)).posts;
+      final hasPost = posts.any((p) => p.id == postId);
+
+      if (hasPost) {
+        ref
+            .read(postServiceProvider(type, destId).notifier)
+            .updatePostLikeCount(postId, delta);
+      }
+    } catch (e) {
+      // Ignore errors - just means this provider instance doesn't exist yet
     }
   }
 

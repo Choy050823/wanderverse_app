@@ -18,6 +18,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   Timer? _debounce;
+  final sharingPostsProvider = postServiceProvider(PostApiType.sharing, "all");
 
   @override
   void initState() {
@@ -80,7 +81,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       final post = posts[index];
                       return PostCard(
                         post: post,
-                        destination: post.destination.name,
+                        // destination: post.destination.name,
                         // initialLikes: post.likesCount,
                         // imageUrl: post.imageUrls.isEmpty ? "" : post.imageUrls[0],
                         // profilePicUrl:
@@ -107,7 +108,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       final post = posts[index];
                       return PostCard(
                         post: post,
-                        destination: post.destination.name,
+                        // destination: post.destination.name,
                         // initialLikes: post.likesCount,
                         // imageUrl: post.imageUrls.isEmpty ? "" : post.imageUrls[0],
                         // profilePicUrl:

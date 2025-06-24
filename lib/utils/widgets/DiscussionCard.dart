@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wanderverse_app/providers/models.dart';
 import 'package:wanderverse_app/providers/post-sharing/likeService.dart';
+import 'package:wanderverse_app/providers/post-sharing/postService.dart';
 import 'package:wanderverse_app/utils/constants.dart';
 import 'package:wanderverse_app/utils/widgets/ImagePreview.dart';
 import 'package:wanderverse_app/utils/widgets/PostCategoryChip.dart';
@@ -30,6 +31,7 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard>
   @override
   void initState() {
     super.initState();
+    print("Widget post likes count: ${widget.post.likesCount}");
     _animationController = AnimationController(
         vsync: this, duration: const Duration(milliseconds: 300));
     if (mounted) {
@@ -113,10 +115,10 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard>
                                 color: colorScheme.outline.withOpacity(0.2),
                                 width: 1,
                               ),
-                              image: const DecorationImage(
+                              image: DecorationImage(
                                 image: NetworkImage(
-                                  "https://plus.unsplash.com/premium_photo-1665203415837-a3b389a6b33e?fm=jpg&q=60&w=3000&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8dHJhdmVsbGVyfGVufDB8fDB8fHww",
-                                ),
+                                    widget.post.creator.profilePicUrl ??
+                                        defaultProfilePic),
                                 fit: BoxFit.cover,
                               ),
                             ),
@@ -202,7 +204,8 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard>
                                         .read(likeServiceProvider(
                                                 int.parse(widget.post.id))
                                             .notifier)
-                                        .toggleLike(widget.post.id);
+                                        .toggleLike(widget.post.id,
+                                            widget.post.destination.id);
                                   },
                                   icon: Icon(
                                     likeData.isLiked
@@ -229,16 +232,29 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard>
                               const SizedBox(width: 6),
 
                               // Like count from provider
-                              likeDataAsync.when(
-                                data: (likeData) => Text(
-                                  likeData.likesCount.toString(),
-                                  style: textTheme.bodyMedium,
-                                ),
-                                loading: () =>
-                                    Text("...", style: textTheme.bodyMedium),
-                                error: (_, __) =>
-                                    Text("0", style: textTheme.bodyMedium),
-                              ),
+                              Builder(builder: (context) {
+                                // Check if post has been updated in the provider
+                                final updatedPost = ref
+                                    .watch(postServiceProvider(
+                                        widget.post.postType == PostType.post
+                                            ? PostApiType.sharing
+                                            : PostApiType.discussion,
+                                        widget.post.destination.id))
+                                    .posts
+                                    .where((post) => post.id == widget.post.id)
+                                    .firstOrNull;
+
+                                // Use updated count if available, otherwise fall back to original
+                                final likesCount = updatedPost?.likesCount ??
+                                    widget.post.likesCount;
+
+                                return Text(
+                                  likesCount.toString(),
+                                  style: textTheme.labelMedium?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                );
+                              }),
                             ],
                           ),
 
@@ -253,12 +269,32 @@ class _DiscussionCardState extends ConsumerState<DiscussionCard>
                                 color: colorScheme.onSurfaceVariant,
                               ),
                               const SizedBox(width: 6),
-                              Text(
-                                "${widget.post.commentsCount} comments",
-                                style: textTheme.labelMedium?.copyWith(
-                                  color: colorScheme.onSurfaceVariant,
-                                ),
-                              ),
+
+                              // Get updated comment count like how likes are handled
+                              Builder(builder: (context) {
+                                // Check if post has been updated in the provider
+                                final updatedPost = ref
+                                    .watch(postServiceProvider(
+                                        widget.post.postType == PostType.post
+                                            ? PostApiType.sharing
+                                            : PostApiType.discussion,
+                                        widget.post.destination.id))
+                                    .posts
+                                    .where((post) => post.id == widget.post.id)
+                                    .firstOrNull;
+
+                                // Use updated count if available, otherwise fall back to original
+                                final commentCount =
+                                    updatedPost?.commentsCount ??
+                                        widget.post.commentsCount;
+
+                                return Text(
+                                  "$commentCount comments",
+                                  style: textTheme.labelMedium?.copyWith(
+                                    color: colorScheme.onSurfaceVariant,
+                                  ),
+                                );
+                              }),
                             ],
                           ),
 

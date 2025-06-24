@@ -14,7 +14,7 @@ part 'commentService.g.dart';
 
 final _baseUrl = environment['api_url'];
 
-@riverpod
+@Riverpod(keepAlive: true)
 class CommentService extends _$CommentService {
   @override
   Future<List<Comment>> build(int postId) async {
@@ -120,15 +120,20 @@ class CommentService extends _$CommentService {
         .toList();
   }
 
-  Future<bool> createComment(String postId, String content,
+  Future<bool> createComment(
+      String postId, String content, String destinationId,
       {String? parentCommentId}) async {
-    // state = state.copyWith(isLoading: true, errorMessage: null);
-
-    // create comment
     try {
-      print(
-          "DEBUG: User data from auth: ${ref.read(authServiceProvider).userData}");
+      // First, get all the data you'll need BEFORE invalidating
       final userId = ref.read(authServiceProvider).userData['id'];
+
+      // Determine post type ahead of time rather than watching after invalidation
+      final isSharingPost = ref
+          .read(postServiceProvider(PostApiType.sharing, "all"))
+          .posts
+          .any((post) => post.id == postId);
+
+      // Make the API request
       final response = await http.post(Uri.parse('$_baseUrl/api/comment'),
           headers: await _headers,
           body: jsonEncode({
@@ -142,18 +147,12 @@ class CommentService extends _$CommentService {
       if (response.statusCode != 201) {
         print("Create post failed with status: ${response.statusCode}");
         print("Response body: ${response.body}");
-        print("Request payload: ${jsonEncode({
-              'postId': postId,
-              'content': content,
-              'userId': userId,
-              'parentCommentId': parentCommentId,
-            })}");
+        return false;
       }
 
       if (response.statusCode == 201) {
         try {
           final data = json.decode(response.body);
-
           final comment = Comment(
               id: data["id"].toString(),
               postId: postId,
@@ -170,40 +169,45 @@ class CommentService extends _$CommentService {
                   updatedAt: _parseDateTime(data["user"]["updatedAt"])),
               replies: []);
 
-          // Optimistic Update for state
+          // Step 1: Update comment state
           if (state.hasValue) {
             final currentComments = state.value ?? [];
             if (parentCommentId == null) {
-              // top level comments
               state = AsyncData([...currentComments, comment]);
             } else {
-              // add replies
               state = AsyncData(_addReplyToComment(
                   currentComments, parentCommentId, comment));
             }
           }
 
+          // Step 2: Update post comment counts BEFORE invalidating self
+          if (isSharingPost) {
+            // Update sharing posts
+            ref
+                .read(postServiceProvider(PostApiType.sharing, "all").notifier)
+                .updatePostCommentCount(postId, 1);
+            ref
+                .read(postServiceProvider(PostApiType.sharing, destinationId)
+                    .notifier)
+                .updatePostCommentCount(postId, 1);
+          } else {
+            // Update discussion posts
+            ref
+                .read(
+                    postServiceProvider(PostApiType.discussion, "all").notifier)
+                .updatePostCommentCount(postId, 1);
+            ref
+                .read(postServiceProvider(PostApiType.discussion, destinationId)
+                    .notifier)
+                .updatePostCommentCount(postId, 1);
+          }
+
+          // Step 3: Now safe to invalidate after all ref operations are complete
           ref.invalidateSelf();
-          
-          final sharingPost = ref
-              .watch(sharingPostsProvider)
-              .posts
-              .where((post) => post.id == postId)
-              .firstOrNull;
 
-          sharingPost != null
-              ? ref
-                  .read(sharingPostsProvider.notifier)
-                  .updatePostCommentCount(postId, 1)
-              : ref
-                  .read(discussionPostsProvider.notifier)
-                  .updatePostCommentCount(postId, 1);
-
-          print("DEBUG: Successfully created comment: ${comment.toString()}");
           return true;
         } catch (e) {
           print("Error processing create post response: $e");
-          // _handleError('Failed to process server response');
           return false;
         }
       } else {

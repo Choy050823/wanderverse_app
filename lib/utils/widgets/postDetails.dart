@@ -9,6 +9,21 @@ import 'package:wanderverse_app/utils/widgets/CommentButton.dart';
 import 'package:wanderverse_app/utils/widgets/ImagePreview.dart';
 import 'package:wanderverse_app/utils/widgets/PostCategoryChip.dart';
 
+// // Create a provider that directly gives you the updated post by ID
+// final updatedPostProvider = Provider.family<Post?, String>((ref, postId) {
+//   final sharingPosts =
+//       ref.watch(postServiceProvider(PostApiType.sharing, "all")).posts;
+//   final discussionPosts =
+//       ref.watch(postServiceProvider(PostApiType.discussion, "all")).posts;
+
+//   // Check in both post types
+//   final matchingPosts = [...sharingPosts, ...discussionPosts]
+//       .where((post) => post.id == postId)
+//       .toList();
+
+//   return matchingPosts.isNotEmpty ? matchingPosts.first : null;
+// });
+
 class PostDetails extends ConsumerStatefulWidget {
   final Post post;
   const PostDetails({required this.post, super.key});
@@ -33,19 +48,21 @@ class _PostDetailsState extends ConsumerState<PostDetails> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final updatedCommentCount = widget.post.postType == PostType.post
+    final updatedPost = widget.post.postType == PostType.post
         ? ref
-            .watch(sharingPostsProvider)
+            .watch(postServiceProvider(
+                PostApiType.sharing, widget.post.destination.id))
             .posts
             .where((post) => post.id == widget.post.id)
-            .first
-            .commentsCount
+            .firstOrNull
         : ref
-            .watch(discussionPostsProvider)
+            .watch(postServiceProvider(
+                PostApiType.discussion, widget.post.destination.id))
             .posts
             .where((post) => post.id == widget.post.id)
-            .first
-            .commentsCount;
+            .firstOrNull;
+    final updatedCommentCount =
+        updatedPost == null ? 0 : updatedPost.commentsCount;
 
     // Watch the like data provider without any additional parameters
     final likeDataAsync =
@@ -145,7 +162,8 @@ class _PostDetailsState extends ConsumerState<PostDetails> {
                                 .read(likeServiceProvider(
                                         int.parse(widget.post.id))
                                     .notifier)
-                                .toggleLike(widget.post.id);
+                                .toggleLike(
+                                    widget.post.id, widget.post.destination.id);
                           },
                           icon: Icon(
                             likeData.isLiked

@@ -6,7 +6,7 @@ part of 'postService.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$postServiceHash() => r'800c2961c2cdfc3605cbfa8b1d8d27531e16a633';
+String _$postServiceHash() => r'9d79c4fc17335c69ef7323fe966710f10d61b777';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -31,9 +31,11 @@ class _SystemHash {
 
 abstract class _$PostService extends BuildlessNotifier<PostsState> {
   late final PostApiType type;
+  late final String destinationId;
 
   PostsState build(
     PostApiType type,
+    String destinationId,
   );
 }
 
@@ -49,9 +51,11 @@ class PostServiceFamily extends Family<PostsState> {
   /// See also [PostService].
   PostServiceProvider call(
     PostApiType type,
+    String destinationId,
   ) {
     return PostServiceProvider(
       type,
+      destinationId,
     );
   }
 
@@ -61,6 +65,7 @@ class PostServiceFamily extends Family<PostsState> {
   ) {
     return call(
       provider.type,
+      provider.destinationId,
     );
   }
 
@@ -85,8 +90,11 @@ class PostServiceProvider
   /// See also [PostService].
   PostServiceProvider(
     PostApiType type,
+    String destinationId,
   ) : this._internal(
-          () => PostService()..type = type,
+          () => PostService()
+            ..type = type
+            ..destinationId = destinationId,
           from: postServiceProvider,
           name: r'postServiceProvider',
           debugGetCreateSourceHash:
@@ -97,6 +105,7 @@ class PostServiceProvider
           allTransitiveDependencies:
               PostServiceFamily._allTransitiveDependencies,
           type: type,
+          destinationId: destinationId,
         );
 
   PostServiceProvider._internal(
@@ -107,9 +116,11 @@ class PostServiceProvider
     required super.debugGetCreateSourceHash,
     required super.from,
     required this.type,
+    required this.destinationId,
   }) : super.internal();
 
   final PostApiType type;
+  final String destinationId;
 
   @override
   PostsState runNotifierBuild(
@@ -117,6 +128,7 @@ class PostServiceProvider
   ) {
     return notifier.build(
       type,
+      destinationId,
     );
   }
 
@@ -125,13 +137,16 @@ class PostServiceProvider
     return ProviderOverride(
       origin: this,
       override: PostServiceProvider._internal(
-        () => create()..type = type,
+        () => create()
+          ..type = type
+          ..destinationId = destinationId,
         from: from,
         name: null,
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
         type: type,
+        destinationId: destinationId,
       ),
     );
   }
@@ -143,13 +158,16 @@ class PostServiceProvider
 
   @override
   bool operator ==(Object other) {
-    return other is PostServiceProvider && other.type == type;
+    return other is PostServiceProvider &&
+        other.type == type &&
+        other.destinationId == destinationId;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
     hash = _SystemHash.combine(hash, type.hashCode);
+    hash = _SystemHash.combine(hash, destinationId.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -158,6 +176,9 @@ class PostServiceProvider
 mixin PostServiceRef on NotifierProviderRef<PostsState> {
   /// The parameter `type` of this provider.
   PostApiType get type;
+
+  /// The parameter `destinationId` of this provider.
+  String get destinationId;
 }
 
 class _PostServiceProviderElement
@@ -167,6 +188,8 @@ class _PostServiceProviderElement
 
   @override
   PostApiType get type => (origin as PostServiceProvider).type;
+  @override
+  String get destinationId => (origin as PostServiceProvider).destinationId;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -29,6 +29,7 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
   final ScrollController _scrollController = ScrollController();
   Timer? _debounce;
   TextEditingController _destinationController = TextEditingController();
+  late PostServiceProvider discussionPostsProvider;
 
   @override
   void initState() {
@@ -65,17 +66,17 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
+    discussionPostsProvider = postServiceProvider(
+        PostApiType.discussion,
+        currentDestination == null || currentDestination!.name == "General"
+            ? "all"
+            : currentDestination!.id);
     final postState = ref.watch(discussionPostsProvider);
     final isLoading = postState.isLoading;
     final hasError = postState.errorMessage != null;
 
     final destinationAsync = ref.watch(destinationServiceProvider);
-    List<Post> discussions = List<Post>.from(postState.posts)
-        .where((post) =>
-            currentDestination == null ||
-            currentDestination!.name == "General" ||
-            post.destination.id == currentDestination!.id)
-        .toList();
+    List<Post> discussions = List<Post>.from(postState.posts);
     final theme = Theme.of(context);
 
     return Scaffold(

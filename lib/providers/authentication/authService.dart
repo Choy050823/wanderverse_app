@@ -55,8 +55,22 @@ class AuthService extends _$AuthService {
         print("DEBUG: tryAutoLogin user data: $userData");
 
         ref.read(userServiceProvider.notifier).getCurrentUser();
-        await ref.read(sharingPostsProvider.notifier).getPosts();
-        await ref.read(discussionPostsProvider.notifier).getPosts();
+        await ref
+            .read(postServiceProvider(PostApiType.sharing, "all").notifier)
+            .getPosts();
+        await ref
+            .read(postServiceProvider(PostApiType.discussion, "all").notifier)
+            .getPosts();
+        for (int i = 1; i <= 20; i++) {
+          await ref
+              .read(postServiceProvider(PostApiType.sharing, i.toString())
+                  .notifier)
+              .getPosts();
+          await ref
+              .read(postServiceProvider(PostApiType.discussion, i.toString())
+                  .notifier)
+              .getPosts();
+        }
         ref.read(appstateProvider.notifier).changeAppRoute('/');
         // ref.read(appstateProvider.notifier).changeIsAuthenticated(true);
       } else {
@@ -127,8 +141,22 @@ class AuthService extends _$AuthService {
             isAuthenticated: true, token: token, userData: userData);
 
         ref.read(userServiceProvider.notifier).getCurrentUser();
-        await ref.read(sharingPostsProvider.notifier).getPosts();
-        await ref.read(discussionPostsProvider.notifier).getPosts();
+        await ref
+            .read(postServiceProvider(PostApiType.sharing, "all").notifier)
+            .getPosts();
+        await ref
+            .read(postServiceProvider(PostApiType.discussion, "all").notifier)
+            .getPosts();
+        for (int i = 1; i <= 20; i++) {
+          await ref
+              .read(postServiceProvider(PostApiType.sharing, i.toString())
+                  .notifier)
+              .getPosts();
+          await ref
+              .read(postServiceProvider(PostApiType.discussion, i.toString())
+                  .notifier)
+              .getPosts();
+        }
         ref.read(appstateProvider.notifier).changeAppRoute('/');
         print('login complete with token: $token, and user: $userData');
         return true;
@@ -167,8 +195,23 @@ class AuthService extends _$AuthService {
         state = state.copyWith(
             isAuthenticated: true, token: token, userData: userData);
 
-        ref.read(sharingPostsProvider.notifier).getPosts();
-        ref.read(discussionPostsProvider.notifier).getPosts();
+        // fetch all posts
+        await ref
+            .read(postServiceProvider(PostApiType.sharing, "all").notifier)
+            .getPosts();
+        await ref
+            .read(postServiceProvider(PostApiType.discussion, "all").notifier)
+            .getPosts();
+        for (int i = 1; i <= 20; i++) {
+          await ref
+              .read(postServiceProvider(PostApiType.sharing, i.toString())
+                  .notifier)
+              .getPosts();
+          await ref
+              .read(postServiceProvider(PostApiType.discussion, i.toString())
+                  .notifier)
+              .getPosts();
+        }
         ref.read(appstateProvider.notifier).changeAppRoute('/');
         ref.read(userServiceProvider.notifier).getCurrentUser();
         // ref.read(appstateProvider.notifier).changeIsAuthenticated(true);

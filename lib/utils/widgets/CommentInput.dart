@@ -8,6 +8,7 @@ class CommentInput extends ConsumerStatefulWidget {
   final String? userProfilePic;
   final String postId;
   final String? parentCommentId;
+  final String destinationId;
   final VoidCallback? onSuccessfulReply;
 
   const CommentInput(
@@ -15,6 +16,7 @@ class CommentInput extends ConsumerStatefulWidget {
       required this.postId,
       this.parentCommentId,
       this.onSuccessfulReply,
+      required this.destinationId,
       super.key});
 
   @override
@@ -35,8 +37,10 @@ class _CommentInputState extends ConsumerState<CommentInput> {
     final commentService =
         ref.read(commentServiceProvider(int.parse(widget.postId)).notifier);
     final success = await commentService.createComment(
-        widget.postId, _commentController.text,
+        widget.postId, _commentController.text, widget.destinationId,
         parentCommentId: widget.parentCommentId);
+
+    print("Succcess add comment? $success");
 
     if (success && mounted) {
       setState(() {

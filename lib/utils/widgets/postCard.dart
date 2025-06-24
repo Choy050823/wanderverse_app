@@ -7,7 +7,7 @@ import 'package:wanderverse_app/screens/post-sharing/SpecificPostScreen.dart';
 import 'package:wanderverse_app/utils/constants.dart';
 
 class PostCard extends ConsumerStatefulWidget {
-  final String destination;
+  // final String destination;
   // final int initialLikes;
   // final String imageUrl;
   // final String profilePicUrl;
@@ -17,7 +17,7 @@ class PostCard extends ConsumerStatefulWidget {
   const PostCard({
     super.key,
     required this.post,
-    required this.destination,
+    // required this.destination,
     // required this.initialLikes,
     // required this.imageUrl,
     // required this.profilePicUrl,
@@ -45,7 +45,7 @@ class _PostCardState extends ConsumerState<PostCard> {
     final theme = Theme.of(context);
 
     final updatedLikesCount = ref
-        .watch(sharingPostsProvider)
+        .watch(postServiceProvider(PostApiType.sharing, "all"))
         .posts
         .where((post) => post.id == widget.post.id)
         .first
@@ -95,7 +95,7 @@ class _PostCardState extends ConsumerState<PostCard> {
                             ),
                           ),
                           Text(
-                            widget.destination,
+                            widget.post.destination.name,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color:
                                   theme.colorScheme.onSurface.withOpacity(0.7),
@@ -170,7 +170,7 @@ class _PostCardState extends ConsumerState<PostCard> {
                                     .read(likeServiceProvider(
                                             int.parse(widget.post.id))
                                         .notifier)
-                                    .toggleLike(widget.post.id);
+                                    .toggleLike(widget.post.id, widget.post.destination.id);
                               },
                               icon: likeData.isLiked
                                   ? Icon(
