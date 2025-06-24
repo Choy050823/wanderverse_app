@@ -16,13 +16,15 @@ class _MinigameScreenState extends State<MinigameScreen> {
     super.initState();
     _controller = WebViewController()
       // ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(Uri.base.resolve('web/unity/index.html'));
+      ..loadRequest(Uri.base.resolve('unity/index.html'));
     // _controller.loadFlutterAsset('web/unity/index.html');
   }
 
   @override
   Widget build(BuildContext context) {
-    print("loading unity game");
+    Future.delayed(const Duration(milliseconds: 500), () {
+      print("loading unity game");
+    });
     return Scaffold(body: WebViewWidget(controller: _controller));
   }
 }
