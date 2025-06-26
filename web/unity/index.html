@@ -42,6 +42,17 @@
         globalUnityInstance.SendMessage(obj.gameObject, obj.method, obj.data);
       });
 
+      window.addEventListener("message", function (event) {
+        if (event.data.from === "flutter") {
+          console.log("Message from flutter: " + event.data.message);
+          globalUnityInstance.SendMessage(
+            "WebCommunication",
+            "ReceiveMessage",
+            event.data.message
+          );
+        }
+      });
+
       var canvas = document.querySelector("#unity-canvas");
 
       // Shows a temporary message banner/ribbon for a few seconds, or
