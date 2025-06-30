@@ -143,7 +143,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
         mainAxisSize: MainAxisSize.min,
         children: [
           // Banner
-          Container(
+          SizedBox(
             height: 180,
             width: double.infinity,
             child: Stack(

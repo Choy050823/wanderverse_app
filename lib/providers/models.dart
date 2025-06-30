@@ -49,9 +49,7 @@ extension PostTypeExtension on PostType {
         return 'questions';
       case PostType.tips:
         return 'tips';
-      default:
-        return 'post';
-    }
+      }
   }
 }
 

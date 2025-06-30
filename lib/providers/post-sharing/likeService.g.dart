@@ -6,7 +6,7 @@ part of 'likeService.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$likeServiceHash() => r'1a0103b8b549948f19ac461f3cbaaec8ddd8d261';
+String _$likeServiceHash() => r'a0ae276d8b302cd22c30a7d8f70c54e036cb5a2b';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -155,6 +155,8 @@ class LikeServiceProvider
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin LikeServiceRef on AsyncNotifierProviderRef<PostLikeData> {
   /// The parameter `postId` of this provider.
   int get postId;
@@ -169,4 +171,4 @@ class _LikeServiceProviderElement
   int get postId => (origin as LikeServiceProvider).postId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

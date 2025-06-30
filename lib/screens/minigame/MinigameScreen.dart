@@ -40,7 +40,7 @@ class _MinigameScreenState extends ConsumerState<MinigameScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Future.delayed(const Duration(milliseconds: 500), () {
+    Future.delayed(const Duration(seconds: 1), () {
       print("loading unity game");
       final token = ref.watch(authServiceProvider).token ?? "";
       print("Sending token: $token");

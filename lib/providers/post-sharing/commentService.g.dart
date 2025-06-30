@@ -6,7 +6,7 @@ part of 'commentService.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$commentServiceHash() => r'49f50c826f924acf55b80264c0fc29e4078b6d22';
+String _$commentServiceHash() => r'd4e7f0953c32a613c627b12a002b757c18404624';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,8 +29,7 @@ class _SystemHash {
   }
 }
 
-abstract class _$CommentService
-    extends BuildlessAutoDisposeAsyncNotifier<List<Comment>> {
+abstract class _$CommentService extends BuildlessAsyncNotifier<List<Comment>> {
   late final int postId;
 
   FutureOr<List<Comment>> build(
@@ -81,8 +80,8 @@ class CommentServiceFamily extends Family<AsyncValue<List<Comment>>> {
 }
 
 /// See also [CommentService].
-class CommentServiceProvider extends AutoDisposeAsyncNotifierProviderImpl<
-    CommentService, List<Comment>> {
+class CommentServiceProvider
+    extends AsyncNotifierProviderImpl<CommentService, List<Comment>> {
   /// See also [CommentService].
   CommentServiceProvider(
     int postId,
@@ -138,8 +137,7 @@ class CommentServiceProvider extends AutoDisposeAsyncNotifierProviderImpl<
   }
 
   @override
-  AutoDisposeAsyncNotifierProviderElement<CommentService, List<Comment>>
-      createElement() {
+  AsyncNotifierProviderElement<CommentService, List<Comment>> createElement() {
     return _CommentServiceProviderElement(this);
   }
 
@@ -157,18 +155,20 @@ class CommentServiceProvider extends AutoDisposeAsyncNotifierProviderImpl<
   }
 }
 
-mixin CommentServiceRef on AutoDisposeAsyncNotifierProviderRef<List<Comment>> {
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
+mixin CommentServiceRef on AsyncNotifierProviderRef<List<Comment>> {
   /// The parameter `postId` of this provider.
   int get postId;
 }
 
 class _CommentServiceProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<CommentService,
-        List<Comment>> with CommentServiceRef {
+    extends AsyncNotifierProviderElement<CommentService, List<Comment>>
+    with CommentServiceRef {
   _CommentServiceProviderElement(super.provider);
 
   @override
   int get postId => (origin as CommentServiceProvider).postId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

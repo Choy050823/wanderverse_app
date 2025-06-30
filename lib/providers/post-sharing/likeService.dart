@@ -72,30 +72,6 @@ class LikeService extends _$LikeService {
     };
   }
 
-  // void _handleError(String message) {
-  //   state = [];
-  // }
-
-  DateTime _parseDateTime(String? dateString) {
-    if (dateString == null) return DateTime.now();
-
-    try {
-      return DateTime.parse(dateString);
-    } catch (e) {
-      print("Error parsing date: $dateString");
-      return DateTime.now();
-    }
-  }
-
-  // void updateLikesCount(int newLikesCount) {
-  //   final currentData =
-  //       state.valueOrNull ?? PostLikeData(isLiked: false, likesCount: 0);
-
-  //   state = AsyncValue.data(PostLikeData(
-  //       isLiked: currentData.isLiked,
-  //       likesCount: newLikesCount >= 0 ? newLikesCount : 0));
-  // }
-
   Future<bool> checkUserLikedPost(int postId) async {
     try {
       final userId = ref.read(authServiceProvider).userData['id'];

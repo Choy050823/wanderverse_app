@@ -6,7 +6,7 @@ part of 'postService.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$postServiceHash() => r'9d79c4fc17335c69ef7323fe966710f10d61b777';
+String _$postServiceHash() => r'a8a17d7a1a2a372b855fa0e141dcf0a234e69a8e';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -173,6 +173,8 @@ class PostServiceProvider
   }
 }
 
+@Deprecated('Will be removed in 3.0. Use Ref instead')
+// ignore: unused_element
 mixin PostServiceRef on NotifierProviderRef<PostsState> {
   /// The parameter `type` of this provider.
   PostApiType get type;
@@ -192,4 +194,4 @@ class _PostServiceProviderElement
   String get destinationId => (origin as PostServiceProvider).destinationId;
 }
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package

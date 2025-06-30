@@ -176,5 +176,14 @@ class UserService extends _$UserService {
     state = state.copyWith(user: null, isLoading: false, errorMessage: null);
   }
 
+  void updateUserGamePointCount(int change) {
+    // Find the currentuser
+    final user = state.user;
+
+    if (user != null) {
+      state = state.copyWith(user: state.user!.copyWith(gamePoints: change));
+    }
+  }
+
   // Create user handled by sign up, will see if needed to implement later
 }

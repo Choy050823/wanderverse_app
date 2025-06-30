@@ -6,7 +6,7 @@ part of 'authService.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$authServiceHash() => r'e3d1ff87bcf57d7d87e35f9c4ec3d26dbcb45f64';
+String _$authServiceHash() => r'7ab4d9eeba3c8423bb42301e91e429d1c5d66c2d';
 
 /// See also [AuthService].
 @ProviderFor(AuthService)
@@ -21,4 +21,4 @@ final authServiceProvider = NotifierProvider<AuthService, AuthState>.internal(
 
 typedef _$AuthService = Notifier<AuthState>;
 // ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
+// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
