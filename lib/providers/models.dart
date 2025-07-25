@@ -11,6 +11,7 @@ class User with _$User {
       required String email,
       String? description,
       String? profilePicUrl,
+      required List<String> badgesUrls,
       required int gamePoints,
       required DateTime createdAt,
       required DateTime updatedAt}) = _User;

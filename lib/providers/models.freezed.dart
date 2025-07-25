@@ -25,6 +25,7 @@ mixin _$User {
   String get email => throw _privateConstructorUsedError;
   String? get description => throw _privateConstructorUsedError;
   String? get profilePicUrl => throw _privateConstructorUsedError;
+  List<String> get badgesUrls => throw _privateConstructorUsedError;
   int get gamePoints => throw _privateConstructorUsedError;
   DateTime get createdAt => throw _privateConstructorUsedError;
   DateTime get updatedAt => throw _privateConstructorUsedError;
@@ -49,6 +50,7 @@ abstract class $UserCopyWith<$Res> {
       String email,
       String? description,
       String? profilePicUrl,
+      List<String> badgesUrls,
       int gamePoints,
       DateTime createdAt,
       DateTime updatedAt});
@@ -74,6 +76,7 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
     Object? email = null,
     Object? description = freezed,
     Object? profilePicUrl = freezed,
+    Object? badgesUrls = null,
     Object? gamePoints = null,
     Object? createdAt = null,
     Object? updatedAt = null,
@@ -99,6 +102,10 @@ class _$UserCopyWithImpl<$Res, $Val extends User>
           ? _value.profilePicUrl
           : profilePicUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      badgesUrls: null == badgesUrls
+          ? _value.badgesUrls
+          : badgesUrls // ignore: cast_nullable_to_non_nullable
+              as List<String>,
       gamePoints: null == gamePoints
           ? _value.gamePoints
           : gamePoints // ignore: cast_nullable_to_non_nullable
@@ -128,6 +135,7 @@ abstract class _$$UserImplCopyWith<$Res> implements $UserCopyWith<$Res> {
       String email,
       String? description,
       String? profilePicUrl,
+      List<String> badgesUrls,
       int gamePoints,
       DateTime createdAt,
       DateTime updatedAt});
@@ -150,6 +158,7 @@ class __$$UserImplCopyWithImpl<$Res>
     Object? email = null,
     Object? description = freezed,
     Object? profilePicUrl = freezed,
+    Object? badgesUrls = null,
     Object? gamePoints = null,
     Object? createdAt = null,
     Object? updatedAt = null,
@@ -175,6 +184,10 @@ class __$$UserImplCopyWithImpl<$Res>
           ? _value.profilePicUrl
           : profilePicUrl // ignore: cast_nullable_to_non_nullable
               as String?,
+      badgesUrls: null == badgesUrls
+          ? _value._badgesUrls
+          : badgesUrls // ignore: cast_nullable_to_non_nullable
+              as List<String>,
       gamePoints: null == gamePoints
           ? _value.gamePoints
           : gamePoints // ignore: cast_nullable_to_non_nullable
@@ -200,9 +213,11 @@ class _$UserImpl implements _User {
       required this.email,
       this.description,
       this.profilePicUrl,
+      required final List<String> badgesUrls,
       required this.gamePoints,
       required this.createdAt,
-      required this.updatedAt});
+      required this.updatedAt})
+      : _badgesUrls = badgesUrls;
 
   factory _$UserImpl.fromJson(Map<String, dynamic> json) =>
       _$$UserImplFromJson(json);
@@ -217,6 +232,14 @@ class _$UserImpl implements _User {
   final String? description;
   @override
   final String? profilePicUrl;
+  final List<String> _badgesUrls;
+  @override
+  List<String> get badgesUrls {
+    if (_badgesUrls is EqualUnmodifiableListView) return _badgesUrls;
+    // ignore: implicit_dynamic_type
+    return EqualUnmodifiableListView(_badgesUrls);
+  }
+
   @override
   final int gamePoints;
   @override
@@ -226,7 +249,7 @@ class _$UserImpl implements _User {
 
   @override
   String toString() {
-    return 'User(id: $id, username: $username, email: $email, description: $description, profilePicUrl: $profilePicUrl, gamePoints: $gamePoints, createdAt: $createdAt, updatedAt: $updatedAt)';
+    return 'User(id: $id, username: $username, email: $email, description: $description, profilePicUrl: $profilePicUrl, badgesUrls: $badgesUrls, gamePoints: $gamePoints, createdAt: $createdAt, updatedAt: $updatedAt)';
   }
 
   @override
@@ -242,6 +265,8 @@ class _$UserImpl implements _User {
                 other.description == description) &&
             (identical(other.profilePicUrl, profilePicUrl) ||
                 other.profilePicUrl == profilePicUrl) &&
+            const DeepCollectionEquality()
+                .equals(other._badgesUrls, _badgesUrls) &&
             (identical(other.gamePoints, gamePoints) ||
                 other.gamePoints == gamePoints) &&
             (identical(other.createdAt, createdAt) ||
@@ -252,8 +277,17 @@ class _$UserImpl implements _User {
 
   @JsonKey(includeFromJson: false, includeToJson: false)
   @override
-  int get hashCode => Object.hash(runtimeType, id, username, email, description,
-      profilePicUrl, gamePoints, createdAt, updatedAt);
+  int get hashCode => Object.hash(
+      runtimeType,
+      id,
+      username,
+      email,
+      description,
+      profilePicUrl,
+      const DeepCollectionEquality().hash(_badgesUrls),
+      gamePoints,
+      createdAt,
+      updatedAt);
 
   /// Create a copy of User
   /// with the given fields replaced by the non-null parameter values.
@@ -278,6 +312,7 @@ abstract class _User implements User {
       required final String email,
       final String? description,
       final String? profilePicUrl,
+      required final List<String> badgesUrls,
       required final int gamePoints,
       required final DateTime createdAt,
       required final DateTime updatedAt}) = _$UserImpl;
@@ -294,6 +329,8 @@ abstract class _User implements User {
   String? get description;
   @override
   String? get profilePicUrl;
+  @override
+  List<String> get badgesUrls;
   @override
   int get gamePoints;
   @override

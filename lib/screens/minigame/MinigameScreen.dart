@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wanderverse_app/providers/authentication/authService.dart';
+import 'package:wanderverse_app/providers/post-sharing/userService.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:js' as js;
 
@@ -18,9 +19,7 @@ class _MinigameScreenState extends ConsumerState<MinigameScreen> {
   void initState() {
     super.initState();
     _controller = WebViewController()
-      // ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..loadRequest(Uri.base.resolve('unity/index.html'));
-    // _controller.loadFlutterAsset('web/unity/index.html');
   }
 
   void _sendMessageToUnity(String message) {
@@ -42,7 +41,11 @@ class _MinigameScreenState extends ConsumerState<MinigameScreen> {
   Widget build(BuildContext context) {
     Future.delayed(const Duration(seconds: 1), () {
       print("loading unity game");
-      final token = ref.watch(authServiceProvider).token ?? "";
+      if (ref.watch(userServiceProvider).user == null) {
+        ref.read(userServiceProvider.notifier).getCurrentUser();
+      }
+      final token =
+          "${ref.watch(authServiceProvider).token} ${ref.watch(userServiceProvider).user!.id}";
       print("Sending token: $token");
       _sendMessageToUnity(token);
     });

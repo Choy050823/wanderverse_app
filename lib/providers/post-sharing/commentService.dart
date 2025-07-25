@@ -115,7 +115,11 @@ class CommentService extends _$CommentService {
                 profilePicUrl: comment["user"]["profilePicUrl"],
                 gamePoints: comment["user"]["gamePoints"],
                 createdAt: _parseDateTime(comment["user"]["createdAt"]),
-                updatedAt: _parseDateTime(comment["user"]["updatedAt"])),
+                updatedAt: _parseDateTime(comment["user"]["updatedAt"]), 
+                badgesUrls: (comment["user"]["badgesUrls"] as List<dynamic>)
+                  .map((url) => url.toString())
+                  .toList(),
+            ),
             replies: parseCommentsFromJson(comment["replies"])))
         .toList();
   }
@@ -166,7 +170,11 @@ class CommentService extends _$CommentService {
                   profilePicUrl: data["user"]["profilePicUrl"],
                   gamePoints: data["user"]["gamePoints"],
                   createdAt: _parseDateTime(data["user"]["createdAt"]),
-                  updatedAt: _parseDateTime(data["user"]["updatedAt"])),
+                  updatedAt: _parseDateTime(data["user"]["updatedAt"]), 
+                  badgesUrls: (data["user"]["badgesUrls"] as List<dynamic>)
+                  .map((url) => url.toString())
+                  .toList(),
+            ),
               replies: []);
 
           // Step 1: Update comment state

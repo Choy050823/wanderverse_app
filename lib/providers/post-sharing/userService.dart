@@ -99,6 +99,9 @@ class UserService extends _$UserService {
                   userData["profilePicUrl"] == null
               ? defaultProfilePic
               : userData["profilePicUrl"],
+          badgesUrls: (userData["badgesUrls"] as List<dynamic>)
+            .map((url) => url.toString())
+            .toList(),
           createdAt: _parseDateTime(userData["createdAt"]),
           updatedAt: _parseDateTime(userData["updatedAt"]));
 
@@ -147,6 +150,9 @@ class UserService extends _$UserService {
                   createdAt: _parseDateTime(json["createdAt"]),
                   updatedAt: _parseDateTime(json["updatedAt"]),
                   gamePoints: json["gamePoints"],
+                  badgesUrls: (json["badgesUrls"] as List<dynamic>)
+                      .map((url) => url.toString())
+                      .toList(),
                 );
               } catch (e) {
                 print("Error parsing user: $e");

@@ -46,8 +46,8 @@
         if (event.data.from === "flutter") {
           console.log("Message from flutter: " + event.data.message);
           globalUnityInstance.SendMessage(
-            "WebCommunication",
-            "ReceiveMessage",
+            "Flutter Communication Manager",
+            "ReceiveFlutterMessage",
             event.data.message
           );
         }

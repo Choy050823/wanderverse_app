@@ -12,6 +12,9 @@ _$UserImpl _$$UserImplFromJson(Map<String, dynamic> json) => _$UserImpl(
       email: json['email'] as String,
       description: json['description'] as String?,
       profilePicUrl: json['profilePicUrl'] as String?,
+      badgesUrls: (json['badgesUrls'] as List<dynamic>)
+          .map((e) => e as String)
+          .toList(),
       gamePoints: (json['gamePoints'] as num).toInt(),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
@@ -24,6 +27,7 @@ Map<String, dynamic> _$$UserImplToJson(_$UserImpl instance) =>
       'email': instance.email,
       'description': instance.description,
       'profilePicUrl': instance.profilePicUrl,
+      'badgesUrls': instance.badgesUrls,
       'gamePoints': instance.gamePoints,
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),

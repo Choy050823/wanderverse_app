@@ -35,13 +35,14 @@ extension PostApiTypeExtension on PostApiType {
 @freezed
 class PostsState with _$PostsState {
   PostsState._();
-  factory PostsState(
-      {@Default([]) List<Post> posts,
-      @Default(false) bool isLoading,
-      String? errorMessage,
-      @Default(0) int currentPage,
-      @Default(12) int pageSize,
-      @Default(true) bool hasMore}) = _PostsState;
+  factory PostsState({
+    @Default([]) List<Post> posts,
+    @Default(false) bool isLoading,
+    String? errorMessage,
+    @Default(0) int currentPage,
+    @Default(12) int pageSize,
+    @Default(true) bool hasMore,
+  }) = _PostsState;
 }
 
 // final sharingPostsProvider = postServiceProvider(PostApiType.sharing);
@@ -110,7 +111,8 @@ class PostService extends _$PostService {
     try {
       // Access the type parameter using the property 'type'
       final url = Uri.parse(
-          '$_baseUrl/api/post/${type.endpoint}?destinationId=$destinationId&page=${state.currentPage}&size=${state.pageSize}');
+        '$_baseUrl/api/post/${type.endpoint}?destinationId=$destinationId&page=${state.currentPage}&size=${state.pageSize}',
+      );
 
       final response = await http.get(url, headers: await _headers);
 
@@ -130,37 +132,40 @@ class PostService extends _$PostService {
                     .initWithPostData(json["likesCount"]);
 
                 return Post(
-                    id: json["id"].toString(),
-                    title: json["title"],
-                    content: json["content"],
-                    imageUrls: (json["imageUrls"] as List<dynamic>)
+                  id: json["id"].toString(),
+                  title: json["title"],
+                  content: json["content"],
+                  imageUrls: (json["imageUrls"] as List<dynamic>)
+                      .map((url) => url.toString())
+                      .toList(),
+                  // Safe date parsing with fallback
+                  createdAt: _parseDateTime(json["createdAt"]),
+                  updatedAt: _parseDateTime(json["updatedAt"]),
+                  creator: User(
+                    id: json["creator"]["id"].toString(),
+                    username: json["creator"]["username"],
+                    email: json["creator"]["email"],
+                    description: json["creator"]["description"],
+                    profilePicUrl: json["creator"]["profilePicUrl"],
+                    gamePoints: json["creator"]["gamePoints"],
+                    createdAt: _parseDateTime(json["creator"]["createdAt"]),
+                    updatedAt: _parseDateTime(json["creator"]["updatedAt"]),
+                    badgesUrls: (json["creator"]["badgesUrls"] as List<dynamic>)
                         .map((url) => url.toString())
                         .toList(),
-                    // Safe date parsing with fallback
-                    createdAt: _parseDateTime(json["createdAt"]),
-                    updatedAt: _parseDateTime(json["updatedAt"]),
-                    creator: User(
-                        id: json["creator"]["id"].toString(),
-                        username: json["creator"]["username"],
-                        email: json["creator"]["email"],
-                        description: json["creator"]["description"],
-                        profilePicUrl: json["creator"]["profilePicUrl"],
-                        gamePoints: json["creator"]["gamePoints"],
-                        createdAt: _parseDateTime(json["creator"]["createdAt"]),
-                        updatedAt:
-                            _parseDateTime(json["creator"]["updatedAt"])),
-                    likesCount: json["likesCount"],
-                    commentsCount: json["commentsCount"],
-                    destination: Destination(
-                        id: json["destination"]["id"].toString(),
-                        name: json["destination"]["name"],
-                        description: json["destination"]["description"],
-                        imageUrl: json["destination"]["imageUrl"],
-                        createdAt:
-                            _parseDateTime(json["destination"]["createdAt"]),
-                        updatedAt:
-                            _parseDateTime(json["destination"]["updatedAt"])),
-                    postType: _convertPostType(json["postType"]));
+                  ),
+                  likesCount: json["likesCount"],
+                  commentsCount: json["commentsCount"],
+                  destination: Destination(
+                    id: json["destination"]["id"].toString(),
+                    name: json["destination"]["name"],
+                    description: json["destination"]["description"],
+                    imageUrl: json["destination"]["imageUrl"],
+                    createdAt: _parseDateTime(json["destination"]["createdAt"]),
+                    updatedAt: _parseDateTime(json["destination"]["updatedAt"]),
+                  ),
+                  postType: _convertPostType(json["postType"]),
+                );
               } catch (e) {
                 print("Error parsing post: $e");
                 return null;
@@ -178,10 +183,11 @@ class PostService extends _$PostService {
         //     .sort((post1, post2) => post2.createdAt.compareTo(post1.createdAt));
 
         state = state.copyWith(
-            posts: allPosts,
-            isLoading: false,
-            hasMore: hasMorePages,
-            currentPage: state.currentPage + 1);
+          posts: allPosts,
+          isLoading: false,
+          hasMore: hasMorePages,
+          currentPage: state.currentPage + 1,
+        );
       } else {
         if (response.statusCode == 401) {
           await ref.read(authServiceProvider.notifier).logout();
@@ -196,7 +202,11 @@ class PostService extends _$PostService {
   // Method to refresh posts
   Future<void> refreshPosts() async {
     state = state.copyWith(
-        currentPage: 0, hasMore: true, posts: [], isLoading: false);
+      currentPage: 0,
+      hasMore: true,
+      posts: [],
+      isLoading: false,
+    );
     await getPosts();
   }
 
@@ -209,8 +219,13 @@ class PostService extends _$PostService {
   }
 
   // Create post
-  Future<bool> createPost(String title, String content, String destinationId,
-      {List<Uint8List>? imageFiles, PostType postType = PostType.post}) async {
+  Future<bool> createPost(
+    String title,
+    String content,
+    String destinationId, {
+    List<Uint8List>? imageFiles,
+    PostType postType = PostType.post,
+  }) async {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     // Upload images
@@ -219,7 +234,9 @@ class PostService extends _$PostService {
       imageUrls = await _uploadImages(imageFiles);
       if (imageUrls.isEmpty) {
         state = state.copyWith(
-            isLoading: false, errorMessage: "Failed to upload image");
+          isLoading: false,
+          errorMessage: "Failed to upload image",
+        );
         return false;
       }
     }
@@ -227,31 +244,29 @@ class PostService extends _$PostService {
     // create post metadata
     try {
       print(
-          "DEBUG: User data from auth: ${ref.read(authServiceProvider).userData}");
+        "DEBUG: User data from auth: ${ref.read(authServiceProvider).userData}",
+      );
       final userId = ref.read(authServiceProvider).userData['id'];
-      final response = await http.post(Uri.parse('$_baseUrl/api/post'),
-          headers: await _headers,
-          body: jsonEncode({
-            'title': title,
-            'content': content,
-            'destinationId': destinationId,
-            'creatorId': userId,
-            'imageUrls': imageUrls,
-            'postType': postType.toJson()
-          }));
+      final response = await http.post(
+        Uri.parse('$_baseUrl/api/post'),
+        headers: await _headers,
+        body: jsonEncode({
+          'title': title,
+          'content': content,
+          'destinationId': destinationId,
+          'creatorId': userId,
+          'imageUrls': imageUrls,
+          'postType': postType.toJson(),
+        }),
+      );
 
       // Print detailed error info for debugging
       if (response.statusCode != 201) {
         print("Create post failed with status: ${response.statusCode}");
         print("Response body: ${response.body}");
-        print("Request payload: ${jsonEncode({
-              'title': title,
-              'content': content,
-              'destinationId': destinationId,
-              'creatorId': userId,
-              'imageUrls': imageUrls,
-              'postType': postType
-            })}");
+        print(
+          "Request payload: ${jsonEncode({'title': title, 'content': content, 'destinationId': destinationId, 'creatorId': userId, 'imageUrls': imageUrls, 'postType': postType})}",
+        );
       }
 
       if (response.statusCode == 201) {
@@ -260,38 +275,45 @@ class PostService extends _$PostService {
 
           // Initialize like data with count from post
           ref
-              .read(likeServiceProvider(int.parse(data["id"].toString()))
-                  .notifier)
+              .read(
+                likeServiceProvider(int.parse(data["id"].toString())).notifier,
+              )
               .initWithPostData(data["likesCount"]);
 
           final newPost = Post(
-              id: data["id"].toString(),
-              title: data["title"],
-              content: data["content"],
-              imageUrls: (data["imageUrls"] as List<dynamic>)
+            id: data["id"].toString(),
+            title: data["title"],
+            content: data["content"],
+            imageUrls: (data["imageUrls"] as List<dynamic>)
+                .map((url) => url.toString())
+                .toList(),
+            createdAt: _parseDateTime(data["createdAt"]),
+            updatedAt: _parseDateTime(data["updatedAt"]),
+            creator: User(
+              id: data["creator"]["id"].toString(),
+              username: data["creator"]["username"],
+              email: data["creator"]["email"],
+              description: data["creator"]["description"],
+              profilePicUrl: data["creator"]["profilePicUrl"],
+              gamePoints: data["creator"]["gamePoints"],
+              createdAt: _parseDateTime(data["creator"]["createdAt"]),
+              updatedAt: _parseDateTime(data["creator"]["updatedAt"]),
+              badgesUrls: (data["creator"]["badgesUrls"] as List<dynamic>)
                   .map((url) => url.toString())
                   .toList(),
-              createdAt: _parseDateTime(data["createdAt"]),
-              updatedAt: _parseDateTime(data["updatedAt"]),
-              creator: User(
-                  id: data["creator"]["id"].toString(),
-                  username: data["creator"]["username"],
-                  email: data["creator"]["email"],
-                  description: data["creator"]["description"],
-                  profilePicUrl: data["creator"]["profilePicUrl"],
-                  gamePoints: data["creator"]["gamePoints"],
-                  createdAt: _parseDateTime(data["creator"]["createdAt"]),
-                  updatedAt: _parseDateTime(data["creator"]["updatedAt"])),
-              likesCount: data["likesCount"],
-              commentsCount: data["commentsCount"],
-              destination: Destination(
-                  id: data["destination"]["id"].toString(),
-                  name: data["destination"]["name"],
-                  description: data["destination"]["description"],
-                  imageUrl: data["destination"]["imageUrl"],
-                  createdAt: _parseDateTime(data["destination"]["createdAt"]),
-                  updatedAt: _parseDateTime(data["destination"]["updatedAt"])),
-              postType: _convertPostType(data["postType"]));
+            ),
+            likesCount: data["likesCount"],
+            commentsCount: data["commentsCount"],
+            destination: Destination(
+              id: data["destination"]["id"].toString(),
+              name: data["destination"]["name"],
+              description: data["destination"]["description"],
+              imageUrl: data["destination"]["imageUrl"],
+              createdAt: _parseDateTime(data["destination"]["createdAt"]),
+              updatedAt: _parseDateTime(data["destination"]["updatedAt"]),
+            ),
+            postType: _convertPostType(data["postType"]),
+          );
 
           final List<Post> allPosts = [newPost, ...state.posts];
           // allPosts.sort(
@@ -349,15 +371,16 @@ class PostService extends _$PostService {
       final url = Uri.parse("$_baseUrl/api/storage/upload");
       final request = http.MultipartRequest('POST', url);
 
-      request.headers.addAll({
-        'Authorization': 'Bearer $token',
-      });
+      request.headers.addAll({'Authorization': 'Bearer $token'});
 
       // Add file (can set the filename here if needed)
       request.files.add(
-        http.MultipartFile.fromBytes('image', imageBytes,
-            filename: 'image_${DateTime.now().millisecondsSinceEpoch}.jpg',
-            contentType: MediaType('image', 'jpeg')),
+        http.MultipartFile.fromBytes(
+          'image',
+          imageBytes,
+          filename: 'image_${DateTime.now().millisecondsSinceEpoch}.jpg',
+          contentType: MediaType('image', 'jpeg'),
+        ),
       );
 
       // Send request
@@ -420,8 +443,9 @@ class PostService extends _$PostService {
     if (index != -1) {
       // Create updated post with new comment count
       final post = posts[index];
-      final updatedPost =
-          post.copyWith(commentsCount: post.commentsCount + change);
+      final updatedPost = post.copyWith(
+        commentsCount: post.commentsCount + change,
+      );
 
       // Create new posts list with updated post
       final newPosts = List<Post>.from(posts);
