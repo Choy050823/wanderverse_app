@@ -63,12 +63,12 @@ const List<MenuItem> menuItems = [
     inactiveIcon: Icons.chat_outlined,
     activeIcon: Icons.chat,
   ),
-  // MenuItem(
-  //   pageName: 'Destinations',
-  //   route: '/world-map',
-  //   inactiveIcon: Icons.location_on_outlined,
-  //   activeIcon: Icons.location_on,
-  // ),
+  MenuItem(
+    pageName: 'Itinerary',
+    route: '/itinerary',
+    inactiveIcon: Icons.location_on_outlined,
+    activeIcon: Icons.location_on,
+  ),
   // MenuItem(
   //   pageName: 'Notifications',
   //   route: '/notifications',

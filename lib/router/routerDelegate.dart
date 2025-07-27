@@ -6,6 +6,7 @@ import 'package:wanderverse_app/screens/authentication/authScreen.dart';
 import 'package:wanderverse_app/router/appShell.dart';
 import 'package:wanderverse_app/screens/authentication/pageNotFoundScreen.dart';
 import 'package:wanderverse_app/screens/discussion/DiscussionScreen.dart';
+import 'package:wanderverse_app/screens/itinerary/ItineraryScreen.dart';
 import 'package:wanderverse_app/screens/minigame/MinigameScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/homeScreen.dart';
 import 'package:wanderverse_app/screens/post-sharing/userProfileScreen.dart';
@@ -58,12 +59,12 @@ class AppRouterDelegate extends RouterDelegate<AppStateData>
 
         // Check if we're still initializing
         if (authState.isLoading) {
-          pages.add(const FadeAnimation(
-            key: ValueKey('Loading'),
-            child: Scaffold(
-              body: Center(child: CircularProgressIndicator()),
+          pages.add(
+            const FadeAnimation(
+              key: ValueKey('Loading'),
+              child: Scaffold(body: Center(child: CircularProgressIndicator())),
             ),
-          ));
+          );
           return Navigator(
             key: navigatorKey,
             pages: pages,
@@ -74,19 +75,23 @@ class AppRouterDelegate extends RouterDelegate<AppStateData>
         // First check if this is the unknown route - THIS MUST COME FIRST
         if (appState.route == AppStateData.unknown) {
           print('Showing Page Not Found screen');
-          pages.add(const FadeAnimation(
-            key: ValueKey('PageNotFound'),
-            name: AppStateData.unknown,
-            child: PageNotFoundScreen(),
-          ));
+          pages.add(
+            const FadeAnimation(
+              key: ValueKey('PageNotFound'),
+              name: AppStateData.unknown,
+              child: PageNotFoundScreen(),
+            ),
+          );
         } else if (!authState.isAuthenticated) {
           // Not authenticated - show auth screen
           print('Showing Auth screen');
-          pages.add(const FadeAnimation(
-            key: ValueKey('Auth'),
-            name: '/auth',
-            child: AuthScreen(),
-          ));
+          pages.add(
+            const FadeAnimation(
+              key: ValueKey('Auth'),
+              name: '/auth',
+              child: AuthScreen(),
+            ),
+          );
         } else {
           // Authenticated - show app shell
           print('Showing AppShell');
@@ -168,6 +173,16 @@ class InnerRouterDelegate extends RouterDelegate<AppStateData>
             key: ValueKey('Discussion'),
             name: AppStateData.discussion,
             child: DiscussionScreen(),
+          ),
+        );
+        break;
+
+      case AppStateData.itinerary:
+        pages.add(
+          const FadeAnimation(
+            key: ValueKey('Itinerary'),
+            name: AppStateData.itinerary,
+            child: ItineraryScreen(),
           ),
         );
         break;

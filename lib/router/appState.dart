@@ -17,6 +17,7 @@ class AppStateData with _$AppStateData {
   static const String discussion = '/discussion';
   static const String profile = '/user-profile';
   static const String game = '/game';
+  static const String itinerary = '/itinerary';
   static const String unknown = '/page-not-found';
 
   bool isValidRoute(String route) {
@@ -24,6 +25,7 @@ class AppStateData with _$AppStateData {
         route == auth ||
         route == discussion ||
         route == game ||
+        route == itinerary ||
         route == profile;
   }
 }

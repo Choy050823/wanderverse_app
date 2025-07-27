@@ -19,6 +19,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
   Timer? _debounce;
   final sharingPostsProvider = postServiceProvider(PostApiType.sharing, "all");
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
@@ -31,6 +32,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     _debounce?.cancel();
     _scrollController.removeListener(_scrollListener);
     _scrollController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -47,6 +49,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     }
   }
 
+  void _performSearch() {
+    final query = _searchController.text;
+    if (query.isNotEmpty) {
+      // TODO: Implement your search logic here
+      print('Searching for: $query');
+      // Example: ref.read(sharingPostsProvider.notifier).searchPosts(query);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final postState = ref.watch(sharingPostsProvider);
@@ -55,70 +66,202 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final hasError = postState.errorMessage != null;
     final isMobile = ResponsiveLayout.isMobile(context);
 
+    List<Post> recommendedPosts = [];
+
     // item count for the grids
     final itemCount = posts.isEmpty && isLoading
         ? 1
         : posts.length + (isLoading && postState.hasMore ? 1 : 0);
 
-    return Scaffold(
-      body: RefreshIndicator(
-        onRefresh: () => ref.read(sharingPostsProvider.notifier).refreshPosts(),
-        child: posts.isEmpty && !isLoading
-            ? _buildEmptyView(hasError, postState.errorMessage)
-            : isMobile
-                ? ListView.builder(
-                    controller: _scrollController,
-                    itemCount: itemCount,
-                    padding: const EdgeInsets.all(8.0),
-                    itemBuilder: (context, index) {
-                      if (index >= posts.length) {
-                        return isLoading
-                            ? _buildLoadingIndicator()
-                            : _buildNoMorePostsIndicator();
-                      }
-
-                      // all listed posts
-                      final post = posts[index];
-                      return PostCard(
-                        post: post,
-                        // destination: post.destination.name,
-                        // initialLikes: post.likesCount,
-                        // imageUrl: post.imageUrls.isEmpty ? "" : post.imageUrls[0],
-                        // profilePicUrl:
-                        //     post.creator.profilePicUrl ?? defaultProfilePic,
-                        // caption: post.title,
-                      );
-                    })
-                : MasonryGridView.count(
-                    controller: _scrollController,
-                    itemCount: itemCount,
-                    crossAxisCount: 3,
-                    mainAxisSpacing: 4.0,
-                    crossAxisSpacing: 4.0,
-                    padding: const EdgeInsets.all(8.0),
-                    itemBuilder: (context, index) {
-                      // show loading indicator after running all the index
-                      if (index >= posts.length) {
-                        return isLoading
-                            ? _buildLoadingIndicator()
-                            : _buildNoMorePostsIndicator();
-                      }
-
-                      // all listed posts
-                      final post = posts[index];
-                      return PostCard(
-                        post: post,
-                        // destination: post.destination.name,
-                        // initialLikes: post.likesCount,
-                        // imageUrl: post.imageUrls.isEmpty ? "" : post.imageUrls[0],
-                        // profilePicUrl:
-                        //     post.creator.profilePicUrl ?? defaultProfilePic,
-                        // caption: post.title,
-                      );
-                    },
-                  ),
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+        appBar: AppBar(
+          // Search Bar
+          title: TextField(
+            controller: _searchController,
+            decoration: InputDecoration(
+              hintText: 'Search posts...',
+              prefixIcon: const Icon(Icons.search),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(30.0),
+                borderSide: BorderSide.none,
+              ),
+              filled: true,
+              contentPadding: EdgeInsets.zero,
+              fillColor: Theme.of(context).colorScheme.surface,
+            ),
+            onSubmitted: (_) => _performSearch(),
+          ),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: _performSearch,
+            ),
+          ],
+          // Tabs
+          bottom: const TabBar(
+            tabs: [
+              Tab(text: 'All'),
+              Tab(text: 'Recommended'),
+            ],
+          ),
+        ),
+        body: TabBarView(
+          children: [
+            _buildPostListView(
+              posts,
+              isLoading,
+              hasError,
+              postState,
+              isMobile,
+              itemCount,
+            ),
+            _buildRecommendedPostWidget(
+              recommendedPosts,
+              isLoading,
+              hasError,
+              postState,
+              isMobile,
+              itemCount,
+            ),
+          ],
+        ),
       ),
     );
+  }
+
+  Widget _buildPostListView(
+    List<Post> posts,
+    bool isLoading,
+    bool hasError,
+    PostsState postState,
+    bool isMobile,
+    int itemCount,
+  ) {
+    return RefreshIndicator(
+      onRefresh: () => ref.read(sharingPostsProvider.notifier).refreshPosts(),
+      child: posts.isEmpty && !isLoading
+          ? _buildEmptyView(hasError, postState.errorMessage)
+          : isMobile
+          ? ListView.builder(
+              controller: _scrollController,
+              itemCount: itemCount,
+              padding: const EdgeInsets.all(8.0),
+              itemBuilder: (context, index) {
+                if (index >= posts.length) {
+                  return isLoading
+                      ? _buildLoadingIndicator()
+                      : _buildNoMorePostsIndicator();
+                }
+
+                // all listed posts
+                final post = posts[index];
+                return PostCard(
+                  post: post,
+                  // destination: post.destination.name,
+                  // initialLikes: post.likesCount,
+                  // imageUrl: post.imageUrls.isEmpty ? "" : post.imageUrls[0],
+                  // profilePicUrl:
+                  //     post.creator.profilePicUrl ?? defaultProfilePic,
+                  // caption: post.title,
+                );
+              },
+            )
+          : MasonryGridView.count(
+              controller: _scrollController,
+              itemCount: itemCount,
+              crossAxisCount: 3,
+              mainAxisSpacing: 4.0,
+              crossAxisSpacing: 4.0,
+              padding: const EdgeInsets.all(8.0),
+              itemBuilder: (context, index) {
+                // show loading indicator after running all the index
+                if (index >= posts.length) {
+                  return isLoading
+                      ? _buildLoadingIndicator()
+                      : _buildNoMorePostsIndicator();
+                }
+
+                // all listed posts
+                final post = posts[index];
+                return PostCard(
+                  post: post,
+                  // destination: post.destination.name,
+                  // initialLikes: post.likesCount,
+                  // imageUrl: post.imageUrls.isEmpty ? "" : post.imageUrls[0],
+                  // profilePicUrl:
+                  //     post.creator.profilePicUrl ?? defaultProfilePic,
+                  // caption: post.title,
+                );
+              },
+            ),
+    );
+  }
+
+  Widget _buildRecommendedPostWidget(
+    List<Post> posts,
+    bool isLoading,
+    bool hasError,
+    PostsState postState,
+    bool isMobile,
+    int itemCount,
+  ) {
+    return posts.isEmpty && !isLoading
+        ? _buildEmptyView(hasError, postState.errorMessage)
+        : isMobile
+        ? ListView.builder(
+            controller: _scrollController,
+            itemCount: itemCount,
+            padding: const EdgeInsets.all(8.0),
+            itemBuilder: (context, index) {
+              if (index >= posts.length) {
+                return isLoading
+                    ? _buildLoadingIndicator()
+                    : _buildNoMorePostsIndicator();
+              }
+
+              // all listed posts
+              final post = posts[index];
+              return PostCard(
+                post: post,
+                // destination: post.destination.name,
+                // initialLikes: post.likesCount,
+                // imageUrl: post.imageUrls.isEmpty ? "" : post.imageUrls[0],
+                // profilePicUrl:
+                //     post.creator.profilePicUrl ?? defaultProfilePic,
+                // caption: post.title,
+              );
+            },
+          )
+        : MasonryGridView.count(
+            controller: _scrollController,
+            itemCount: itemCount,
+            crossAxisCount: 3,
+            mainAxisSpacing: 4.0,
+            crossAxisSpacing: 4.0,
+            padding: const EdgeInsets.all(8.0),
+            itemBuilder: (context, index) {
+              // show loading indicator after running all the index
+              if (index >= posts.length) {
+                return isLoading
+                    ? _buildLoadingIndicator()
+                    : _buildNoMorePostsIndicator();
+              }
+
+              // all listed posts
+              final post = posts[index];
+              return PostCard(
+                post: post,
+                // destination: post.destination.name,
+                // initialLikes: post.likesCount,
+                // imageUrl: post.imageUrls.isEmpty ? "" : post.imageUrls[0],
+                // profilePicUrl:
+                //     post.creator.profilePicUrl ?? defaultProfilePic,
+                // caption: post.title,
+              );
+            },
+          );
   }
 
   Widget _buildEmptyView(bool hasError, String? errorMessage) {
@@ -131,38 +274,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               Icons.error_outline,
               color: Theme.of(context).colorScheme.error,
             ),
-            const SizedBox(
-              height: 16,
-            ),
+            const SizedBox(height: 16),
             Text(
               errorMessage ?? "Unexpected error occurred",
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-              ),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
               textAlign: TextAlign.center,
-            )
+            ),
           ] else ...[
             const Icon(
               Icons.photo_album_outlined,
               color: Colors.grey,
               size: 60,
             ),
-            const SizedBox(
-              height: 16,
-            ),
+            const SizedBox(height: 16),
             const Text(
               "No post found\nPull down to refresh",
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.black),
-            )
+            ),
           ],
-          const SizedBox(
-            height: 24,
-          ),
+          const SizedBox(height: 24),
           ElevatedButton(
-              onPressed: () =>
-                  ref.read(sharingPostsProvider.notifier).refreshPosts(),
-              child: const Text("Refresh"))
+            onPressed: () =>
+                ref.read(sharingPostsProvider.notifier).refreshPosts(),
+            child: const Text("Refresh"),
+          ),
         ],
       ),
     );
@@ -174,23 +310,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       padding: const EdgeInsets.all(16.0),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8)
-          ]),
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8),
+        ],
+      ),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const CircularProgressIndicator(),
-            const SizedBox(
-              height: 12,
-            ),
+            const SizedBox(height: 12),
             Text(
               "Loading more posts...",
               style: Theme.of(context).textTheme.bodySmall,
-            )
+            ),
           ],
         ),
       ),
