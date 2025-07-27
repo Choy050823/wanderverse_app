@@ -44,28 +44,38 @@ class _PostCardState extends ConsumerState<PostCard> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    final updatedLikesCount = ref
-        .watch(postServiceProvider(PostApiType.sharing, "all"))
-        .posts
-        .where((post) => post.id == widget.post.id)
-        .first
-        .likesCount;
+    print("Widget post id: ${widget.post.id}");
+
+    final updatedLikesCount =
+        ref
+            .watch(postServiceProvider(PostApiType.sharing, "all"))
+            .posts
+            .where((post) => post.id == widget.post.id)
+            .isNotEmpty
+        ? ref
+              .watch(postServiceProvider(PostApiType.sharing, "all"))
+              .posts
+              .where((post) => post.id == widget.post.id)
+              .first
+              .likesCount
+        : 0;
 
     // Just watch the provider, no additional parameters
-    final likeDataAsync =
-        ref.watch(likeServiceProvider(int.parse(widget.post.id)));
+    final likeDataAsync = ref.watch(
+      likeServiceProvider(int.parse(widget.post.id)),
+    );
 
     return Container(
       padding: const EdgeInsets.all(20.0),
       child: Card(
         elevation: 8,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         child: InkWell(
-          onTap: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => SpecificPostScreen(post: widget.post),
-          )),
+          onTap: () => Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => SpecificPostScreen(post: widget.post),
+            ),
+          ),
           child: Container(
             padding: const EdgeInsets.all(10.0),
             child: Column(
@@ -77,10 +87,11 @@ class _PostCardState extends ConsumerState<PostCard> {
                       radius: 20,
                       backgroundColor: Colors.transparent,
                       backgroundImage: NetworkImage(
-                          widget.post.creator.profilePicUrl == null ||
-                                  widget.post.creator.profilePicUrl == ""
-                              ? defaultProfilePic
-                              : widget.post.creator.profilePicUrl!),
+                        widget.post.creator.profilePicUrl == null ||
+                                widget.post.creator.profilePicUrl == ""
+                            ? defaultProfilePic
+                            : widget.post.creator.profilePicUrl!,
+                      ),
                     ),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(8, 0, 0, 0),
@@ -97,13 +108,14 @@ class _PostCardState extends ConsumerState<PostCard> {
                           Text(
                             widget.post.destination.name,
                             style: theme.textTheme.bodyMedium?.copyWith(
-                              color:
-                                  theme.colorScheme.onSurface.withOpacity(0.7),
+                              color: theme.colorScheme.onSurface.withOpacity(
+                                0.7,
+                              ),
                             ),
-                          )
+                          ),
                         ],
                       ),
-                    )
+                    ),
                   ],
                 ),
                 const SizedBox(height: 5),
@@ -135,9 +147,10 @@ class _PostCardState extends ConsumerState<PostCard> {
                               Icon(Icons.error, color: theme.colorScheme.error),
                               Text(
                                 'Error Loading Image!',
-                                style:
-                                    TextStyle(color: theme.colorScheme.error),
-                              )
+                                style: TextStyle(
+                                  color: theme.colorScheme.error,
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -167,10 +180,15 @@ class _PostCardState extends ConsumerState<PostCard> {
                               onPressed: () {
                                 // Simply toggle like
                                 ref
-                                    .read(likeServiceProvider(
-                                            int.parse(widget.post.id))
-                                        .notifier)
-                                    .toggleLike(widget.post.id, widget.post.destination.id);
+                                    .read(
+                                      likeServiceProvider(
+                                        int.parse(widget.post.id),
+                                      ).notifier,
+                                    )
+                                    .toggleLike(
+                                      widget.post.id,
+                                      widget.post.destination.id,
+                                    );
                               },
                               icon: likeData.isLiked
                                   ? Icon(

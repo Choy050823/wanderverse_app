@@ -19,10 +19,11 @@ final _baseUrl = environment['api_url'];
 @freezed
 class UserState with _$UserState {
   UserState._();
-  factory UserState(
-      {User? user,
-      @Default(false) bool isLoading,
-      String? errorMessage}) = _UserState;
+  factory UserState({
+    User? user,
+    @Default(false) bool isLoading,
+    String? errorMessage,
+  }) = _UserState;
 }
 
 @Riverpod(keepAlive: true)
@@ -80,30 +81,36 @@ class UserService extends _$UserService {
     state = state.copyWith(isLoading: true, errorMessage: null);
 
     try {
-      // final prefs = await SharedPreferences.getInstance();
-      final storedUser = ref.watch(authServiceProvider).userData;
+      // CORRECT: Use ref.read inside a function, not ref.watch.
+      final storedUser = ref.read(authServiceProvider).userData;
 
       if (storedUser.isEmpty) {
         print("EMPTY USER DATA FROM AUTH SERVICE!");
+        // Handle this case gracefully
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: "User data not found.",
+        );
         return;
       }
 
       final userData = storedUser;
       final user = User(
-          id: userData["id"].toString(),
-          username: userData["username"],
-          email: userData["email"],
-          description: userData["description"],
-          gamePoints: userData["gamePoints"],
-          profilePicUrl: userData["profilePicUrl"] == "" ||
-                  userData["profilePicUrl"] == null
-              ? defaultProfilePic
-              : userData["profilePicUrl"],
-          badgesUrls: (userData["badgesUrls"] as List<dynamic>)
+        id: userData["id"].toString(),
+        username: userData["username"],
+        email: userData["email"],
+        description: userData["description"],
+        gamePoints: userData["gamePoints"],
+        profilePicUrl:
+            userData["profilePicUrl"] == "" || userData["profilePicUrl"] == null
+            ? defaultProfilePic
+            : userData["profilePicUrl"],
+        badgesUrls: (userData["badgesUrls"] as List<dynamic>)
             .map((url) => url.toString())
             .toList(),
-          createdAt: _parseDateTime(userData["createdAt"]),
-          updatedAt: _parseDateTime(userData["updatedAt"]));
+        createdAt: _parseDateTime(userData["createdAt"]),
+        updatedAt: _parseDateTime(userData["updatedAt"]),
+      );
 
       print("User found: ${user.profilePicUrl}");
 

@@ -9,6 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:wanderverse_app/providers/authentication/authService.dart';
 import 'package:wanderverse_app/providers/models.dart';
 import 'package:wanderverse_app/providers/post-sharing/likeService.dart';
+import 'package:wanderverse_app/providers/post-sharing/userService.dart';
+import 'package:wanderverse_app/router/appState.dart';
 import 'package:wanderverse_app/utils/env.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
@@ -196,6 +198,221 @@ class PostService extends _$PostService {
       }
     } catch (e) {
       _handleError('Network error: ${e.toString()}');
+    }
+  }
+
+  Future<List<Post>> getRecommendedPosts() async {
+    print("starting to get recommend posts");
+    try {
+      // CORRECT: Only READ the user state. Do not watch or trigger updates.
+      final user = ref.read(userServiceProvider).user;
+
+      // If the user is not logged in or not yet loaded, we can't get recommendations.
+      if (user == null) {
+        print("Cannot get recommendations: User not available.");
+        return []; // Return an empty list gracefully.
+      }
+
+      final url = Uri.parse(
+        '$_baseUrl/api/post/sharing/recommend?userId=${user.id}',
+      );
+
+      final response = await http.get(url, headers: await _headers);
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        print("got data from recommend: $data");
+        // Minor fix: handle null data case safely
+        final List<dynamic> postsJson = data is List ? data : [];
+
+        final recommendedPosts = postsJson
+            .map((json) {
+              try {
+                // Initialize like data with count from post
+                ref
+                    .read(likeServiceProvider(json["id"]).notifier)
+                    .initWithPostData(json["likesCount"]);
+
+                return Post(
+                  id: json["id"].toString(),
+                  title: json["title"],
+                  content: json["content"],
+                  imageUrls: (json["imageUrls"] as List<dynamic>)
+                      .map((url) => url.toString())
+                      .toList(),
+                  // Safe date parsing with fallback
+                  createdAt: _parseDateTime(json["createdAt"]),
+                  updatedAt: _parseDateTime(json["updatedAt"]),
+                  creator: User(
+                    id: json["creator"]["id"].toString(),
+                    username: json["creator"]["username"],
+                    email: json["creator"]["email"],
+                    description: json["creator"]["description"],
+                    profilePicUrl: json["creator"]["profilePicUrl"],
+                    gamePoints: json["creator"]["gamePoints"],
+                    createdAt: _parseDateTime(json["creator"]["createdAt"]),
+                    updatedAt: _parseDateTime(json["creator"]["updatedAt"]),
+                    badgesUrls: (json["creator"]["badgesUrls"] as List<dynamic>)
+                        .map((url) => url.toString())
+                        .toList(),
+                  ),
+                  likesCount: json["likesCount"],
+                  commentsCount: json["commentsCount"],
+                  destination: Destination(
+                    id: json["destination"]["id"].toString(),
+                    name: json["destination"]["name"],
+                    description: json["destination"]["description"],
+                    imageUrl: json["destination"]["imageUrl"],
+                    createdAt: _parseDateTime(json["destination"]["createdAt"]),
+                    updatedAt: _parseDateTime(json["destination"]["updatedAt"]),
+                  ),
+                  postType: _convertPostType(json["postType"]),
+                );
+              } catch (e) {
+                print("Error parsing post: $e");
+                return null;
+              }
+            })
+            .where((post) => post != null)
+            .cast<Post>()
+            .toList();
+
+        print(
+          "Recommended post: ${recommendedPosts.isEmpty ? "None" : "have"}",
+        );
+
+        return recommendedPosts;
+      } else {
+        if (response.statusCode == 401) {
+          await ref.read(authServiceProvider.notifier).logout();
+          ref.read(appstateProvider.notifier).changeAppRoute('/auth');
+        }
+        print(
+          "Failed to load recommended posts. Status: ${response.statusCode}",
+        );
+        return [];
+      }
+    } catch (e) {
+      print('Network error: ${e.toString()}');
+      return [];
+    }
+  }
+
+  Future<List<Post>> getSearchPosts(String query) async {
+    print("🔍 PostService.getSearchPosts called with query: '$query'");
+
+    try {
+      if (query.isEmpty) {
+        print("🔍 Empty search query");
+        return [];
+      }
+
+      // Encode the query parameter to handle special characters
+      final encodedQuery = Uri.encodeComponent(query);
+      final url = Uri.parse(
+        '$_baseUrl/api/post/sharing/search?query=$encodedQuery',
+      );
+
+      print("🔍 Sending request to: ${url.toString()}");
+
+      final response = await http.get(url, headers: await _headers);
+
+      print("🔍 Search response status code: ${response.statusCode}");
+      print("🔍 Response body preview: ${response.body}...");
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+
+        // Debug the response structure
+        print("🔍 Data type: ${data.runtimeType}");
+        if (data is List) {
+          print("🔍 Data is a List with ${data.length} items");
+        } else if (data is Map) {
+          print("🔍 Data is a Map with keys: ${data.keys.toList()}");
+          if (data.containsKey('content')) {
+            print("🔍 'content' has ${(data['content'] as List).length} items");
+          }
+        } else {
+          print("🔍 Unknown data format");
+        }
+
+        // Handle both array and paginated object responses
+        final List<dynamic> postsJson;
+        if (data is List) {
+          postsJson = data;
+        } else if (data is Map && data.containsKey('content')) {
+          postsJson = data['content'] as List<dynamic>;
+        } else {
+          postsJson = [];
+          print("🔍 Could not extract posts from response");
+        }
+
+        if (postsJson.isEmpty) {
+          print("🔍 No posts found in response");
+          return [];
+        }
+
+        final searchResults = postsJson
+            .map((json) {
+              try {
+                // Initialize like data with count from post
+                ref
+                    .read(likeServiceProvider(json["id"]).notifier)
+                    .initWithPostData(json["likesCount"]);
+
+                return Post(
+                  id: json["id"].toString(),
+                  title: json["title"],
+                  content: json["content"],
+                  imageUrls: (json["imageUrls"] as List<dynamic>)
+                      .map((url) => url.toString())
+                      .toList(),
+                  createdAt: _parseDateTime(json["createdAt"]),
+                  updatedAt: _parseDateTime(json["updatedAt"]),
+                  creator: User(
+                    id: json["creator"]["id"].toString(),
+                    username: json["creator"]["username"],
+                    email: json["creator"]["email"],
+                    description: json["creator"]["description"],
+                    profilePicUrl: json["creator"]["profilePicUrl"],
+                    gamePoints: json["creator"]["gamePoints"],
+                    createdAt: _parseDateTime(json["creator"]["createdAt"]),
+                    updatedAt: _parseDateTime(json["creator"]["updatedAt"]),
+                    badgesUrls: (json["creator"]["badgesUrls"] as List<dynamic>)
+                        .map((url) => url.toString())
+                        .toList(),
+                  ),
+                  likesCount: json["likesCount"],
+                  commentsCount: json["commentsCount"],
+                  destination: Destination(
+                    id: json["destination"]["id"].toString(),
+                    name: json["destination"]["name"],
+                    description: json["destination"]["description"],
+                    imageUrl: json["destination"]["imageUrl"],
+                    createdAt: _parseDateTime(json["destination"]["createdAt"]),
+                    updatedAt: _parseDateTime(json["destination"]["updatedAt"]),
+                  ),
+                  postType: _convertPostType(json["postType"]),
+                );
+              } catch (e) {
+                print("Error parsing search result: $e");
+                return null;
+              }
+            })
+            .where((post) => post != null)
+            .cast<Post>()
+            .toList();
+
+        print("Parsed search results: ${searchResults.length} posts");
+        return searchResults;
+      } else {
+        print("🔍 Search failed with status: ${response.statusCode}");
+        print("🔍 Response body: ${response.body}");
+        return [];
+      }
+    } catch (e) {
+      print("🔍 Search network error: ${e.toString()}");
+      return [];
     }
   }
 
