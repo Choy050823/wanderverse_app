@@ -41,7 +41,7 @@ class Post with _$Post {
 
 enum PostType { post, experience, questions, tips }
 
-enum TravelMode { driving, walking }
+enum TravelMode { DRIVING, WALKING }
 
 extension PostTypeExtension on PostType {
   String toJson() {
@@ -98,4 +98,82 @@ class Destination with _$Destination {
 
   factory Destination.fromJson(Map<String, dynamic> json) =>
       _$DestinationFromJson(json);
+}
+
+@freezed
+class TripPlan with _$TripPlan {
+  factory TripPlan({
+    required String planTitle,
+    required String overview,
+    required List<String> warnings,
+    required DateTime tripStartDate,
+    required DateTime tripEndDate,
+    required List<DailyItinerary> dailyItineraryList,
+  }) = _TripPlan;
+
+  // Factory constructor for parsing JSON.
+  factory TripPlan.fromJson(Map<String, dynamic> json) =>
+      _$TripPlanFromJson(json);
+}
+
+@freezed
+class DailyItinerary with _$DailyItinerary {
+  factory DailyItinerary({
+    required DateTime date,
+    required String daySummary,
+    String? warnings,
+    required List<TripActivity> activityList,
+  }) = _DailyItinerary;
+
+  factory DailyItinerary.fromJson(Map<String, dynamic> json) =>
+      _$DailyItineraryFromJson(json);
+}
+
+enum ActivityType { destination, travel }
+
+@freezed
+class TripActivity with _$TripActivity {
+  factory TripActivity({
+    required ActivityType activityType,
+    required DateTime estimatedStartTime,
+    required DateTime estimatedEndTime,
+    LocationDetails? locationDetails,
+    TravelDetails? travelDetails,
+  }) = _TripActivity;
+
+  factory TripActivity.fromJson(Map<String, dynamic> json) =>
+      _$TripActivityFromJson(json);
+}
+
+@freezed
+class LocationDetails with _$LocationDetails {
+  factory LocationDetails({
+    required String placeId,
+    required String name,
+    String? editorialSummary,
+    String? formattedAddress,
+    @Default([]) List<String> openingHours,
+    @Default(0.0) double rating,
+    String? website,
+    String? phoneNumber,
+    String? locationUrl,
+    String? locationImageUrl,
+  }) = _LocationDetails;
+
+  factory LocationDetails.fromJson(Map<String, dynamic> json) =>
+      _$LocationDetailsFromJson(json);
+}
+
+@freezed
+class TravelDetails with _$TravelDetails {
+  factory TravelDetails({
+    required String origin,
+    required String destination,
+    required TravelMode mode,
+    required int durationMinutes,
+    required double distanceKm,
+  }) = _TravelDetails;
+
+  factory TravelDetails.fromJson(Map<String, dynamic> json) =>
+      _$TravelDetailsFromJson(json);
 }

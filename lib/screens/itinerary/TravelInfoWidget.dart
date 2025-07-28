@@ -10,7 +10,7 @@ class TravelInfoWidget extends StatelessWidget {
     super.key,
     required this.duration,
     required this.distance,
-    this.mode = TravelMode.driving,
+    this.mode = TravelMode.DRIVING,
   });
 
   @override
@@ -20,10 +20,10 @@ class TravelInfoWidget extends StatelessWidget {
 
     IconData iconData;
     switch (mode) {
-      case TravelMode.walking:
+      case TravelMode.WALKING:
         iconData = Icons.directions_walk;
         break;
-      case TravelMode.driving:
+      case TravelMode.DRIVING:
         iconData = Icons.directions_car;
         break;
     }
@@ -31,6 +31,7 @@ class TravelInfoWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(left: 52.0),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Icon(iconData, size: 18, color: colorScheme.outline),
           const SizedBox(width: 8),
@@ -41,7 +42,8 @@ class TravelInfoWidget extends StatelessWidget {
               fontWeight: FontWeight.w600,
             ),
           ),
-          const Spacer(),
+          const SizedBox(width: 16),
+          // const Spacer(),
           TextButton(
             onPressed: () {},
             style: TextButton.styleFrom(
@@ -50,11 +52,11 @@ class TravelInfoWidget extends StatelessWidget {
               tapTargetSize: MaterialTapTargetSize.shrinkWrap,
               alignment: Alignment.centerRight,
             ),
-            child: Row(
+            child: const Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('Directions'),
-                Icon(Icons.arrow_drop_down, color: colorScheme.outline),
+                Text('Directions'),
+                // Icon(Icons.arrow_drop_down, color: colorScheme.outline),
               ],
             ),
           ),

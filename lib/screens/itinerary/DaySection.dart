@@ -15,6 +15,13 @@ class ItineraryTimelineNodeData {
   final String travelDistance;
   final String imageUrl;
   final TravelMode travelMode;
+  final String? address;
+  final double? rating;
+  final String? phoneNumber;
+  final String? website;
+  final List<String>? openingHours;
+  final Map<String, dynamic>? additionalInfo;
+  final String? locationUrl;
 
   const ItineraryTimelineNodeData({
     required this.index,
@@ -25,6 +32,13 @@ class ItineraryTimelineNodeData {
     required this.travelDistance,
     required this.imageUrl,
     required this.travelMode,
+    this.address,
+    this.rating,
+    this.phoneNumber,
+    this.website,
+    this.openingHours,
+    this.additionalInfo,
+    this.locationUrl,
   });
 }
 
@@ -60,18 +74,7 @@ class DaySection extends StatelessWidget {
     final List<Widget> widgets = [];
     for (int i = 0; i < items.length; i++) {
       final item = items[i];
-      final isLast = i == items.length - 1;
-
-      widgets.add(
-        ItineraryTimelineNode(
-          index: item.index,
-          title: item.title,
-          description: item.description,
-          time: item.time,
-          imageUrl: item.imageUrl,
-          isLast: isLast,
-        ),
-      );
+      final isLast = i == items.length;
 
       if (!isLast && item.travelDuration.isNotEmpty) {
         widgets.add(
@@ -85,6 +88,22 @@ class DaySection extends StatelessWidget {
           ),
         );
       }
+
+      widgets.add(
+        ItineraryTimelineNode(
+          index: item.index,
+          title: item.title,
+          description: item.description,
+          time: item.time,
+          imageUrl: item.imageUrl,
+          isLast: isLast,
+          address: item.address,
+          rating: item.rating,
+          phoneNumber: item.phoneNumber,
+          website: item.website,
+          openingHours: item.openingHours,
+        ),
+      );
     }
     return widgets;
   }
