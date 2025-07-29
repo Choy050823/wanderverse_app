@@ -206,15 +206,22 @@ class PostService extends _$PostService {
     try {
       // CORRECT: Only READ the user state. Do not watch or trigger updates.
       final user = ref.read(userServiceProvider).user;
+      var userId;
+      if (user != null) {
+        userId = user.id;
+      }
 
       // If the user is not logged in or not yet loaded, we can't get recommendations.
       if (user == null) {
         print("Cannot get recommendations: User not available.");
-        return []; // Return an empty list gracefully.
+        // ref.read(authServiceProvider.notifier);
+        print("user from current: ${ref.read(authServiceProvider).userData}");
+        userId = ref.read(authServiceProvider).userData["id"];
+        // return []; // Return an empty list gracefully.
       }
 
       final url = Uri.parse(
-        '$_baseUrl/api/post/sharing/recommend?userId=${user.id}',
+        '$_baseUrl/api/post/sharing/recommend?userId=$userId',
       );
 
       final response = await http.get(url, headers: await _headers);

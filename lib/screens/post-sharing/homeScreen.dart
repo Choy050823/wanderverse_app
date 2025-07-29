@@ -349,13 +349,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ],
           const SizedBox(height: 24),
-          // ElevatedButton(
-          //   onPressed: () {
-          //     ref.read(sharingPostsProvider.notifier).refreshPosts();
-          //     ref.read(sharingPostsProvider.notifier).getRecommendedPosts();
-          //   },
-          //   child: const Text("Refresh Post"),
-          // ),
+          ElevatedButton(
+            onPressed: () async {
+              print("pressed refresh post button");
+              ref.read(sharingPostsProvider.notifier).getRecommendedPosts();
+              ref.read(sharingPostsProvider.notifier).refreshPosts();
+              ref.invalidate(recommendedPostsProvider);
+            },
+            child: const Text("Refresh Posts"),
+          ),
         ],
       ),
     );
@@ -394,7 +396,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       padding: const EdgeInsets.all(16.0),
       alignment: Alignment.center,
       child: const Text(
-        "You've reached the end",
+        "Scroll for more posts...",
         style: TextStyle(color: Colors.black, fontStyle: FontStyle.italic),
       ),
     );

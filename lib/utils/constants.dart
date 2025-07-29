@@ -9,11 +9,12 @@ class MenuItem {
   final IconData inactiveIcon;
   final IconData activeIcon;
 
-  const MenuItem(
-      {required this.pageName,
-      required this.route,
-      required this.inactiveIcon,
-      required this.activeIcon});
+  const MenuItem({
+    required this.pageName,
+    required this.route,
+    required this.inactiveIcon,
+    required this.activeIcon,
+  });
 }
 
 class DroppedFile {
@@ -22,11 +23,12 @@ class DroppedFile {
   final String mime;
   final int bytes;
 
-  const DroppedFile(
-      {required this.fileData,
-      required this.name,
-      required this.mime,
-      required this.bytes});
+  const DroppedFile({
+    required this.fileData,
+    required this.name,
+    required this.mime,
+    required this.bytes,
+  });
 
   String get size {
     final kb = bytes / 1024;
@@ -76,14 +78,17 @@ const List<MenuItem> menuItems = [
   //   activeIcon: Icons.notifications,
   // ),
   MenuItem(
-      pageName: 'User Profile',
-      route: '/user-profile',
-      inactiveIcon: Icons.person_2_outlined,
-      activeIcon: Icons.person_2),
+    pageName: 'User Profile',
+    route: '/user-profile',
+    inactiveIcon: Icons.person_2_outlined,
+    activeIcon: Icons.person_2,
+  ),
 ];
 
 String getTimeAgo(DateTime dateTime) {
-  final difference = DateTime.now().difference(dateTime);
+  final difference = DateTime.now().difference(
+    dateTime.add(const Duration(hours: 8)),
+  );
   if (difference.inDays > 0) {
     return '${difference.inDays} days ago';
   } else if (difference.inHours > 0) {
@@ -99,10 +104,11 @@ const defaultProfilePic =
     "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSCHU5JIkqfD2z1KMc4c1nW4zdArnxBM3cCcQ&s";
 
 final generalDestination = Destination(
-    id: "0",
-    name: "General",
-    description: "Welcome to the General Page",
-    imageUrl: "https://wanderverse-cloud-bucket.s3.ap-southeast-1.amazonaws.com/general.png",
-    createdAt: DateTime.now(),
-    updatedAt: DateTime.now()
+  id: "0",
+  name: "General",
+  description: "Welcome to the General Page",
+  imageUrl:
+      "https://wanderverse-cloud-bucket.s3.ap-southeast-1.amazonaws.com/general.png",
+  createdAt: DateTime.now(),
+  updatedAt: DateTime.now(),
 );
