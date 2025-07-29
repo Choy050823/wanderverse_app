@@ -354,7 +354,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ref.read(sharingPostsProvider.notifier).refreshPosts();
               ref.read(sharingPostsProvider.notifier).getRecommendedPosts();
             },
-            child: const Text("Refresh"),
+            child: const Text("Refresh Post"),
           ),
         ],
       ),
