@@ -17,7 +17,10 @@ class ItineraryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Agentic AI Trip Planner'),
+        title: Text(
+          'Agentic AI Trip Planner',
+          style: Theme.of(context).textTheme.titleLarge,
+        ),
         // leading: IconButton(
         //   icon: const Icon(Icons.arrow_back),
         //   onPressed: () {

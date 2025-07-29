@@ -348,11 +348,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ElevatedButton(
             onPressed: () async {
               print("pressed refresh post button");
-              ref.read(sharingPostsProvider.notifier).getRecommendedPosts();
-              ref.read(sharingPostsProvider.notifier).refreshPosts();
+              await ref.read(sharingPostsProvider.notifier).getRecommendedPosts();
+              ref.read(sharingPostsProvider.notifier).refreshPosts();         
               ref.invalidate(recommendedPostsProvider);
             },
-            child: const Text("Refresh Posts"),
+            child: Text("Refresh", style: Theme.of(context).textTheme.bodyMedium,),
           ),
         ],
       ),
