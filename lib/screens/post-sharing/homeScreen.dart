@@ -350,8 +350,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
           const SizedBox(height: 24),
           ElevatedButton(
-            onPressed: () =>
-                ref.read(sharingPostsProvider.notifier).refreshPosts(),
+            onPressed: () {
+              ref.read(sharingPostsProvider.notifier).refreshPosts();
+              ref.read(sharingPostsProvider.notifier).getRecommendedPosts();
+            },
             child: const Text("Refresh"),
           ),
         ],
