@@ -3,12 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
-import 'package:http/http.dart' as http;
 import 'package:wanderverse_app/providers/models.dart';
 import 'package:wanderverse_app/providers/post-sharing/postService.dart';
-import 'package:wanderverse_app/providers/post-sharing/userService.dart';
 import 'package:wanderverse_app/router/ResponsiveLayout.dart';
-import 'package:wanderverse_app/utils/env.dart';
 import 'package:wanderverse_app/utils/widgets/postCard.dart';
 
 // New provider for fetching recommended posts
@@ -31,7 +28,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Timer? _debounce;
   final sharingPostsProvider = postServiceProvider(PostApiType.sharing, "all");
   final TextEditingController _searchController = TextEditingController();
-  final _baseUrl = environment['api_url'];
 
   // Add these variables to _HomeScreenState class
   bool _isSearching = false;
