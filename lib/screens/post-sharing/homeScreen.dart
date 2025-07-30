@@ -338,21 +338,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               size: 60,
             ),
             const SizedBox(height: 16),
-            const Text(
+            Text(
               "No post found\nPull down to refresh.\nIf you are in recommended section, you need to like a post first and refresh",
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.black),
+              style: Theme.of(context).textTheme.labelMedium,
             ),
           ],
           const SizedBox(height: 24),
           ElevatedButton(
             onPressed: () async {
               print("pressed refresh post button");
-              await ref.read(sharingPostsProvider.notifier).getRecommendedPosts();
-              ref.read(sharingPostsProvider.notifier).refreshPosts();         
+              await ref
+                  .read(sharingPostsProvider.notifier)
+                  .getRecommendedPosts();
+              ref.read(sharingPostsProvider.notifier).refreshPosts();
               ref.invalidate(recommendedPostsProvider);
             },
-            child: Text("Refresh", style: Theme.of(context).textTheme.bodyMedium,),
+            child: Text(
+              "Refresh",
+              style: Theme.of(context).textTheme.bodyMedium,
+            ),
           ),
         ],
       ),
@@ -391,9 +396,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     return Container(
       padding: const EdgeInsets.all(16.0),
       alignment: Alignment.center,
-      child: const Text(
+      child: Text(
         "Scroll for more posts...",
-        style: TextStyle(color: Colors.black, fontStyle: FontStyle.italic),
+        style: Theme.of(context).textTheme.labelMedium,
       ),
     );
   }

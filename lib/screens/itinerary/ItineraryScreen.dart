@@ -21,20 +21,6 @@ class ItineraryScreen extends StatelessWidget {
           'Agentic AI Trip Planner',
           style: Theme.of(context).textTheme.titleLarge,
         ),
-        // leading: IconButton(
-        //   icon: const Icon(Icons.arrow_back),
-        //   onPressed: () {
-        //     // TODO: Handle back navigation
-        //   },
-        // ),
-        // actions: [
-        //   IconButton(
-        //     icon: const Icon(Icons.more_horiz),
-        //     onPressed: () {
-        //       // TODO: Handle more options
-        //     },
-        //   ),
-        // ],
       ),
       body: const ItineraryBody(),
     );
