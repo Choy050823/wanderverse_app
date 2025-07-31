@@ -232,25 +232,25 @@ class _ItineraryBodyState extends ConsumerState<ItineraryBody> {
         ),
 
         // Overview section
-        if (tripPlan.overview.isNotEmpty) ...[
-          const SizedBox(height: 16),
-          Card(
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Overview',
-                    style: Theme.of(context).textTheme.titleLarge,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(tripPlan.overview),
-                ],
-              ),
-            ),
-          ),
-        ],
+        // if (tripPlan.overview.isNotEmpty) ...[
+        //   const SizedBox(height: 16),
+        //   Card(
+        //     child: Padding(
+        //       padding: const EdgeInsets.all(16.0),
+        //       child: Column(
+        //         crossAxisAlignment: CrossAxisAlignment.start,
+        //         children: [
+        //           Text(
+        //             'Overview',
+        //             style: Theme.of(context).textTheme.titleLarge,
+        //           ),
+        //           const SizedBox(height: 8),
+        //           Text(tripPlan.overview),
+        //         ],
+        //       ),
+        //     ),
+        //   ),
+        // ],
 
         // Warnings section if any
         if (tripPlan.warnings.isNotEmpty) ...[
@@ -367,50 +367,5 @@ class _ItineraryBodyState extends ConsumerState<ItineraryBody> {
     }
 
     return DaySection(date: dailyItinerary.date, items: items);
-  }
-
-  Widget _buildPlaceholderView(ThemeData theme) {
-    // Show a placeholder or sample itinerary when no real data is available
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        ItineraryHeader(
-          title: 'Sample Itinerary',
-          startDate: DateTime(2024, 12, 27),
-          endDate: DateTime(2025, 1, 4),
-        ),
-        const SizedBox(height: 24),
-        DaySection(
-          date: DateTime(2024, 12, 27),
-          items: const [
-            ItineraryTimelineNodeData(
-              index: 1,
-              title: 'Kansai International Airport',
-              description:
-                  'From the web: Serving the greater Osaka area, this hub on a man-made island has rail access & an adjacent hotel.',
-              time: '5:00 PM',
-              travelDuration: '2 hr 30 min',
-              travelDistance: '56.9 mi',
-              imageUrl:
-                  'https://images.unsplash.com/photo-1587049352852-252077526367?q=80&w=2070&auto=format&fit=crop',
-              travelMode: TravelMode.DRIVING,
-            ),
-            ItineraryTimelineNodeData(
-              index: 2,
-              title: 'Okonomiyaki Katsu',
-              description:
-                  'Open 6-9PM • Compact restaurant with griddle tables for cook-your-own pancakes with savory fillings.',
-              time: '',
-              travelDuration: '28 min',
-              travelDistance: '1.4 mi',
-              imageUrl:
-                  'https://images.unsplash.com/photo-1598867027375-86a0845a27e8?q=80&w=1974&auto=format&fit=crop',
-              travelMode: TravelMode.WALKING,
-            ),
-            // ... more items
-          ],
-        ),
-      ],
-    );
   }
 }

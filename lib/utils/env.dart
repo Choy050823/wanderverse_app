@@ -3,5 +3,5 @@ const environment = {
   // 'api_url': "http://localhost:8080"
 
   // cloud (production)
-  'api_url': "https://api.wanderverse-service.org"
+  'api_url': "https://api.wanderverse-service.org",
 };

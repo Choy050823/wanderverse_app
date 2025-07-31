@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:wanderverse_app/screens/itinerary/ItineraryCard.dart';
-import 'package:wanderverse_app/screens/itinerary/TimelinePainter.dart';
 
 class ItineraryTimelineNode extends StatelessWidget {
   final int index;
@@ -38,7 +37,6 @@ class ItineraryTimelineNode extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    // Remove IntrinsicHeight and use a Column with Row inside instead
     return Column(
       children: [
         Row(
@@ -46,39 +44,42 @@ class ItineraryTimelineNode extends StatelessWidget {
               CrossAxisAlignment.start, // Important: align to top
           children: [
             // Timeline circle and line
-            SizedBox(
-              width: 40,
-              // Don't constrain the height of this container
-              child: Column(
-                children: [
-                  // Circle with number
-                  Container(
-                    width: 32,
-                    height: 32,
-                    decoration: BoxDecoration(
-                      color: colorScheme.secondary,
-                      shape: BoxShape.circle,
-                    ),
-                    child: Center(
-                      child: Text(
-                        index.toString(),
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8.0),
+              child: SizedBox(
+                width: 40,
+                // Don't constrain the height of this container
+                child: Column(
+                  children: [
+                    // Circle with number
+                    Container(
+                      width: 32,
+                      height: 32,
+                      decoration: BoxDecoration(
+                        color: colorScheme.secondary,
+                        shape: BoxShape.circle,
+                      ),
+                      child: Center(
+                        child: Text(
+                          index.toString(),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  // Timeline line
-                  if (!isLast)
-                    Container(
-                      width: 2,
-                      height:
-                          100, // Just a starting height, will be painted over
-                      color: colorScheme.outline.withOpacity(0.3),
-                    ),
-                ],
+                    // Timeline line
+                    // if (!isLast)
+                    //   Container(
+                    //     width: 2,
+                    //     height:
+                    //         100, // Just a starting height, will be painted over
+                    //     color: colorScheme.outline.withOpacity(0.3),
+                    //   ),
+                  ],
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -94,7 +95,7 @@ class ItineraryTimelineNode extends StatelessWidget {
                 phoneNumber: phoneNumber,
                 website: website,
                 openingHours: openingHours,
-                locationUrl: locationUrl, // Pass it here
+                locationUrl: locationUrl,
               ),
             ),
           ],

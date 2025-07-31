@@ -16,11 +16,13 @@ class AuthScreen extends ConsumerStatefulWidget {
 
 class _AuthScreenState extends ConsumerState<AuthScreen> {
   // Add these color constants
-  final Color formBackgroundColor =
-      const Color(0xFFFFF8E1); // Warm cream background
+  final Color formBackgroundColor = const Color(
+    0xFFFFF8E1,
+  ); // Warm cream background
   final Color formAccentColor = const Color(0xFFFFD54F); // Golden accent
-  final Color formBorderColor =
-      const Color(0xFFFFCA28); // Slightly deeper gold for borders
+  final Color formBorderColor = const Color(
+    0xFFFFCA28,
+  ); // Slightly deeper gold for borders
 
   // login form
   final _loginFormKey = GlobalKey<FormState>();
@@ -60,32 +62,41 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
   Future<void> _handleLogin() async {
     print('login');
     if (_loginFormKey.currentState!.validate()) {
-      final success = await ref
+      final message = await ref
           .read(authServiceProvider.notifier)
-          .loginWithEmailAndPassword(_loginEmailController.text.trim(),
-              _loginPasswordController.text.trim());
+          .loginWithEmailAndPassword(
+            _loginEmailController.text.trim(),
+            _loginPasswordController.text.trim(),
+          );
 
-      if (!success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Login Failed'),
-          backgroundColor: Colors.red,
-        ));
+      if (!message['success'] && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Login Failed: ${message['error']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
 
   Future<void> _handleSignUp() async {
     if (_signupFormKey.currentState!.validate()) {
-      final success = await ref.read(authServiceProvider.notifier).signUp(
-          _signupUsernameController.text.trim(),
-          _signupEmailController.text.trim(),
-          _signupPasswordController.text.trim());
+      final message = await ref
+          .read(authServiceProvider.notifier)
+          .signUp(
+            _signupUsernameController.text.trim(),
+            _signupEmailController.text.trim(),
+            _signupPasswordController.text.trim(),
+          );
 
-      if (!success && mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-          content: Text('Sign Up Failed'),
-          backgroundColor: Colors.red,
-        ));
+      if (!message['success'] && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Sign Up Failed: ${message['error']}'),
+            backgroundColor: Colors.red,
+          ),
+        );
       }
     }
   }
@@ -99,9 +110,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       floatingActionButton: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(24),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         elevation: 20,
         child: const ThemeToggleButton(),
       ),
@@ -160,7 +169,7 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                       end: Alignment.bottomCenter,
                       colors: [
                         Theme.of(context).colorScheme.primary.withOpacity(0.2),
-                        Colors.black.withOpacity(0.7)
+                        Colors.black.withOpacity(0.7),
                       ],
                     ),
                   ),
@@ -171,19 +180,19 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     alignment: Alignment.bottomLeft,
                     child: Text(
                       'WanderVerse',
-                      style:
-                          Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                color: Colors.white,
-                                fontWeight: FontWeight.bold,
-                              ),
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                   ),
-                )
+                ),
               ],
             ),
           ),
 
-          _isLoginMode ? _buildLoginForm() : _buildSingUpForm()
+          _isLoginMode ? _buildLoginForm() : _buildSingUpForm(),
         ],
       ),
     );
@@ -218,7 +227,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 Text(
                   "Don't have an account?",
                   style: TextStyle(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7)),
+                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
@@ -231,72 +241,66 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     style: TextStyle(color: Colors.blue),
                   ),
                   // TextButton style comes from theme
-                )
+                ),
               ],
             ),
-            const SizedBox(
-              height: 32,
-            ),
+            const SizedBox(height: 32),
 
             // Email
             buildTextField(
-                controller: _loginEmailController,
-                labelText: 'Email',
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
-                  }
+              controller: _loginEmailController,
+              labelText: 'Email',
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter your email';
+                }
 
-                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                    return 'Please enter a valid email';
-                  }
-                  return null;
-                }),
-            const SizedBox(
-              height: 16,
+                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                  return 'Please enter a valid email';
+                }
+                return null;
+              },
             ),
+            const SizedBox(height: 16),
 
             // Password
             buildTextField(
-                controller: _loginPasswordController,
-                labelText: 'Password',
-                obscureText: _obscurePassword,
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                  icon: Icon(_obscurePassword
-                      ? Icons.visibility_off
-                      : Icons.visibility),
-                ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a password';
-                  }
-                  return null;
-                }),
-
-            const SizedBox(
-              height: 8,
-            ),
-
-            // Forgot Password
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () {},
-                child: const Text(
-                  'Forgot Password?',
-                  // Don't use hardcoded color
-                  style: TextStyle(color: Colors.blue),
+              controller: _loginPasswordController,
+              labelText: 'Password',
+              obscureText: _obscurePassword,
+              suffixIcon: IconButton(
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
                 ),
               ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a password';
+                }
+                return null;
+              },
             ),
-            const SizedBox(
-              height: 24,
-            ),
+
+            const SizedBox(height: 8),
+
+            // Forgot Password
+            // Align(
+            //   alignment: Alignment.centerRight,
+            //   child: TextButton(
+            //     onPressed: () {},
+            //     child: const Text(
+            //       'Forgot Password?',
+            //       // Don't use hardcoded color
+            //       style: TextStyle(color: Colors.blue),
+            //     ),
+            //   ),
+            // ),
+            const SizedBox(height: 24),
 
             // Login Button
             SizedBox(
@@ -307,59 +311,47 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 child: const Text('Log In', style: TextStyle(fontSize: 16)),
               ),
             ),
-            const SizedBox(
-              height: 24,
-            ),
+            const SizedBox(height: 24),
 
             // Divider
             Row(
               children: [
                 Expanded(
-                    child: Divider(
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
-                )),
+                  child: Divider(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.3),
+                  ),
+                ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
                     'Or sign in with',
                     style: TextStyle(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .onSurface
-                            .withOpacity(0.3)),
+                      color: Theme.of(
+                        context,
+                      ).colorScheme.onSurface.withOpacity(0.3),
+                    ),
                   ),
                 ),
                 Expanded(
-                    child: Divider(
-                  color:
-                      Theme.of(context).colorScheme.onSurface.withOpacity(0.3),
-                )),
+                  child: Divider(
+                    color: Theme.of(
+                      context,
+                    ).colorScheme.onSurface.withOpacity(0.3),
+                  ),
+                ),
               ],
             ),
-            const SizedBox(
-              height: 24,
-            ),
+            const SizedBox(height: 24),
 
             // Social buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                buildSocialIcon(
-                    onPressed: () {},
-                    iconUrl:
-                        "https://cdn.iconscout.com/icon/free/png-256/free-google-logo-icon-download-in-svg-png-gif-file-formats--brands-pack-logos-icons-189824.png?f=webp&w=256",
-                    label: 'Google'),
-                const SizedBox(
-                  width: 16,
-                ),
-                buildSocialIcon(
-                    onPressed: () {},
-                    iconUrl:
-                        "https://cdn-icons-png.flaticon.com/128/6033/6033716.png",
-                    label: 'Meta')
-              ],
-            )
+            buildSocialIcon(
+              onPressed: () {},
+              iconUrl:
+                  "https://cdn.iconscout.com/icon/free/png-256/free-google-logo-icon-download-in-svg-png-gif-file-formats--brands-pack-logos-icons-189824.png?f=webp&w=256",
+              label: 'Google',
+            ),
           ],
         ),
       ),
@@ -395,7 +387,8 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 Text(
                   "Already have an account?",
                   style: TextStyle(
-                      color: theme.colorScheme.onSurface.withOpacity(0.7)),
+                    color: theme.colorScheme.onSurface.withOpacity(0.7),
+                  ),
                 ),
                 TextButton(
                   onPressed: () {
@@ -407,62 +400,65 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                     'Log In',
                     style: TextStyle(color: Colors.blue),
                   ),
-                )
+                ),
               ],
             ),
             const SizedBox(height: 32),
 
             // Username
             buildTextField(
-                controller: _signupUsernameController,
-                labelText: 'Username',
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Username required';
-                  }
-                  return null;
-                }),
+              controller: _signupUsernameController,
+              labelText: 'Username',
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Username required';
+                }
+                return null;
+              },
+            ),
             const SizedBox(height: 16),
 
             // Email
             buildTextField(
-                controller: _signupEmailController,
-                labelText: 'Email',
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Email required';
-                  }
-                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
-                    return 'Please enter a valid email';
-                  }
-                  return null;
-                }),
+              controller: _signupEmailController,
+              labelText: 'Email',
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Email required';
+                }
+                if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                  return 'Please enter a valid email';
+                }
+                return null;
+              },
+            ),
             const SizedBox(height: 16),
 
             // Password
             buildTextField(
-                controller: _signupPasswordController,
-                labelText: 'Password',
-                obscureText: _obscurePassword,
-                suffixIcon: IconButton(
-                  onPressed: () {
-                    setState(() {
-                      _obscurePassword = !_obscurePassword;
-                    });
-                  },
-                  icon: Icon(_obscurePassword
-                      ? Icons.visibility_off
-                      : Icons.visibility),
+              controller: _signupPasswordController,
+              labelText: 'Password',
+              obscureText: _obscurePassword,
+              suffixIcon: IconButton(
+                onPressed: () {
+                  setState(() {
+                    _obscurePassword = !_obscurePassword;
+                  });
+                },
+                icon: Icon(
+                  _obscurePassword ? Icons.visibility_off : Icons.visibility,
                 ),
-                validator: (value) {
-                  if (value == null || value.isEmpty) {
-                    return 'Please enter a password';
-                  }
-                  if (value.length < 8) {
-                    return 'Password must be at least 8 characters';
-                  }
-                  return null;
-                }),
+              ),
+              validator: (value) {
+                if (value == null || value.isEmpty) {
+                  return 'Please enter a password';
+                }
+                if (value.length < 8) {
+                  return 'Password must be at least 8 characters';
+                }
+                return null;
+              },
+            ),
 
             const SizedBox(height: 32),
 
@@ -485,41 +481,34 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
               children: [
                 Expanded(
                   child: Divider(
-                      color: theme.colorScheme.onSurface.withOpacity(0.3)),
+                    color: theme.colorScheme.onSurface.withOpacity(0.3),
+                  ),
                 ),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Text(
                     'Or sign in with',
                     style: TextStyle(
-                        color: theme.colorScheme.onSurface.withOpacity(0.3)),
+                      color: theme.colorScheme.onSurface.withOpacity(0.3),
+                    ),
                   ),
                 ),
                 Expanded(
                   child: Divider(
-                      color: theme.colorScheme.onSurface.withOpacity(0.3)),
+                    color: theme.colorScheme.onSurface.withOpacity(0.3),
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 24),
 
             // Social buttons
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                buildSocialIcon(
-                    onPressed: () {},
-                    iconUrl:
-                        "https://cdn.iconscout.com/icon/free/png-256/free-google-logo-icon-download-in-svg-png-gif-file-formats--brands-pack-logos-icons-189824.png?f=webp&w=256",
-                    label: 'Google'),
-                const SizedBox(width: 16),
-                buildSocialIcon(
-                    onPressed: () {},
-                    iconUrl:
-                        "https://cdn-icons-png.flaticon.com/128/6033/6033716.png",
-                    label: 'Meta')
-              ],
-            )
+            buildSocialIcon(
+              onPressed: () {},
+              iconUrl:
+                  "https://cdn.iconscout.com/icon/free/png-256/free-google-logo-icon-download-in-svg-png-gif-file-formats--brands-pack-logos-icons-189824.png?f=webp&w=256",
+              label: 'Google',
+            ),
           ],
         ),
       ),

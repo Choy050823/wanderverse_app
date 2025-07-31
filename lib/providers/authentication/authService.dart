@@ -19,12 +19,13 @@ final _baseUrl = environment['api_url'];
 @freezed
 class AuthState with _$AuthState {
   AuthState._();
-  factory AuthState(
-      {@Default(false) bool isAuthenticated,
-      String? token,
-      @Default({}) Map<String, dynamic> userData,
-      @Default(false) bool isLoading,
-      String? errorMessage}) = _AuthState;
+  factory AuthState({
+    @Default(false) bool isAuthenticated,
+    String? token,
+    @Default({}) Map<String, dynamic> userData,
+    @Default(false) bool isLoading,
+    String? errorMessage,
+  }) = _AuthState;
 }
 
 @Riverpod(keepAlive: true)
@@ -47,10 +48,11 @@ class AuthService extends _$AuthService {
             ? json.decode(userDataString) as Map<String, dynamic>
             : <String, dynamic>{};
         state = state.copyWith(
-            isAuthenticated: true,
-            token: token,
-            userData: userData,
-            isLoading: false);
+          isAuthenticated: true,
+          token: token,
+          userData: userData,
+          isLoading: false,
+        );
 
         print("DEBUG: tryAutoLogin user data: $userData");
 
@@ -63,12 +65,17 @@ class AuthService extends _$AuthService {
             .getPosts();
         for (int i = 1; i <= 20; i++) {
           await ref
-              .read(postServiceProvider(PostApiType.sharing, i.toString())
-                  .notifier)
+              .read(
+                postServiceProvider(PostApiType.sharing, i.toString()).notifier,
+              )
               .getPosts();
           await ref
-              .read(postServiceProvider(PostApiType.discussion, i.toString())
-                  .notifier)
+              .read(
+                postServiceProvider(
+                  PostApiType.discussion,
+                  i.toString(),
+                ).notifier,
+              )
               .getPosts();
         }
         ref.read(appstateProvider.notifier).changeAppRoute('/');
@@ -111,7 +118,10 @@ class AuthService extends _$AuthService {
   //   }
   // }
 
-  Future<bool> loginWithEmailAndPassword(String email, String password) async {
+  Future<Map<String, dynamic>> loginWithEmailAndPassword(
+    String email,
+    String password,
+  ) async {
     try {
       // Example HTTP POST request (replace with your backend endpoint and body)
       final response = await http.post(
@@ -130,7 +140,7 @@ class AuthService extends _$AuthService {
 
         // extract user data
         final userData = data['user'] ?? {};
-        print("DEBUG: userDATA: $userData");
+        print("DEBUG: userData: $userData");
 
         // save to preferences
         final prefs = await SharedPreferences.getInstance();
@@ -138,7 +148,10 @@ class AuthService extends _$AuthService {
         await prefs.setString('user_data', json.encode(userData));
 
         state = state.copyWith(
-            isAuthenticated: true, token: token, userData: userData);
+          isAuthenticated: true,
+          token: token,
+          userData: userData,
+        );
 
         ref.read(userServiceProvider.notifier).getCurrentUser();
         await ref
@@ -149,34 +162,48 @@ class AuthService extends _$AuthService {
             .getPosts();
         for (int i = 1; i <= 20; i++) {
           await ref
-              .read(postServiceProvider(PostApiType.sharing, i.toString())
-                  .notifier)
+              .read(
+                postServiceProvider(PostApiType.sharing, i.toString()).notifier,
+              )
               .getPosts();
           await ref
-              .read(postServiceProvider(PostApiType.discussion, i.toString())
-                  .notifier)
+              .read(
+                postServiceProvider(
+                  PostApiType.discussion,
+                  i.toString(),
+                ).notifier,
+              )
               .getPosts();
         }
         ref.read(appstateProvider.notifier).changeAppRoute('/');
         print('login complete with token: $token, and user: $userData');
-        return true;
+        return {'success': true, 'error': null};
       } else {
-        print("Status Code: ${response.statusCode}");
-        return false;
+        print("Status Code: ${response.statusCode}: ${response.body}");
+        return {'success': false, 'error': jsonDecode(response.body)['error']};
       }
     } catch (e) {
       print(e.toString());
-      return false;
+      return {'success': false, 'error': e.toString()};
     }
   }
 
-  Future<bool> signUp(String username, String email, String password) async {
+  Future<Map<String, dynamic>> signUp(
+    String username,
+    String email,
+    String password,
+  ) async {
     try {
       // sign up from backend
-      final response = await http.post(Uri.parse('$_baseUrl/api/auth/signup'),
-          headers: {'Content-Type': 'application/json'},
-          body: json.encode(
-              {'username': username, 'email': email, 'password': password}));
+      final response = await http.post(
+        Uri.parse('$_baseUrl/api/auth/signup'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'username': username,
+          'email': email,
+          'password': password,
+        }),
+      );
 
       if (response.statusCode == 201) {
         final data = json.decode(response.body);
@@ -193,7 +220,10 @@ class AuthService extends _$AuthService {
         await prefs.setString('user_data', json.encode(userData));
 
         state = state.copyWith(
-            isAuthenticated: true, token: token, userData: userData);
+          isAuthenticated: true,
+          token: token,
+          userData: userData,
+        );
 
         // fetch all posts
         await ref
@@ -204,26 +234,31 @@ class AuthService extends _$AuthService {
             .getPosts();
         for (int i = 1; i <= 20; i++) {
           await ref
-              .read(postServiceProvider(PostApiType.sharing, i.toString())
-                  .notifier)
+              .read(
+                postServiceProvider(PostApiType.sharing, i.toString()).notifier,
+              )
               .getPosts();
           await ref
-              .read(postServiceProvider(PostApiType.discussion, i.toString())
-                  .notifier)
+              .read(
+                postServiceProvider(
+                  PostApiType.discussion,
+                  i.toString(),
+                ).notifier,
+              )
               .getPosts();
         }
         ref.read(appstateProvider.notifier).changeAppRoute('/');
         ref.read(userServiceProvider.notifier).getCurrentUser();
         // ref.read(appstateProvider.notifier).changeIsAuthenticated(true);
         print('signup complete with token: $token');
-        return true;
+        return {'success': true, 'error': null};
       } else {
-        print("Status Code: ${response.statusCode}");
-        return false;
+        print("Status Code: ${response.statusCode}: ${response.body}");
+        return {'success': false, 'error': jsonDecode(response.body)['error']};
       }
     } catch (e) {
       print(e.toString());
-      return false;
+      return {'success': false, 'error': e.toString()};
     }
   }
 

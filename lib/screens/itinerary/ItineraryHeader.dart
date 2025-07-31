@@ -21,11 +21,20 @@ class ItineraryHeader extends StatelessWidget {
     final String formattedDateRange =
         '${DateFormat('M/d').format(startDate)} - ${DateFormat('M/d').format(endDate)}';
 
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween, // Similar to spaceBetween in Row
+      crossAxisAlignment: WrapCrossAlignment.center,
+      runSpacing: 12, // Vertical space between lines
+      spacing: 12, // Horizontal space between items
       children: [
-        Text(title, style: textTheme.displaySmall),
+        Flexible(
+          // Allow title to shrink a bit if needed
+          child: Text(
+            title,
+            style: textTheme.displaySmall,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
           decoration: BoxDecoration(
@@ -33,6 +42,8 @@ class ItineraryHeader extends StatelessWidget {
             borderRadius: BorderRadius.circular(24),
           ),
           child: Row(
+            mainAxisSize: MainAxisSize
+                .min, // Important: don't take more space than needed
             children: [
               Icon(
                 Icons.calendar_today_outlined,

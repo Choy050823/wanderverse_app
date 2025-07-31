@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:wanderverse_app/providers/authentication/authService.dart';
 import 'package:wanderverse_app/providers/post-sharing/userService.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter/services.dart';
 import 'dart:js' as js;
 
 class MinigameScreen extends ConsumerStatefulWidget {
@@ -18,8 +19,25 @@ class _MinigameScreenState extends ConsumerState<MinigameScreen> {
   @override
   void initState() {
     super.initState();
+
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+    ]);
+
     _controller = WebViewController()
       ..loadRequest(Uri.base.resolve('unity/index.html'));
+  }
+
+  @override
+  void dispose() {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.landscapeLeft,
+      DeviceOrientation.landscapeRight,
+      DeviceOrientation.portraitDown,
+      DeviceOrientation.portraitUp,
+    ]);
+    super.dispose();
   }
 
   void _sendMessageToUnity(String message) {

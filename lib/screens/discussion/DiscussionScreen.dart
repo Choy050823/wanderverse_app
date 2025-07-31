@@ -35,7 +35,9 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
   void initState() {
     super.initState();
     _animationController = AnimationController(
-        vsync: this, duration: const Duration(milliseconds: 300));
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
     _animationController.forward();
     _scrollController.addListener(_scrollListener);
   }
@@ -67,10 +69,11 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
     discussionPostsProvider = postServiceProvider(
-        PostApiType.discussion,
-        currentDestination == null || currentDestination!.name == "General"
-            ? "all"
-            : currentDestination!.id);
+      PostApiType.discussion,
+      currentDestination == null || currentDestination!.name == "General"
+          ? "all"
+          : currentDestination!.id,
+    );
     final postState = ref.watch(discussionPostsProvider);
     final isLoading = postState.isLoading;
     final hasError = postState.errorMessage != null;
@@ -102,15 +105,16 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
-                          color: colorScheme.surface.withOpacity(0.5),
-                          borderRadius: BorderRadius.circular(12)),
+                        color: colorScheme.surface.withOpacity(0.5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                       child: Text(
                         "Travel Discussions: ${currentDestination == null ? generalDestination.name : currentDestination!.name}",
-                        style: textTheme.headlineLarge?.copyWith(
-                          fontSize: 22,
-                        ),
+                        style: textTheme.headlineLarge?.copyWith(fontSize: 22),
                       ),
                     ),
                   ],
@@ -140,43 +144,43 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
                   ],
                 ),
               ),
-              actions: [
-                IconButton(
-                  onPressed: () {
-                    // Search Engine Function
-                  },
-                  icon: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: const Icon(
-                      Icons.search,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                IconButton(
-                  onPressed: () {
-                    // filter function
-                  },
-                  icon: Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.black.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: const Icon(
-                      Icons.filter_list,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-              ],
+              // actions: [
+              //   IconButton(
+              //     onPressed: () {
+              //       // Search Engine Function
+              //     },
+              //     icon: Container(
+              //       padding: const EdgeInsets.all(8),
+              //       decoration: BoxDecoration(
+              //         color: Colors.black.withOpacity(0.2),
+              //         borderRadius: BorderRadius.circular(50),
+              //       ),
+              //       child: const Icon(
+              //         Icons.search,
+              //         color: Colors.white,
+              //         size: 20,
+              //       ),
+              //     ),
+              //   ),
+              //   IconButton(
+              //     onPressed: () {
+              //       // filter function
+              //     },
+              //     icon: Container(
+              //       padding: const EdgeInsets.all(8),
+              //       decoration: BoxDecoration(
+              //         color: Colors.black.withOpacity(0.2),
+              //         borderRadius: BorderRadius.circular(50),
+              //       ),
+              //       child: const Icon(
+              //         Icons.filter_list,
+              //         color: Colors.white,
+              //         size: 20,
+              //       ),
+              //     ),
+              //   ),
+              //   const SizedBox(width: 8),
+              // ],
             ),
 
             // Sort bar
@@ -198,102 +202,112 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
                   ),
                   child: Padding(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         // Sort dropdown
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: colorScheme.surfaceVariant.withOpacity(0.5),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                "Sort By:",
-                                style: textTheme.bodySmall?.copyWith(
-                                    color: colorScheme.onSurfaceVariant),
-                              ),
-                              const SizedBox(width: 8),
-                              DropdownButtonHideUnderline(
-                                child: DropdownButton<String>(
-                                  isDense: true,
-                                  value: _sortBy,
-                                  icon: Icon(
-                                    Icons.arrow_drop_down,
-                                    color: colorScheme.onSurfaceVariant,
-                                  ),
-                                  items: _sortOptions.map((String value) {
-                                    return DropdownMenuItem<String>(
-                                      value: value,
-                                      child: Text(
-                                        value,
-                                        style: textTheme.bodySmall?.copyWith(
-                                            fontWeight: FontWeight.w600),
-                                      ),
-                                    );
-                                  }).toList(),
-                                  onChanged: (String? value) {
-                                    if (value != null) {
-                                      setState(() {
-                                        _sortBy = value;
-                                      });
-                                    }
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const Spacer(),
+                        // Container(
+                        //   padding: const EdgeInsets.symmetric(
+                        //       horizontal: 12, vertical: 6),
+                        //   decoration: BoxDecoration(
+                        //     color: colorScheme.surfaceVariant.withOpacity(0.5),
+                        //     borderRadius: BorderRadius.circular(16),
+                        //   ),
+                        //   child: Row(
+                        //     mainAxisSize: MainAxisSize.min,
+                        //     children: [
+                        //       Text(
+                        //         "Sort By:",
+                        //         style: textTheme.bodySmall?.copyWith(
+                        //             color: colorScheme.onSurfaceVariant),
+                        //       ),
+                        //       const SizedBox(width: 8),
+                        //       DropdownButtonHideUnderline(
+                        //         child: DropdownButton<String>(
+                        //           isDense: true,
+                        //           value: _sortBy,
+                        //           icon: Icon(
+                        //             Icons.arrow_drop_down,
+                        //             color: colorScheme.onSurfaceVariant,
+                        //           ),
+                        //           items: _sortOptions.map((String value) {
+                        //             return DropdownMenuItem<String>(
+                        //               value: value,
+                        //               child: Text(
+                        //                 value,
+                        //                 style: textTheme.bodySmall?.copyWith(
+                        //                     fontWeight: FontWeight.w600),
+                        //               ),
+                        //             );
+                        //           }).toList(),
+                        //           onChanged: (String? value) {
+                        //             if (value != null) {
+                        //               setState(() {
+                        //                 _sortBy = value;
+                        //               });
+                        //             }
+                        //           },
+                        //         ),
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+                        // const Spacer(),
                         Expanded(
                           child: destinationAsync.when(
                             data: (destinations) {
                               return Autocomplete<Destination>(
                                 optionsBuilder:
                                     (TextEditingValue textEditingValue) {
-                                  if (textEditingValue.text.isEmpty) {
-                                    return destinations;
-                                  }
-                                  return destinations.where((destination) {
-                                    return destination.name
-                                        .toLowerCase()
-                                        .contains(textEditingValue.text
-                                            .toLowerCase());
-                                  });
-                                },
+                                      if (textEditingValue.text.isEmpty) {
+                                        return destinations;
+                                      }
+                                      return destinations.where((destination) {
+                                        return destination.name
+                                            .toLowerCase()
+                                            .contains(
+                                              textEditingValue.text
+                                                  .toLowerCase(),
+                                            );
+                                      });
+                                    },
                                 displayStringForOption: (destination) =>
                                     destination.name,
-                                fieldViewBuilder: (context,
-                                    textEditingController,
-                                    focusNode,
-                                    onFieldSubmitted) {
-                                  _destinationController =
-                                      textEditingController;
-                                  return TextField(
-                                    controller: textEditingController,
-                                    focusNode: focusNode,
-                                    textAlignVertical: TextAlignVertical.center,
-                                    decoration: InputDecoration(
-                                      hintText: "Search for a destination...",
-                                      prefixIcon: const Icon(Icons.search),
-                                      border: OutlineInputBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8)),
-                                      fillColor: theme.colorScheme.surface,
-                                      filled: true,
-                                      contentPadding:
-                                          ResponsiveLayout.isMobile(context)
-                                              ? const EdgeInsets.symmetric(
-                                                  vertical: 8, horizontal: 12)
-                                              : null,
-                                    ),
-                                    onSubmitted: (_) => onFieldSubmitted(),
-                                  );
-                                },
+                                fieldViewBuilder:
+                                    (
+                                      context,
+                                      textEditingController,
+                                      focusNode,
+                                      onFieldSubmitted,
+                                    ) {
+                                      _destinationController =
+                                          textEditingController;
+
+                                      return TextField(
+                                        controller: textEditingController,
+                                        focusNode: focusNode,
+                                        decoration: InputDecoration(
+                                          hintText:
+                                              'Search for a destination...',
+                                          prefixIcon: const Icon(Icons.search),
+                                          border: OutlineInputBorder(
+                                            borderRadius: BorderRadius.circular(
+                                              30.0,
+                                            ),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          filled: true,
+                                          contentPadding: EdgeInsets.zero,
+                                          fillColor: Theme.of(
+                                            context,
+                                          ).colorScheme.surface,
+                                        ),
+                                        onSubmitted: (_) => onFieldSubmitted(),
+                                      );
+                                    },
                                 onSelected: (Destination destination) {
                                   setState(() {
                                     currentDestination = destination;
@@ -306,54 +320,59 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
                                 // Add this options view builder for rich destination display
                                 optionsViewBuilder:
                                     (context, onSelected, options) {
-                                  return Align(
-                                    alignment: Alignment.topLeft,
-                                    child: Material(
-                                      elevation: 4.0,
-                                      child: ConstrainedBox(
-                                        constraints: const BoxConstraints(
-                                          maxHeight: 200,
-                                          maxWidth: 500,
+                                      return Align(
+                                        alignment: Alignment.topLeft,
+                                        child: Material(
+                                          elevation: 4.0,
+                                          child: ConstrainedBox(
+                                            constraints: const BoxConstraints(
+                                              maxHeight: 200,
+                                              maxWidth: 500,
+                                            ),
+                                            child: ListView.builder(
+                                              padding: EdgeInsets.zero,
+                                              shrinkWrap: true,
+                                              itemCount: options.length,
+                                              itemBuilder: (context, index) {
+                                                final Destination option =
+                                                    options.elementAt(index);
+                                                return ListTile(
+                                                  leading:
+                                                      option.imageUrl.isNotEmpty
+                                                      ? CircleAvatar(
+                                                          backgroundImage:
+                                                              NetworkImage(
+                                                                option.imageUrl,
+                                                              ),
+                                                        )
+                                                      : const CircleAvatar(
+                                                          child: Icon(
+                                                            Icons.location_on,
+                                                          ),
+                                                        ),
+                                                  title: Text(option.name),
+                                                  subtitle: Text(
+                                                    option.description,
+                                                    maxLines: 1,
+                                                    overflow:
+                                                        TextOverflow.ellipsis,
+                                                  ),
+                                                  onTap: () =>
+                                                      onSelected(option),
+                                                );
+                                              },
+                                            ),
+                                          ),
                                         ),
-                                        child: ListView.builder(
-                                          padding: EdgeInsets.zero,
-                                          shrinkWrap: true,
-                                          itemCount: options.length,
-                                          itemBuilder: (context, index) {
-                                            final Destination option =
-                                                options.elementAt(index);
-                                            return ListTile(
-                                              leading: option
-                                                      .imageUrl.isNotEmpty
-                                                  ? CircleAvatar(
-                                                      backgroundImage:
-                                                          NetworkImage(
-                                                              option.imageUrl),
-                                                    )
-                                                  : const CircleAvatar(
-                                                      child: Icon(
-                                                          Icons.location_on),
-                                                    ),
-                                              title: Text(option.name),
-                                              subtitle: Text(
-                                                option.description,
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                              onTap: () => onSelected(option),
-                                            );
-                                          },
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
+                                      );
+                                    },
                               );
                             },
                             error: (error, _) =>
                                 Text("Error loading destinations: $error"),
                             loading: () => const Center(
-                                child: CircularProgressIndicator()),
+                              child: CircularProgressIndicator(),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 16),
@@ -361,7 +380,9 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
                         Container(
                           height: 36,
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 14, vertical: 0),
+                            horizontal: 14,
+                            vertical: 0,
+                          ),
                           decoration: BoxDecoration(
                             color: colorScheme.primary,
                             borderRadius: BorderRadius.circular(24),
@@ -417,12 +438,15 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
                             flex: 7,
                             child: discussions.isEmpty && !isLoading
                                 ? _buildEmptyView(
-                                    hasError, postState.errorMessage)
+                                    hasError,
+                                    postState.errorMessage,
+                                  )
                                 : Column(
                                     children: [
                                       // List of discussion cards
-                                      ...List.generate(discussions.length,
-                                          (index) {
+                                      ...List.generate(discussions.length, (
+                                        index,
+                                      ) {
                                         return DiscussionCard(
                                           post: discussions[index],
                                           index: index,
@@ -462,35 +486,35 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
                         ],
                       )
                     : discussions.isEmpty && !isLoading
-                        ? _buildEmptyView(hasError, postState.errorMessage)
-                        : Column(
-                            children: [
-                              // List of discussion cards
-                              ...List.generate(discussions.length, (index) {
-                                return DiscussionCard(
-                                  post: discussions[index],
-                                  index: index,
-                                  screen: SpecificDiscussionScreen(
-                                    destination: discussions[index].destination,
-                                    discussionPost: discussions[index],
-                                  ),
-                                );
-                              }),
+                    ? _buildEmptyView(hasError, postState.errorMessage)
+                    : Column(
+                        children: [
+                          // List of discussion cards
+                          ...List.generate(discussions.length, (index) {
+                            return DiscussionCard(
+                              post: discussions[index],
+                              index: index,
+                              screen: SpecificDiscussionScreen(
+                                destination: discussions[index].destination,
+                                discussionPost: discussions[index],
+                              ),
+                            );
+                          }),
 
-                              // Loading indicator or "no more posts" message
-                              if (isLoading && postState.hasMore)
-                                _buildLoadingIndicator()
-                              else if (!isLoading && postState.hasMore)
-                                const SizedBox(height: 16)
-                              else if (!isLoading &&
-                                  !postState.hasMore &&
-                                  discussions.isNotEmpty)
-                                _buildNoMorePostsIndicator(),
+                          // Loading indicator or "no more posts" message
+                          if (isLoading && postState.hasMore)
+                            _buildLoadingIndicator()
+                          else if (!isLoading && postState.hasMore)
+                            const SizedBox(height: 16)
+                          else if (!isLoading &&
+                              !postState.hasMore &&
+                              discussions.isNotEmpty)
+                            _buildNoMorePostsIndicator(),
 
-                              // Add extra space at bottom for FAB
-                              const SizedBox(height: 80),
-                            ],
-                          ),
+                          // Add extra space at bottom for FAB
+                          const SizedBox(height: 80),
+                        ],
+                      ),
               ),
             ),
 
@@ -521,10 +545,7 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
           },
           elevation: 0,
           backgroundColor: Colors.transparent,
-          icon: Icon(
-            Icons.add,
-            color: Theme.of(context).colorScheme.onPrimary,
-          ),
+          icon: Icon(Icons.add, color: Theme.of(context).colorScheme.onPrimary),
           label: Text(
             "Post a Discussion",
             style: textTheme.labelLarge?.copyWith(
@@ -547,38 +568,31 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
               Icons.error_outline,
               color: Theme.of(context).colorScheme.error,
             ),
-            const SizedBox(
-              height: 16,
-            ),
+            const SizedBox(height: 16),
             Text(
               errorMessage ?? "Unexpected error occurred",
-              style: TextStyle(
-                color: Theme.of(context).colorScheme.error,
-              ),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
               textAlign: TextAlign.center,
-            )
+            ),
           ] else ...[
             const Icon(
               Icons.photo_album_outlined,
               color: Colors.grey,
               size: 60,
             ),
-            const SizedBox(
-              height: 16,
-            ),
+            const SizedBox(height: 16),
             const Text(
               "No post found\nPull down to refresh",
               textAlign: TextAlign.center,
               style: TextStyle(color: Colors.grey),
-            )
+            ),
           ],
-          const SizedBox(
-            height: 24,
-          ),
+          const SizedBox(height: 24),
           ElevatedButton(
-              onPressed: () =>
-                  ref.read(discussionPostsProvider.notifier).refreshPosts(),
-              child: const Text("Refresh"))
+            onPressed: () =>
+                ref.read(discussionPostsProvider.notifier).refreshPosts(),
+            child: const Text("Refresh"),
+          ),
         ],
       ),
     );
@@ -590,23 +604,22 @@ class _DiscussionScreenState extends ConsumerState<DiscussionScreen>
       padding: const EdgeInsets.all(16.0),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8)
-          ]),
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 8),
+        ],
+      ),
       child: Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const CircularProgressIndicator(),
-            const SizedBox(
-              height: 12,
-            ),
+            const SizedBox(height: 12),
             Text(
               "Loading more posts...",
               style: Theme.of(context).textTheme.bodySmall,
-            )
+            ),
           ],
         ),
       ),
@@ -632,7 +645,10 @@ class _SortBarDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return Container(
       color: Theme.of(context).scaffoldBackgroundColor,
       child: child,

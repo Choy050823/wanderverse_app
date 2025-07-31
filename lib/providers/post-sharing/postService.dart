@@ -188,7 +188,7 @@ class PostService extends _$PostService {
           posts: allPosts,
           isLoading: false,
           hasMore: hasMorePages,
-          currentPage: state.currentPage + 1,
+          currentPage: state.currentPage,
         );
       } else {
         if (response.statusCode == 401) {

@@ -56,6 +56,9 @@ class DaySection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        const SizedBox(height: 24),
+        const Divider(),
+        const SizedBox(height: 24),
         Text(
           DateFormat('EEEE, MMMM d').format(date),
           style: textTheme.headlineSmall?.copyWith(
@@ -84,6 +87,7 @@ class DaySection extends StatelessWidget {
               duration: item.travelDuration,
               distance: item.travelDistance,
               mode: item.travelMode,
+              directionUrl: item.locationUrl ?? "",
             ),
           ),
         );

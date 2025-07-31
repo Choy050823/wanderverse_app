@@ -6,6 +6,7 @@ import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:wanderverse_app/providers/models.dart';
 import 'package:wanderverse_app/providers/post-sharing/postService.dart';
 import 'package:wanderverse_app/router/ResponsiveLayout.dart';
+import 'package:wanderverse_app/utils/appTheme.dart';
 import 'package:wanderverse_app/utils/widgets/postCard.dart';
 
 // New provider for fetching recommended posts
@@ -155,6 +156,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           actions: [
             IconButton(
               icon: const Icon(Icons.search),
+              style: IconButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+                foregroundColor: Theme.of(context).colorScheme.onPrimary,
+                padding: const EdgeInsets.all(14),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
               onPressed: _performSearch,
             ),
           ],
@@ -316,50 +325,83 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 
   Widget _buildEmptyView(bool hasError, String? errorMessage) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (hasError) ...[
-            Icon(
-              Icons.error_outline,
-              color: Theme.of(context).colorScheme.error,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              errorMessage ?? "Unexpected error occurred",
-              style: TextStyle(color: Theme.of(context).colorScheme.error),
-              textAlign: TextAlign.center,
-            ),
-          ] else ...[
-            const Icon(
-              Icons.photo_album_outlined,
-              color: Colors.grey,
-              size: 60,
-            ),
-            const SizedBox(height: 16),
-            Text(
-              "No post found\nPull down to refresh.\nIf you are in recommended section, you need to like a post first and refresh",
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.labelMedium,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            if (hasError) ...[
+              Icon(Icons.error_outline, color: colorScheme.error, size: 64),
+              const SizedBox(height: 16),
+              Text(
+                errorMessage ?? "Unexpected error occurred",
+                style: textTheme.titleMedium?.copyWith(
+                  color: colorScheme.error,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ] else ...[
+              Icon(
+                Icons.photo_album_outlined,
+                // Use secondary in dark mode, primary in light mode for better contrast
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? AppTheme.secondaryTeal.withOpacity(0.9)
+                    : AppTheme.primaryBlue.withOpacity(0.7),
+                size: 64,
+              ),
+              const SizedBox(height: 16),
+              Text(
+                "No post found\nPull down to refresh.\nIf you are in recommended section, you need to like a post first and refresh",
+                textAlign: TextAlign.center,
+                style: textTheme.bodyMedium?.copyWith(
+                  // Use onBackground for proper contrast on current background
+                  color: colorScheme.onBackground.withOpacity(0.8),
+                  height: 1.5,
+                ),
+              ),
+            ],
+            const SizedBox(height: 28),
+            ElevatedButton.icon(
+              onPressed: () async {
+                print("pressed refresh post button");
+                await ref
+                    .read(sharingPostsProvider.notifier)
+                    .getRecommendedPosts();
+                ref.read(sharingPostsProvider.notifier).refreshPosts();
+                ref.invalidate(recommendedPostsProvider);
+              },
+              icon: Icon(
+                Icons.refresh,
+                size: 18,
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white
+                    : Colors.white,
+              ),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
+                // Use the theme's button style but ensure proper contrast
+                backgroundColor: Theme.of(context).brightness == Brightness.dark
+                    ? AppTheme.tertiaryGreen
+                    : AppTheme.primaryBlue,
+              ),
+              label: Text(
+                "Refresh",
+                style: textTheme.labelLarge?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ],
-          const SizedBox(height: 24),
-          ElevatedButton(
-            onPressed: () async {
-              print("pressed refresh post button");
-              await ref
-                  .read(sharingPostsProvider.notifier)
-                  .getRecommendedPosts();
-              ref.read(sharingPostsProvider.notifier).refreshPosts();
-              ref.invalidate(recommendedPostsProvider);
-            },
-            child: Text(
-              "Refresh",
-              style: Theme.of(context).textTheme.bodyMedium,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
