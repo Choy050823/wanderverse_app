@@ -178,8 +178,21 @@ class _ItineraryBodyState extends ConsumerState<ItineraryBody> {
                             origLocationDetails['formattedAddress'];
                       }
                       if (origLocationDetails.containsKey('openingHours')) {
-                        cleanLocationDetails['openingHours'] =
+                        final dynamic hours =
                             origLocationDetails['openingHours'];
+                        if (hours is List) {
+                          // It's a list, so cast its elements to String.
+                          try {
+                            cleanLocationDetails['openingHours'] = hours
+                                .cast<String>();
+                          } catch (e) {
+                            // If casting fails, default to an empty list.
+                            cleanLocationDetails['openingHours'] = <String>[];
+                          }
+                        } else {
+                          // If it's not a list, default to an empty list to prevent a crash.
+                          cleanLocationDetails['openingHours'] = <String>[];
+                        }
                       }
                       if (origLocationDetails.containsKey('rating')) {
                         cleanLocationDetails['rating'] =
