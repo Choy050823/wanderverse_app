@@ -74,9 +74,7 @@ class _ItineraryBodyState extends ConsumerState<ItineraryBody> {
 
   Future<void> _sendItineraryRequest() async {
     final request = _textController.text.trim();
-    if (request.isEmpty) {
-      return;
-    }
+    if (request.isEmpty) return;
 
     setState(() {
       _isLoading = true;
@@ -84,7 +82,6 @@ class _ItineraryBodyState extends ConsumerState<ItineraryBody> {
     });
 
     try {
-      // Encode the query parameter properly
       final encodedRequest = Uri.encodeComponent(request);
       final baseUrl = environment['api_url'];
       final url = Uri.parse(
@@ -92,39 +89,180 @@ class _ItineraryBodyState extends ConsumerState<ItineraryBody> {
       );
 
       print('Sending itinerary request to: $url');
-
       final response = await http.get(url, headers: await _headers);
 
       if (response.statusCode == 200) {
-        // Parse the response
-        final jsonData = json.decode(response.body);
-        print(
-          'Received response: ${response.body.substring(0, min(100, response.body.length))}...',
-        );
+        try {
+          // Store response data for debugging
+          final responseBody = response.body;
+          print('Response length: ${responseBody.length}');
 
-        // Convert JSON to TripPlan object
-        final tripPlan = TripPlan.fromJson(jsonData);
-
-        setState(() {
-          _tripPlan = tripPlan;
-          _isLoading = false;
-          // Clear the text field after successful request
-          if (tripPlan.dailyItineraryList.isNotEmpty) {
-            _textController.clear();
+          // Step 1: Safely parse JSON
+          Map<String, dynamic> jsonData;
+          try {
+            jsonData = json.decode(responseBody) as Map<String, dynamic>;
+          } catch (e) {
+            throw Exception('Failed to decode JSON: $e');
           }
-        });
+
+          // Step 2: Safely convert JSON to TripPlan with manual field validation
+          TripPlan? tripPlan;
+          try {
+            // Validate required fields first
+            if (!jsonData.containsKey('planTitle') ||
+                !jsonData.containsKey('tripStartDate') ||
+                !jsonData.containsKey('tripEndDate') ||
+                !jsonData.containsKey('dailyItineraryList')) {
+              throw Exception('Missing required fields in response');
+            }
+
+            // Create dates safely
+            final DateTime startDate = DateTime.parse(
+              jsonData['tripStartDate'].toString(),
+            );
+            final DateTime endDate = DateTime.parse(
+              jsonData['tripEndDate'].toString(),
+            );
+
+            // Process dailyItineraryList with special handling for types
+            final List<dynamic> dailyListJson =
+                jsonData['dailyItineraryList'] as List<dynamic>;
+            final List<DailyItinerary> dailyList = [];
+
+            for (final dayJson in dailyListJson) {
+              // Fix any type issues in the day JSON before parsing
+              final Map<String, dynamic> fixedDayJson =
+                  Map<String, dynamic>.from(dayJson as Map);
+
+              // Ensure warnings is a string (common issue)
+              if (fixedDayJson['warnings'] != null &&
+                  !(fixedDayJson['warnings'] is String)) {
+                fixedDayJson['warnings'] = fixedDayJson['warnings'].toString();
+              }
+
+              // Process activities with special handling for location details
+              if (fixedDayJson.containsKey('activityList')) {
+                final List<dynamic> activityListJson =
+                    fixedDayJson['activityList'] as List<dynamic>;
+                final List<Map<String, dynamic>> fixedActivityList = [];
+
+                for (final activityJson in activityListJson) {
+                  final Map<String, dynamic> fixedActivityJson =
+                      Map<String, dynamic>.from(activityJson as Map);
+
+                  // Handle locationDetails type issues
+                  if (fixedActivityJson.containsKey('locationDetails')) {
+                    final locationDetails =
+                        fixedActivityJson['locationDetails'];
+                    if (locationDetails != null) {
+                      // Create a clean copy without unexpected fields
+                      final Map<String, dynamic> cleanLocationDetails = {};
+                      final Map<String, dynamic> origLocationDetails =
+                          Map<String, dynamic>.from(locationDetails as Map);
+
+                      // Only include fields we expect in our model
+                      if (origLocationDetails.containsKey('placeId')) {
+                        cleanLocationDetails['placeId'] =
+                            origLocationDetails['placeId'];
+                      }
+                      if (origLocationDetails.containsKey('name')) {
+                        cleanLocationDetails['name'] =
+                            origLocationDetails['name'];
+                      }
+                      if (origLocationDetails.containsKey('editorialSummary')) {
+                        cleanLocationDetails['editorialSummary'] =
+                            origLocationDetails['editorialSummary'];
+                      }
+                      if (origLocationDetails.containsKey('formattedAddress')) {
+                        cleanLocationDetails['formattedAddress'] =
+                            origLocationDetails['formattedAddress'];
+                      }
+                      if (origLocationDetails.containsKey('openingHours')) {
+                        cleanLocationDetails['openingHours'] =
+                            origLocationDetails['openingHours'];
+                      }
+                      if (origLocationDetails.containsKey('rating')) {
+                        cleanLocationDetails['rating'] =
+                            origLocationDetails['rating'];
+                      }
+                      if (origLocationDetails.containsKey('website')) {
+                        cleanLocationDetails['website'] =
+                            origLocationDetails['website'];
+                      }
+                      if (origLocationDetails.containsKey('phoneNumber')) {
+                        cleanLocationDetails['phoneNumber'] =
+                            origLocationDetails['phoneNumber'];
+                      }
+                      if (origLocationDetails.containsKey('locationUrl')) {
+                        cleanLocationDetails['locationUrl'] =
+                            origLocationDetails['locationUrl'];
+                      }
+                      if (origLocationDetails.containsKey('locationImageUrl')) {
+                        cleanLocationDetails['locationImageUrl'] =
+                            origLocationDetails['locationImageUrl'];
+                      }
+
+                      fixedActivityJson['locationDetails'] =
+                          cleanLocationDetails;
+                    }
+                  }
+
+                  fixedActivityList.add(fixedActivityJson);
+                }
+
+                fixedDayJson['activityList'] = fixedActivityList;
+              }
+
+              try {
+                dailyList.add(DailyItinerary.fromJson(fixedDayJson));
+              } catch (e) {
+                print('Error parsing daily itinerary: $e');
+                // Skip this day rather than failing everything
+              }
+            }
+
+            // Create the TripPlan with the cleaned data
+            tripPlan = TripPlan(
+              planTitle: jsonData['planTitle']?.toString() ?? 'Itinerary Plan',
+              overview: jsonData['overview']?.toString() ?? '',
+              warnings:
+                  (jsonData['warnings'] as List<dynamic>?)?.cast<String>() ??
+                  [],
+              tripStartDate: startDate,
+              tripEndDate: endDate,
+              dailyItineraryList: dailyList,
+            );
+          } catch (parseError) {
+            print('Error in TripPlan manual parsing: $parseError');
+            rethrow;
+          }
+
+          setState(() {
+            _tripPlan = tripPlan;
+            _isLoading = false;
+            if (tripPlan!.dailyItineraryList.isNotEmpty) {
+              _textController.clear();
+            }
+          });
+        } catch (parseError) {
+          print('Error parsing response: $parseError');
+          setState(() {
+            _errorMessage =
+                'Failed to process the itinerary. Please try again.';
+            _isLoading = false;
+          });
+        }
       } else {
-        print('Error: ${response.statusCode}, ${response.body}');
         setState(() {
           _errorMessage =
-              'Failed to generate itinerary: ${response.statusCode}';
+              'Server error (${response.statusCode}). Please try again.';
           _isLoading = false;
         });
       }
     } catch (e) {
-      print('Exception during API call: $e');
       setState(() {
-        _errorMessage = 'Error: $e';
+        _errorMessage =
+            'Connection error. Please check your internet and try again.';
         _isLoading = false;
       });
     }
