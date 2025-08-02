@@ -2268,6 +2268,8 @@ mixin _$LocationDetails {
   String get name => throw _privateConstructorUsedError;
   String? get editorialSummary => throw _privateConstructorUsedError;
   String? get formattedAddress => throw _privateConstructorUsedError;
+  double? get latitude => throw _privateConstructorUsedError;
+  double? get longitude => throw _privateConstructorUsedError;
   List<String> get openingHours => throw _privateConstructorUsedError;
   double get rating => throw _privateConstructorUsedError;
   String? get website => throw _privateConstructorUsedError;
@@ -2296,6 +2298,8 @@ abstract class $LocationDetailsCopyWith<$Res> {
       String name,
       String? editorialSummary,
       String? formattedAddress,
+      double? latitude,
+      double? longitude,
       List<String> openingHours,
       double rating,
       String? website,
@@ -2323,6 +2327,8 @@ class _$LocationDetailsCopyWithImpl<$Res, $Val extends LocationDetails>
     Object? name = null,
     Object? editorialSummary = freezed,
     Object? formattedAddress = freezed,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
     Object? openingHours = null,
     Object? rating = null,
     Object? website = freezed,
@@ -2347,6 +2353,14 @@ class _$LocationDetailsCopyWithImpl<$Res, $Val extends LocationDetails>
           ? _value.formattedAddress
           : formattedAddress // ignore: cast_nullable_to_non_nullable
               as String?,
+      latitude: freezed == latitude
+          ? _value.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      longitude: freezed == longitude
+          ? _value.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double?,
       openingHours: null == openingHours
           ? _value.openingHours
           : openingHours // ignore: cast_nullable_to_non_nullable
@@ -2388,6 +2402,8 @@ abstract class _$$LocationDetailsImplCopyWith<$Res>
       String name,
       String? editorialSummary,
       String? formattedAddress,
+      double? latitude,
+      double? longitude,
       List<String> openingHours,
       double rating,
       String? website,
@@ -2413,6 +2429,8 @@ class __$$LocationDetailsImplCopyWithImpl<$Res>
     Object? name = null,
     Object? editorialSummary = freezed,
     Object? formattedAddress = freezed,
+    Object? latitude = freezed,
+    Object? longitude = freezed,
     Object? openingHours = null,
     Object? rating = null,
     Object? website = freezed,
@@ -2437,6 +2455,14 @@ class __$$LocationDetailsImplCopyWithImpl<$Res>
           ? _value.formattedAddress
           : formattedAddress // ignore: cast_nullable_to_non_nullable
               as String?,
+      latitude: freezed == latitude
+          ? _value.latitude
+          : latitude // ignore: cast_nullable_to_non_nullable
+              as double?,
+      longitude: freezed == longitude
+          ? _value.longitude
+          : longitude // ignore: cast_nullable_to_non_nullable
+              as double?,
       openingHours: null == openingHours
           ? _value._openingHours
           : openingHours // ignore: cast_nullable_to_non_nullable
@@ -2473,6 +2499,8 @@ class _$LocationDetailsImpl implements _LocationDetails {
       required this.name,
       this.editorialSummary,
       this.formattedAddress,
+      this.latitude,
+      this.longitude,
       final List<String> openingHours = const [],
       this.rating = 0.0,
       this.website,
@@ -2492,6 +2520,10 @@ class _$LocationDetailsImpl implements _LocationDetails {
   final String? editorialSummary;
   @override
   final String? formattedAddress;
+  @override
+  final double? latitude;
+  @override
+  final double? longitude;
   final List<String> _openingHours;
   @override
   @JsonKey()
@@ -2515,7 +2547,7 @@ class _$LocationDetailsImpl implements _LocationDetails {
 
   @override
   String toString() {
-    return 'LocationDetails(placeId: $placeId, name: $name, editorialSummary: $editorialSummary, formattedAddress: $formattedAddress, openingHours: $openingHours, rating: $rating, website: $website, phoneNumber: $phoneNumber, locationUrl: $locationUrl, locationImageUrl: $locationImageUrl)';
+    return 'LocationDetails(placeId: $placeId, name: $name, editorialSummary: $editorialSummary, formattedAddress: $formattedAddress, latitude: $latitude, longitude: $longitude, openingHours: $openingHours, rating: $rating, website: $website, phoneNumber: $phoneNumber, locationUrl: $locationUrl, locationImageUrl: $locationImageUrl)';
   }
 
   @override
@@ -2529,6 +2561,10 @@ class _$LocationDetailsImpl implements _LocationDetails {
                 other.editorialSummary == editorialSummary) &&
             (identical(other.formattedAddress, formattedAddress) ||
                 other.formattedAddress == formattedAddress) &&
+            (identical(other.latitude, latitude) ||
+                other.latitude == latitude) &&
+            (identical(other.longitude, longitude) ||
+                other.longitude == longitude) &&
             const DeepCollectionEquality()
                 .equals(other._openingHours, _openingHours) &&
             (identical(other.rating, rating) || other.rating == rating) &&
@@ -2549,6 +2585,8 @@ class _$LocationDetailsImpl implements _LocationDetails {
       name,
       editorialSummary,
       formattedAddress,
+      latitude,
+      longitude,
       const DeepCollectionEquality().hash(_openingHours),
       rating,
       website,
@@ -2579,6 +2617,8 @@ abstract class _LocationDetails implements LocationDetails {
       required final String name,
       final String? editorialSummary,
       final String? formattedAddress,
+      final double? latitude,
+      final double? longitude,
       final List<String> openingHours,
       final double rating,
       final String? website,
@@ -2597,6 +2637,10 @@ abstract class _LocationDetails implements LocationDetails {
   String? get editorialSummary;
   @override
   String? get formattedAddress;
+  @override
+  double? get latitude;
+  @override
+  double? get longitude;
   @override
   List<String> get openingHours;
   @override

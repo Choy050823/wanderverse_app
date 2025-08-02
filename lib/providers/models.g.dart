@@ -206,6 +206,8 @@ _$LocationDetailsImpl _$$LocationDetailsImplFromJson(
       name: json['name'] as String,
       editorialSummary: json['editorialSummary'] as String?,
       formattedAddress: json['formattedAddress'] as String?,
+      latitude: (json['latitude'] as num?)?.toDouble(),
+      longitude: (json['longitude'] as num?)?.toDouble(),
       openingHours: (json['openingHours'] as List<dynamic>?)
               ?.map((e) => e as String)
               .toList() ??
@@ -224,6 +226,8 @@ Map<String, dynamic> _$$LocationDetailsImplToJson(
       'name': instance.name,
       'editorialSummary': instance.editorialSummary,
       'formattedAddress': instance.formattedAddress,
+      'latitude': instance.latitude,
+      'longitude': instance.longitude,
       'openingHours': instance.openingHours,
       'rating': instance.rating,
       'website': instance.website,

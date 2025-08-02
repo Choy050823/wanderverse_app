@@ -152,6 +152,8 @@ class LocationDetails with _$LocationDetails {
     required String name,
     String? editorialSummary,
     String? formattedAddress,
+    double? latitude,
+    double? longitude,
     @Default([]) List<String> openingHours,
     @Default(0.0) double rating,
     String? website,
