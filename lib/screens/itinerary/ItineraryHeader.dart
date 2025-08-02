@@ -27,13 +27,10 @@ class ItineraryHeader extends StatelessWidget {
       runSpacing: 12, // Vertical space between lines
       spacing: 12, // Horizontal space between items
       children: [
-        Flexible(
-          // Allow title to shrink a bit if needed
-          child: Text(
-            title,
-            style: textTheme.displaySmall,
-            overflow: TextOverflow.ellipsis,
-          ),
+        Text(
+          title,
+          style: textTheme.displaySmall,
+          overflow: TextOverflow.ellipsis,
         ),
         Container(
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
