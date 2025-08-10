@@ -1,4 +1,5 @@
-### Wanderverse Frontend
+# Wanderverse Backend
+---
 
 The Wanderverse frontend is built with **Flutter**, a cross-platform framework that provides a consistent and visually appealing user interface across web, iOS, and Android. The UI is designed to be responsive and user-friendly, offering a seamless experience for both the social-sharing and gaming aspects of the app.
 
