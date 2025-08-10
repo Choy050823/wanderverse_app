@@ -119,29 +119,29 @@ class _UserProfileScreenState extends ConsumerState<UserProfileScreen>
                                     overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
-                                const SizedBox(width: 8),
-                                OutlinedButton(
-                                  onPressed: () {
-                                    // Navigate to edit profile
-                                  },
-                                  style: OutlinedButton.styleFrom(
-                                    foregroundColor: colorScheme.primary,
-                                    backgroundColor: colorScheme.secondary,
-                                    side: BorderSide(
-                                        color: colorScheme.primary, width: 1.5),
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16, vertical: 12),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    "Edit Profile",
-                                    style: textTheme.labelLarge?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ),
+                                // const SizedBox(width: 8),
+                                // OutlinedButton(
+                                //   onPressed: () {
+                                //     // Navigate to edit profile
+                                //   },
+                                //   style: OutlinedButton.styleFrom(
+                                //     foregroundColor: colorScheme.primary,
+                                //     backgroundColor: colorScheme.secondary,
+                                //     side: BorderSide(
+                                //         color: colorScheme.primary, width: 1.5),
+                                //     padding: const EdgeInsets.symmetric(
+                                //         horizontal: 16, vertical: 12),
+                                //     shape: RoundedRectangleBorder(
+                                //       borderRadius: BorderRadius.circular(8.0),
+                                //     ),
+                                //   ),
+                                //   child: Text(
+                                //     "Edit Profile",
+                                //     style: textTheme.labelLarge?.copyWith(
+                                //       fontWeight: FontWeight.w600,
+                                //     ),
+                                //   ),
+                                // ),
                               ],
                             ),
                             const SizedBox(height: 12),

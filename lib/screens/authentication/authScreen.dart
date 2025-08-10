@@ -311,47 +311,47 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
                 child: const Text('Log In', style: TextStyle(fontSize: 16)),
               ),
             ),
-            const SizedBox(height: 24),
+            // const SizedBox(height: 24),
 
             // Divider
-            Row(
-              children: [
-                Expanded(
-                  child: Divider(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withOpacity(0.3),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    'Or sign in with',
-                    style: TextStyle(
-                      color: Theme.of(
-                        context,
-                      ).colorScheme.onSurface.withOpacity(0.3),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Divider(
-                    color: Theme.of(
-                      context,
-                    ).colorScheme.onSurface.withOpacity(0.3),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: Divider(
+            //         color: Theme.of(
+            //           context,
+            //         ).colorScheme.onSurface.withOpacity(0.3),
+            //       ),
+            //     ),
+            //     Padding(
+            //       padding: const EdgeInsets.symmetric(horizontal: 16),
+            //       child: Text(
+            //         'Or sign in with',
+            //         style: TextStyle(
+            //           color: Theme.of(
+            //             context,
+            //           ).colorScheme.onSurface.withOpacity(0.3),
+            //         ),
+            //       ),
+            //     ),
+            //     Expanded(
+            //       child: Divider(
+            //         color: Theme.of(
+            //           context,
+            //         ).colorScheme.onSurface.withOpacity(0.3),
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            // const SizedBox(height: 24),
 
-            // Social buttons
-            buildSocialIcon(
-              onPressed: () {},
-              iconUrl:
-                  "https://cdn.iconscout.com/icon/free/png-256/free-google-logo-icon-download-in-svg-png-gif-file-formats--brands-pack-logos-icons-189824.png?f=webp&w=256",
-              label: 'Google',
-            ),
+            // // Social buttons
+            // buildSocialIcon(
+            //   onPressed: () {},
+            //   iconUrl:
+            //       "https://cdn.iconscout.com/icon/free/png-256/free-google-logo-icon-download-in-svg-png-gif-file-formats--brands-pack-logos-icons-189824.png?f=webp&w=256",
+            //   label: 'Google',
+            // ),
           ],
         ),
       ),
@@ -477,38 +477,38 @@ class _AuthScreenState extends ConsumerState<AuthScreen> {
             const SizedBox(height: 24),
 
             // Divider
-            Row(
-              children: [
-                Expanded(
-                  child: Divider(
-                    color: theme.colorScheme.onSurface.withOpacity(0.3),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: Text(
-                    'Or sign in with',
-                    style: TextStyle(
-                      color: theme.colorScheme.onSurface.withOpacity(0.3),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: Divider(
-                    color: theme.colorScheme.onSurface.withOpacity(0.3),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: Divider(
+            //         color: theme.colorScheme.onSurface.withOpacity(0.3),
+            //       ),
+            //     ),
+            //     Padding(
+            //       padding: const EdgeInsets.symmetric(horizontal: 16),
+            //       child: Text(
+            //         'Or sign in with',
+            //         style: TextStyle(
+            //           color: theme.colorScheme.onSurface.withOpacity(0.3),
+            //         ),
+            //       ),
+            //     ),
+            //     Expanded(
+            //       child: Divider(
+            //         color: theme.colorScheme.onSurface.withOpacity(0.3),
+            //       ),
+            //     ),
+            //   ],
+            // ),
+            // const SizedBox(height: 24),
 
-            // Social buttons
-            buildSocialIcon(
-              onPressed: () {},
-              iconUrl:
-                  "https://cdn.iconscout.com/icon/free/png-256/free-google-logo-icon-download-in-svg-png-gif-file-formats--brands-pack-logos-icons-189824.png?f=webp&w=256",
-              label: 'Google',
-            ),
+            // // Social buttons
+            // buildSocialIcon(
+            //   onPressed: () {},
+            //   iconUrl:
+            //       "https://cdn.iconscout.com/icon/free/png-256/free-google-logo-icon-download-in-svg-png-gif-file-formats--brands-pack-logos-icons-189824.png?f=webp&w=256",
+            //   label: 'Google',
+            // ),
           ],
         ),
       ),
